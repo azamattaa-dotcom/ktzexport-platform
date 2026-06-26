@@ -1,0 +1,119 @@
+{
+  "nav": {
+    "products": "Ürünler",
+    "suppliers": "Tedarikçiler",
+    "forBuyers": "Alıcılar İçin",
+    "forSellers": "Tedarikçiler İçin",
+    "contact": "İletişim",
+    "registerSupplier": "Tedarikçi Ol",
+    "adminPanel": "Yönetici Paneli"
+  },
+  "hero": {
+    "badge": "Kazakistan Tarım İhracatı",
+    "title": "Kazakistan Tarım Ürünleri Küresel Pazarlar İçin",
+    "subtitle": "Çin, Orta Asya ve Avrupa'ya tahıl, un ve yağlı tohum doğrudan tedariki. Lojistik fiyata dahildir.",
+    "ctaBuyer": "Ürün Bul",
+    "ctaSupplier": "Tedarikçi Ol",
+    "stat1": "İhraç Edilen Ton",
+    "stat2": "Ortak Ülke",
+    "stat3": "Tedarikçi"
+  },
+  "products": {
+    "title": "Ürünlerimiz",
+    "subtitle": "Kalite sertifikalı geniş Kazakistan tarım ürünleri yelpazesi",
+    "items": {
+      "flour_feed": "Yem Unu",
+      "flour_wheat": "Buğday Unu",
+      "wheat": "Buğday",
+      "barley": "Arpa",
+      "bran": "Buğday Kepeği",
+      "flaxseed": "Keten Tohumu",
+      "sunflower": "Ayçiçeği Tohumu",
+      "corn": "Mısır"
+    },
+    "viewAll": "Tümünü Görüntüle"
+  },
+  "howItWorks": {
+    "title": "Nasıl Çalışır",
+    "subtitle": "Talepten teslimata basit süreç",
+    "step1Title": "Ürün Seçin",
+    "step1Desc": "Katalogda ihtiyacınız olan ürünü bulun ve farklı tedarikçilerin tekliflerini karşılaştırın",
+    "step2Title": "Talep ve Müzakere",
+    "step2Desc": "Platform içi sohbet üzerinden tedarikçiyle iletişime geçin ve şartları belirleyin",
+    "step3Title": "Online Sözleşme İmzalama",
+    "step3Desc": "E-imza ile yasal bağlayıcı sözleşmeyi doğrudan platformda imzalayın",
+    "step4Title": "Anahtar Teslim Teslimat",
+    "step4Desc": "Lojistik fiyata dahildir. Konteyner trenlerle teslimatı organize ediyoruz"
+  },
+  "whyUs": {
+    "title": "Neden KTZ Export",
+    "reason1Title": "Kendi Lojistiği",
+    "reason1Desc": "Kazakistan → Çin ve Orta Asya konteyner trenleri. Lojistik maliyeti fiyata dahil.",
+    "reason2Title": "Doğrulanmış Tedarikçiler",
+    "reason2Desc": "Tüm tedarikçiler doğrulama sürecinden geçer. Yalnızca güvenilir ortaklar.",
+    "reason3Title": "Hukuki Koruma",
+    "reason3Desc": "Platformda e-imzalı sözleşmeler. Tüm işlemler belgelidir.",
+    "reason4Title": "5 Dil Arayüzü",
+    "reason4Desc": "Rusça, Kazakça, İngilizce, Çince, Türkçe — tüm ortakların rahatlığı için."
+  },
+  "supplier": {
+    "registerTitle": "Tedarikçi Kaydı",
+    "registerSubtitle": "Formu doldurun — inceleyip sizinle iletişime geçeceğiz",
+    "companyName": "Şirket Adı",
+    "country": "Ülke",
+    "contactName": "İrtibat Kişisi",
+    "email": "E-posta",
+    "phone": "Telefon",
+    "products": "Ürünler (uygun olanları seçin)",
+    "annualVolume": "Yıllık İhracat Hacmi",
+    "description": "Şirket Hakkında",
+    "submit": "Başvuru Gönder",
+    "submitting": "Gönderiliyor...",
+    "successTitle": "Başvuru Gönderildi!",
+    "successDesc": "Başvurunuzu inceleyip 2 iş günü içinde e-posta ile sizinle iletişime geçeceğiz.",
+    "errorTitle": "Gönderme Hatası",
+    "requiredField": "Zorunlu alan",
+    "invalidEmail": "Geçersiz e-posta formatı",
+    "volumes": {
+      "lt1000": "1.000 ton/yıla kadar",
+      "1000_5000": "1.000 – 5.000 ton/yıl",
+      "5000_20000": "5.000 – 20.000 ton/yıl",
+      "gt20000": "20.000 ton/yıldan fazla"
+    }
+  },
+  "admin": {
+    "loginTitle": "Yönetici Paneli Girişi",
+    "email": "E-posta",
+    "password": "Şifre",
+    "loginBtn": "Giriş",
+    "loggingIn": "Giriş yapılıyor...",
+    "invalidCredentials": "Geçersiz e-posta veya şifre",
+    "dashboardTitle": "Kontrol Paneli",
+    "suppliersTitle": "Tedarikçi Başvuruları",
+    "pending": "Beklemede",
+    "approved": "Onaylı",
+    "rejected": "Reddedildi",
+    "approve": "Onayla",
+    "reject": "Reddet",
+    "viewDetails": "Detaylar",
+    "noApplications": "Başvuru yok",
+    "submittedAt": "Başvuru Tarihi",
+    "logout": "Çıkış",
+    "status": {
+      "pending": "İncelemede",
+      "approved": "Onaylandı",
+      "rejected": "Reddedildi"
+    }
+  },
+  "footer": {
+    "description": "Kazakistan tarım ürünlerini küresel pazarlara ihraç eden platform.",
+    "products": "Ürünler",
+    "company": "Şirket",
+    "about": "Hakkımızda",
+    "contact": "İletişim",
+    "forSuppliers": "Tedarikçiler İçin",
+    "rights": "Tüm hakları saklıdır",
+    "email": "info@ktzexport.com",
+    "phone": "+7 (702) 661-34-44"
+  }
+}

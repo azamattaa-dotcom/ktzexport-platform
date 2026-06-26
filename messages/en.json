@@ -1,0 +1,119 @@
+{
+  "nav": {
+    "products": "Products",
+    "suppliers": "Suppliers",
+    "forBuyers": "For Buyers",
+    "forSellers": "For Suppliers",
+    "contact": "Contact",
+    "registerSupplier": "Become a Supplier",
+    "adminPanel": "Admin Panel"
+  },
+  "hero": {
+    "badge": "Kazakh Agricultural Export",
+    "title": "Kazakh Agricultural Products for Global Markets",
+    "subtitle": "Direct supply of grain, flour and oilseeds to China, Central Asia and Europe. Logistics included in price.",
+    "ctaBuyer": "Find Products",
+    "ctaSupplier": "Become a Supplier",
+    "stat1": "Tonnes Exported",
+    "stat2": "Partner Countries",
+    "stat3": "Suppliers"
+  },
+  "products": {
+    "title": "Our Products",
+    "subtitle": "Wide range of Kazakh agricultural products with quality certificates",
+    "items": {
+      "flour_feed": "Feed Flour",
+      "flour_wheat": "Wheat Flour",
+      "wheat": "Wheat",
+      "barley": "Barley",
+      "bran": "Wheat Bran",
+      "flaxseed": "Flaxseed",
+      "sunflower": "Sunflower Seeds",
+      "corn": "Corn"
+    },
+    "viewAll": "View All"
+  },
+  "howItWorks": {
+    "title": "How It Works",
+    "subtitle": "Simple process from request to delivery",
+    "step1Title": "Choose Products",
+    "step1Desc": "Find the product you need in the catalog and compare offers from different suppliers",
+    "step2Title": "Request & Negotiate",
+    "step2Desc": "Contact the supplier through the platform's internal chat and agree on terms",
+    "step3Title": "Sign Contract Online",
+    "step3Desc": "Sign a legally binding contract with electronic signature — no paper, no couriers",
+    "step4Title": "End-to-End Delivery",
+    "step4Desc": "Logistics is already included in the price. We organize delivery by container trains"
+  },
+  "whyUs": {
+    "title": "Why KTZ Export",
+    "reason1Title": "Own Logistics",
+    "reason1Desc": "Container trains Kazakhstan → China and Central Asia. Logistics cost included in the rate.",
+    "reason2Title": "Verified Suppliers",
+    "reason2Desc": "All suppliers go through verification. Only reliable partners.",
+    "reason3Title": "Legal Protection",
+    "reason3Desc": "Contracts with e-signatures on the platform. All deals documented.",
+    "reason4Title": "5 Languages",
+    "reason4Desc": "Russian, Kazakh, English, Chinese, Turkish — for the convenience of all partners."
+  },
+  "supplier": {
+    "registerTitle": "Supplier Registration",
+    "registerSubtitle": "Fill in the form — we will review and contact you",
+    "companyName": "Company Name",
+    "country": "Country",
+    "contactName": "Contact Person",
+    "email": "Email",
+    "phone": "Phone",
+    "products": "Products (select all applicable)",
+    "annualVolume": "Annual Export Volume",
+    "description": "Company Description",
+    "submit": "Submit Application",
+    "submitting": "Submitting...",
+    "successTitle": "Application Submitted!",
+    "successDesc": "We will review your application and contact you by email within 2 business days.",
+    "errorTitle": "Submission Error",
+    "requiredField": "Required field",
+    "invalidEmail": "Invalid email format",
+    "volumes": {
+      "lt1000": "Up to 1,000 tonnes/year",
+      "1000_5000": "1,000 – 5,000 tonnes/year",
+      "5000_20000": "5,000 – 20,000 tonnes/year",
+      "gt20000": "More than 20,000 tonnes/year"
+    }
+  },
+  "admin": {
+    "loginTitle": "Admin Panel Login",
+    "email": "Email",
+    "password": "Password",
+    "loginBtn": "Sign In",
+    "loggingIn": "Signing in...",
+    "invalidCredentials": "Invalid email or password",
+    "dashboardTitle": "Dashboard",
+    "suppliersTitle": "Supplier Applications",
+    "pending": "Pending",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "approve": "Approve",
+    "reject": "Reject",
+    "viewDetails": "Details",
+    "noApplications": "No applications",
+    "submittedAt": "Submitted",
+    "logout": "Logout",
+    "status": {
+      "pending": "Pending Review",
+      "approved": "Approved",
+      "rejected": "Rejected"
+    }
+  },
+  "footer": {
+    "description": "Kazakhstan's platform for exporting agricultural products to global markets.",
+    "products": "Products",
+    "company": "Company",
+    "about": "About Us",
+    "contact": "Contact",
+    "forSuppliers": "For Suppliers",
+    "rights": "All rights reserved",
+    "email": "info@ktzexport.com",
+    "phone": "+7 (702) 661-34-44"
+  }
+}

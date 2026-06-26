@@ -1,0 +1,19 @@
+# Dependencies
+node_modules/
+
+# Next.js
+.next/
+out/
+
+# Environment variables
+.env.local
+.env.*.local
+
+# Data (local only)
+data/suppliers.json
+
+# OS
+.DS_Store
+
+# Vercel
+.vercel
