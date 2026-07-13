@@ -1,5 +1,5 @@
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? 'azamattaa@gmail.com';
+const NOTIFICATION_EMAIL = process.env.NOTIFICATION_EMAIL ?? process.env.ADMIN_EMAIL ?? 'azamattaa@gmail.com';
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://ktzexport-platform.vercel.app';
 
 async function send(to: string, subject: string, text: string) {
@@ -8,11 +8,17 @@ async function send(to: string, subject: string, text: string) {
     return;
   }
   try {
-    await fetch('https://api.resend.com/emails', {
+    const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({ from: 'KTZ Export <onboarding@resend.dev>', to: [to], subject, text }),
     });
+    if (!res.ok) {
+      const err = await res.text();
+      console.error('[email] Resend error:', res.status, err);
+    } else {
+      console.log('[email] Sent to', to);
+    }
   } catch (e) {
     console.error('[email] Failed to send:', e);
   }
@@ -34,7 +40,7 @@ Email: ${supplier.email}
 
 Одобрить или отклонить: ${SITE_URL}/ru/admin`;
 
-  await send(ADMIN_EMAIL, `Новая заявка: ${supplier.companyName}`, body);
+  await send(NOTIFICATION_EMAIL, `Новая заявка: ${supplier.companyName}`, body);
 }
 
 export async function sendSupplierInvite(supplier: {
