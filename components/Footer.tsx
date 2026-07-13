@@ -1,8 +1,10 @@
 import { useTranslations, useLocale } from 'next-intl';
 import Link from 'next/link';
+import { PRODUCT_LIST } from '@/lib/products';
 
 export default function Footer() {
   const t = useTranslations('footer');
+  const tp = useTranslations('products');
   const locale = useLocale();
 
   return (
@@ -24,14 +26,14 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Products */}
+          {/* Products — using translations for correct language */}
           <div>
             <h3 className="font-semibold mb-4 text-primary-100">{t('products')}</h3>
             <ul className="space-y-2 text-sm text-primary-300">
-              {['flour_feed','flour_wheat','wheat','barley','bran','flaxseed','sunflower','corn'].map((p) => (
-                <li key={p}>
-                  <Link href={`/${locale}#products`} className="hover:text-white transition-colors">
-                    {p.replace('_', ' ')}
+              {PRODUCT_LIST.map((p) => (
+                <li key={p.id}>
+                  <Link href={`/${locale}/products/${p.id}`} className="hover:text-white transition-colors">
+                    {tp(`items.${p.id}`)}
                   </Link>
                 </li>
               ))}

@@ -43,12 +43,12 @@
     "step3Title": "在线签署合同",
     "step3Desc": "使用电子签名在平台上签署具有法律效力的合同",
     "step4Title": "一站式交货",
-    "step4Desc": "物流费用已包含在报价中，我们负责集装箱列车运输"
+    "step4Desc": "物流按需安排，具体费用视目的站而定，详细交货条款在下单时协商确定。"
   },
   "whyUs": {
     "title": "为什么选择KTZ Export",
     "reason1Title": "自有物流",
-    "reason1Desc": "哈萨克斯坦→中国及中亚的集装箱列车，物流费用含在报价中。",
+    "reason1Desc": "哈萨克斯坦→中国及中亚集装箱列车。物流费用及条款视目的站按需协商确定。",
     "reason2Title": "认证供应商",
     "reason2Desc": "所有供应商均经过资质审核，只与可靠合作伙伴合作。",
     "reason3Title": "法律保障",
@@ -66,6 +66,10 @@
     "phone": "电话",
     "products": "产品（可多选）",
     "annualVolume": "年出口量",
+    "elevatorName": "粮仓/仓库名称",
+    "letterhead": "公司信笺",
+    "letterheadHint": "PDF或JPEG/PNG，最大2MB",
+    "letterheadError": "文件过大（最大2MB）",
     "description": "公司简介",
     "submit": "提交申请",
     "submitting": "提交中...",
@@ -80,6 +84,14 @@
       "5000_20000": "5,000 – 20,000吨/年",
       "gt20000": "超过20,000吨/年"
     }
+  },
+  "catalog": {
+    "backToProducts": "返回产品列表",
+    "suppliersCount": "{count}家供应商",
+    "noSuppliers": "该类别暂无认证供应商",
+    "priceOnRequest": "价格面议",
+    "downloadLetterhead": "公司信笺",
+    "volume": "年产量"
   },
   "admin": {
     "loginTitle": "管理员登录",

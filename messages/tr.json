@@ -43,12 +43,12 @@
     "step3Title": "Online Sözleşme İmzalama",
     "step3Desc": "E-imza ile yasal bağlayıcı sözleşmeyi doğrudan platformda imzalayın",
     "step4Title": "Anahtar Teslim Teslimat",
-    "step4Desc": "Lojistik fiyata dahildir. Konteyner trenlerle teslimatı organize ediyoruz"
+    "step4Desc": "Lojistik talep üzerine düzenlenir ve varış istasyonuna göre değişir. Teslimat koşulları sipariş verilirken kararlaştırılır."
   },
   "whyUs": {
     "title": "Neden KTZ Export",
     "reason1Title": "Kendi Lojistiği",
-    "reason1Desc": "Kazakistan → Çin ve Orta Asya konteyner trenleri. Lojistik maliyeti fiyata dahil.",
+    "reason1Desc": "Kazakistan → Çin ve Orta Asya konteyner trenleri. Lojistik koşulları ve maliyeti varış istasyonuna göre talep üzerine belirlenir.",
     "reason2Title": "Doğrulanmış Tedarikçiler",
     "reason2Desc": "Tüm tedarikçiler doğrulama sürecinden geçer. Yalnızca güvenilir ortaklar.",
     "reason3Title": "Hukuki Koruma",
@@ -66,6 +66,10 @@
     "phone": "Telefon",
     "products": "Ürünler (uygun olanları seçin)",
     "annualVolume": "Yıllık İhracat Hacmi",
+    "elevatorName": "Asansör / Depo Adı",
+    "letterhead": "Şirket Antetli Kağıdı",
+    "letterheadHint": "PDF veya JPEG/PNG, maks. 2 MB",
+    "letterheadError": "Dosya çok büyük (maks. 2 MB)",
     "description": "Şirket Hakkında",
     "submit": "Başvuru Gönder",
     "submitting": "Gönderiliyor...",
@@ -80,6 +84,14 @@
       "5000_20000": "5.000 – 20.000 ton/yıl",
       "gt20000": "20.000 ton/yıldan fazla"
     }
+  },
+  "catalog": {
+    "backToProducts": "Ürünlere Dön",
+    "suppliersCount": "{count} tedarikçi",
+    "noSuppliers": "Bu kategoride henüz onaylı tedarikçi bulunmuyor",
+    "priceOnRequest": "Fiyat bilgi alınacak",
+    "downloadLetterhead": "Antetli Kağıt",
+    "volume": "Hacim"
   },
   "admin": {
     "loginTitle": "Yönetici Paneli Girişi",

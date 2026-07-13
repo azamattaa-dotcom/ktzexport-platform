@@ -43,12 +43,12 @@
     "step3Title": "Sign Contract Online",
     "step3Desc": "Sign a legally binding contract with electronic signature — no paper, no couriers",
     "step4Title": "End-to-End Delivery",
-    "step4Desc": "Logistics is already included in the price. We organize delivery by container trains"
+    "step4Desc": "Logistics is arranged on request and depends on the destination station. Delivery terms are agreed upon when placing the order."
   },
   "whyUs": {
     "title": "Why KTZ Export",
     "reason1Title": "Own Logistics",
-    "reason1Desc": "Container trains Kazakhstan → China and Central Asia. Logistics cost included in the rate.",
+    "reason1Desc": "Container trains Kazakhstan → China and Central Asia. Logistics cost and terms are agreed on request depending on the destination station.",
     "reason2Title": "Verified Suppliers",
     "reason2Desc": "All suppliers go through verification. Only reliable partners.",
     "reason3Title": "Legal Protection",
@@ -66,6 +66,10 @@
     "phone": "Phone",
     "products": "Products (select all applicable)",
     "annualVolume": "Annual Export Volume",
+    "elevatorName": "Elevator / Warehouse Name",
+    "letterhead": "Company Letterhead",
+    "letterheadHint": "PDF or JPEG/PNG, up to 2 MB",
+    "letterheadError": "File too large (max 2 MB)",
     "description": "Company Description",
     "submit": "Submit Application",
     "submitting": "Submitting...",
@@ -80,6 +84,14 @@
       "5000_20000": "5,000 – 20,000 tonnes/year",
       "gt20000": "More than 20,000 tonnes/year"
     }
+  },
+  "catalog": {
+    "backToProducts": "Back to Products",
+    "suppliersCount": "{count} supplier{count, plural, one {} other {s}}",
+    "noSuppliers": "No verified suppliers in this category yet",
+    "priceOnRequest": "Price on request",
+    "downloadLetterhead": "Letterhead",
+    "volume": "Volume"
   },
   "admin": {
     "loginTitle": "Admin Panel Login",

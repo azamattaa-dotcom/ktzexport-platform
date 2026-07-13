@@ -1,22 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { notifyAdminNewSupplier } from '@/lib/email';
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { companyName, country, contactName, email, phone, products, annualVolume, description } = body;
+    const {
+      companyName, country, contactName, email, phone,
+      products, annualVolume, elevatorName, description,
+      letterheadBase64, letterheadFileName,
+    } = body;
 
-    // Validation
     if (!companyName || !country || !contactName || !email || !phone || !products?.length || !annualVolume) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return NextResponse.json({ error: 'Invalid email format' }, { status: 400 });
     }
 
-    // Check for duplicate email
     const existing = await db.suppliers.findByEmail(email);
     if (existing) {
       return NextResponse.json({ error: 'A supplier with this email already exists' }, { status: 409 });
@@ -30,7 +32,20 @@ export async function POST(req: NextRequest) {
       phone: phone.trim(),
       products,
       annualVolume,
-      description: description?.trim() || '',
+      elevatorName: elevatorName?.trim() ?? '',
+      description: description?.trim() ?? '',
+      letterheadBase64: letterheadBase64 ?? undefined,
+      letterheadFileName: letterheadFileName ?? undefined,
+    });
+
+    await notifyAdminNewSupplier({
+      companyName: supplier.companyName,
+      country: supplier.country,
+      contactName: supplier.contactName,
+      email: supplier.email,
+      phone: supplier.phone,
+      products: supplier.products,
+      elevatorName: supplier.elevatorName,
     });
 
     return NextResponse.json({ success: true, id: supplier.id }, { status: 201 });
