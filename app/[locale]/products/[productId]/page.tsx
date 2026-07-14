@@ -5,8 +5,7 @@ import { notFound } from 'next/navigation';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
-
-const PRICE_LABELS: Record<string, string> = { USD: '$', KZT: '₸' };
+import SupplierCard from '@/components/SupplierCard';
 
 export default async function ProductPage({
   params,
@@ -53,67 +52,14 @@ export default async function ProductPage({
           </div>
         ) : (
           <div className="space-y-4">
-            {suppliers.map((supplier) => {
-              const price = supplier.productPrices?.[productId];
-              return (
-                <div key={supplier.id} className="bg-white border border-gray-100 rounded-2xl shadow-sm p-6">
-                  <div className="flex flex-col sm:flex-row justify-between gap-4">
-                    <div className="flex-1">
-                      {/* Company header */}
-                      <div className="flex items-center gap-3 mb-3">
-                        <div className="w-10 h-10 rounded-xl bg-primary-100 flex items-center justify-center text-primary-700 font-bold text-sm">
-                          {supplier.companyName.charAt(0).toUpperCase()}
-                        </div>
-                        <div>
-                          <h2 className="font-bold text-gray-900">{supplier.companyName}</h2>
-                          <p className="text-xs text-gray-400">{supplier.country}{supplier.elevatorName ? ` · ${supplier.elevatorName}` : ''}</p>
-                        </div>
-                      </div>
-
-                      {/* Products tags */}
-                      <div className="flex flex-wrap gap-2 mb-3">
-                        {supplier.products.map((pid) => {
-                          const p = PRODUCT_LIST.find((x) => x.id === pid);
-                          return (
-                            <span key={pid} className={`text-xs px-2 py-0.5 rounded-full bg-gradient-to-r ${p?.from ?? 'from-gray-100'} ${p?.to ?? 'to-gray-100'} ${p?.text ?? 'text-gray-700'} border ${p?.border ?? 'border-gray-200'}`}>
-                              {p?.emoji} {t(`items.${pid}`)}
-                            </span>
-                          );
-                        })}
-                      </div>
-
-                      {/* Volume */}
-                      <p className="text-xs text-gray-500">{tc('volume')}: {supplier.annualVolume}</p>
-                    </div>
-
-                    {/* Price + letterhead */}
-                    <div className="flex flex-col items-end justify-between gap-3 shrink-0">
-                      <div className="text-right">
-                        {price ? (
-                          <div className="text-primary-700 font-bold text-lg">
-                            {price.type === 'fixed'
-                              ? `${PRICE_LABELS[price.currency] ?? ''}${price.fixed?.toLocaleString()} / ${price.unit}`
-                              : `${PRICE_LABELS[price.currency] ?? ''}${price.min?.toLocaleString()} – ${price.max?.toLocaleString()} / ${price.unit}`}
-                          </div>
-                        ) : (
-                          <div className="text-gray-400 text-sm italic">{tc('priceOnRequest')}</div>
-                        )}
-                      </div>
-
-                      {supplier.letterheadBase64 && (
-                        <a
-                          href={supplier.letterheadBase64}
-                          download={supplier.letterheadFileName ?? 'letterhead'}
-                          className="text-xs text-primary-600 hover:text-primary-800 border border-primary-200 hover:border-primary-400 px-3 py-1.5 rounded-lg transition-colors"
-                        >
-                          📄 {tc('downloadLetterhead')}
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+            {suppliers.map((supplier) => (
+              <SupplierCard
+                key={supplier.id}
+                supplier={supplier}
+                productId={productId}
+                locale={locale}
+              />
+            ))}
           </div>
         )}
       </main>

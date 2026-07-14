@@ -32,6 +32,9 @@ export default function Header() {
             <Link href={`/${locale}/suppliers/register`} className="text-gray-600 hover:text-primary-700 text-sm font-medium transition-colors">
               {t('forSellers')}
             </Link>
+            <Link href={`/${locale}/supplier/dashboard`} className="text-gray-600 hover:text-primary-700 text-sm font-medium transition-colors">
+              {t('cabinet')}
+            </Link>
           </nav>
 
           {/* Right: lang + CTA */}
@@ -64,6 +67,7 @@ export default function Header() {
             <Link href={`/${locale}#products`} className="block text-gray-700 font-medium py-1">{t('products')}</Link>
             <Link href={`/${locale}#how-it-works`} className="block text-gray-700 font-medium py-1">{t('forBuyers')}</Link>
             <Link href={`/${locale}/suppliers/register`} className="block text-gray-700 font-medium py-1">{t('forSellers')}</Link>
+            <Link href={`/${locale}/supplier/dashboard`} className="block text-gray-700 font-medium py-1">{t('cabinet')}</Link>
             <div className="pt-2">
               <LanguageSwitcher />
             </div>

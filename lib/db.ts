@@ -10,6 +10,15 @@ export interface ProductPrice {
   unit: string;
 }
 
+export interface ProductDetail {
+  price?: ProductPrice;
+  availableVolume?: string;
+  minOrder?: string;
+  characteristics?: string;
+  certificateBase64?: string;
+  certificateFileName?: string;
+}
+
 export interface Supplier {
   id: string;
   companyName: string;
@@ -24,6 +33,7 @@ export interface Supplier {
   letterheadBase64?: string;
   letterheadFileName?: string;
   productPrices?: Record<string, ProductPrice>;
+  productDetails?: Record<string, ProductDetail>;
   status: 'pending' | 'approved' | 'rejected';
   inviteToken?: string;
   passwordHash?: string;
@@ -81,6 +91,16 @@ export const db = {
       suppliers[idx].status = status;
       suppliers[idx].updatedAt = new Date().toISOString();
       if (inviteToken) suppliers[idx].inviteToken = inviteToken;
+      await writeSuppliers(suppliers);
+      return suppliers[idx];
+    },
+
+    async updateProductDetails(id: string, productDetails: Record<string, ProductDetail>): Promise<Supplier | null> {
+      const suppliers = await readSuppliers();
+      const idx = suppliers.findIndex((s) => s.id === id);
+      if (idx === -1) return null;
+      suppliers[idx].productDetails = productDetails;
+      suppliers[idx].updatedAt = new Date().toISOString();
       await writeSuppliers(suppliers);
       return suppliers[idx];
     },
