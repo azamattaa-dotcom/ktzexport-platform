@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { Supplier, ProductDetail, ProductPrice } from '@/lib/db';
+import type { Supplier, ProductDetail, ProductPrice } from '@/lib/db';
 
 const PRODUCT_LABELS: Record<string, string> = {
   flour_feed: 'Кормовая мука', flour_wheat: 'Пшеничная мука', wheat: 'Пшеница',

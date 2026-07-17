@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { Supplier } from '@/lib/db';
+import type { Supplier } from '@/lib/db';
 import { PRODUCT_LIST } from '@/lib/products';
 
 const PRODUCT_LABELS: Record<string, Record<string, string>> = {
