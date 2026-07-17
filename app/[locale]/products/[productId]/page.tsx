@@ -1,5 +1,4 @@
 import { useTranslations } from 'next-intl';
-import { unstable_noStore as noStore } from 'next/cache';
 import { db } from '@/lib/db';
 import { PRODUCT_LIST } from '@/lib/products';
 import { notFound } from 'next/navigation';
@@ -13,7 +12,6 @@ export default async function ProductPage({
 }: {
   params: Promise<{ locale: string; productId: string }>;
 }) {
-  noStore();
   const { locale, productId } = await params;
   const t = useTranslations('products');
   const tc = useTranslations('catalog');
