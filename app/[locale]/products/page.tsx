@@ -1,12 +1,16 @@
-import { useTranslations, useLocale } from 'next-intl';
+import { getTranslations } from 'next-intl/server';
 import { PRODUCT_LIST } from '@/lib/products';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
 
-export default function ProductsPage() {
-  const t = useTranslations('products');
-  const locale = useLocale();
+export default async function ProductsPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'products' });
 
   return (
     <>

@@ -1,4 +1,4 @@
-import { useTranslations } from 'next-intl';
+import { getTranslations } from 'next-intl/server';
 import { db } from '@/lib/db';
 import { PRODUCT_LIST } from '@/lib/products';
 import { notFound } from 'next/navigation';
@@ -13,13 +13,15 @@ export default async function ProductPage({
   params: Promise<{ locale: string; productId: string }>;
 }) {
   const { locale, productId } = await params;
-  const t = useTranslations('products');
-  const tc = useTranslations('catalog');
 
   const product = PRODUCT_LIST.find((p) => p.id === productId);
   if (!product) notFound();
 
-  const allSuppliers = await db.suppliers.findAll();
+  const [t, tc, allSuppliers] = await Promise.all([
+    getTranslations({ locale, namespace: 'products' }),
+    getTranslations({ locale, namespace: 'catalog' }),
+    db.suppliers.findAll(),
+  ]);
   const suppliers = allSuppliers.filter(
     (s) => s.status === 'approved' && s.products.includes(productId)
   );
