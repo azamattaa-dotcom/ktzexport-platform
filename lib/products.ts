@@ -1,5 +1,5 @@
 export const PRODUCT_LIST = [
-  { id: 'flour_feed',  emoji: '🏭', image: null,                        fit: null,       from: 'from-amber-100',  to: 'to-orange-100',   border: 'border-amber-300',  text: 'text-amber-800' },
+  { id: 'flour_feed',  emoji: '🏭', image: '/products/flour_feed.jpg',    fit: 'cover',    from: 'from-amber-100',  to: 'to-orange-100',   border: 'border-amber-300',  text: 'text-amber-800' },
   { id: 'flour_wheat', emoji: '🌾', image: '/products/flour_wheat.png', fit: 'contain',  from: 'from-yellow-50',  to: 'to-amber-100',    border: 'border-yellow-300', text: 'text-yellow-800' },
   { id: 'wheat',       emoji: '🌾', image: null,                        fit: null,       from: 'from-yellow-100', to: 'to-amber-200',    border: 'border-amber-300',  text: 'text-amber-900' },
   { id: 'barley',      emoji: '🌿', image: '/products/barley.jpg',      fit: 'cover',    from: 'from-green-50',   to: 'to-emerald-100',  border: 'border-green-300',  text: 'text-green-800' },

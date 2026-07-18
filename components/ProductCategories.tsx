@@ -1,5 +1,8 @@
+'use client';
+
 import { useTranslations, useLocale } from 'next-intl';
 import Link from 'next/link';
+import Image from 'next/image';
 import { PRODUCT_LIST } from '@/lib/products';
 
 const VIEW_LABEL: Record<string, string> = {
@@ -27,22 +30,32 @@ export default function ProductCategories() {
             <Link
               key={product.id}
               href={`/${locale}/products/${product.id}`}
-              className={`group relative bg-gradient-to-br ${product.from} ${product.to} border ${product.border} rounded-2xl p-5 cursor-pointer transition-all duration-200 hover:shadow-lg hover:scale-[1.02] block`}
+              className={`group bg-gradient-to-br ${product.from} ${product.to} border ${product.border} rounded-2xl overflow-hidden cursor-pointer transition-all duration-200 hover:shadow-lg hover:scale-[1.02] block`}
             >
-              {/* Icon area */}
-              <div className="mb-3 h-16 flex items-center">
-                <span className="text-5xl filter drop-shadow-sm">{product.emoji}</span>
-              </div>
+              {product.image ? (
+                <div className={`relative w-full aspect-square ${product.fit === 'contain' ? 'p-5' : ''}`}>
+                  <Image
+                    src={product.image}
+                    alt=""
+                    fill
+                    className={product.fit === 'contain' ? 'object-contain' : 'object-cover'}
+                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                  />
+                </div>
+              ) : (
+                <div className="flex items-center justify-center aspect-square">
+                  <span className="text-5xl">{product.emoji}</span>
+                </div>
+              )}
 
-              {/* Name */}
-              <h3 className={`font-bold text-sm leading-tight mb-1 ${product.text}`}>
-                {t(`items.${product.id}`)}
-              </h3>
-
-              {/* CTA */}
-              <div className="flex items-center gap-1 text-xs text-primary-600 opacity-0 group-hover:opacity-100 transition-opacity mt-2">
-                <span>{VIEW_LABEL[locale] ?? VIEW_LABEL.ru}</span>
-                <span>→</span>
+              <div className="px-4 pb-4 pt-2">
+                <h3 className={`font-bold text-sm leading-tight mb-1 ${product.text}`}>
+                  {t(`items.${product.id}`)}
+                </h3>
+                <div className="flex items-center gap-1 text-xs text-primary-600 opacity-0 group-hover:opacity-100 transition-opacity mt-1">
+                  <span>{VIEW_LABEL[locale] ?? VIEW_LABEL.ru}</span>
+                  <span>→</span>
+                </div>
               </div>
             </Link>
           ))}
