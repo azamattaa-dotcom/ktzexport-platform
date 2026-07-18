@@ -35,12 +35,12 @@ export default async function ProductsPage({
               className={`group bg-gradient-to-br ${product.from} ${product.to} border ${product.border} rounded-2xl overflow-hidden hover:shadow-lg hover:scale-[1.02] transition-all`}
             >
               {product.image ? (
-                <div className={`relative w-full aspect-square ${product.fit === 'contain' ? 'p-5' : ''}`}>
+                <div className="relative w-full aspect-square">
                   <Image
                     src={product.image}
                     alt=""
                     fill
-                    className={product.fit === 'contain' ? 'object-contain' : 'object-cover'}
+                    className="object-cover"
                     sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                   />
                 </div>

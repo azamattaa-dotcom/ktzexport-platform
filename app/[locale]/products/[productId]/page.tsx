@@ -37,12 +37,12 @@ export default async function ProductPage({
           </Link>
           <div className="flex items-center gap-4">
             {product.image ? (
-              <div className={`relative w-24 h-24 rounded-2xl overflow-hidden flex-shrink-0 shadow-lg ${product.fit === 'contain' ? 'bg-white/30 p-2' : ''}`}>
+              <div className="relative w-24 h-24 rounded-2xl overflow-hidden flex-shrink-0 shadow-lg">
                 <Image
                   src={product.image}
                   alt=""
                   fill
-                  className={product.fit === 'contain' ? 'object-contain' : 'object-cover'}
+                  className="object-cover"
                   priority
                 />
               </div>
