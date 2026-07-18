@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
+import Image from 'next/image';
 import SupplierCard from '@/components/SupplierCard';
 
 export default async function ProductPage({
@@ -35,7 +36,19 @@ export default async function ProductPage({
             ← {tc('backToProducts')}
           </Link>
           <div className="flex items-center gap-4">
-            <span className="text-6xl">{product.emoji}</span>
+            {product.image ? (
+              <div className={`relative w-24 h-24 rounded-2xl overflow-hidden flex-shrink-0 shadow-lg ${product.fit === 'contain' ? 'bg-white/30 p-2' : ''}`}>
+                <Image
+                  src={product.image}
+                  alt=""
+                  fill
+                  className={product.fit === 'contain' ? 'object-contain' : 'object-cover'}
+                  priority
+                />
+              </div>
+            ) : (
+              <span className="text-6xl">{product.emoji}</span>
+            )}
             <div>
               <h1 className={`text-3xl font-bold ${product.text}`}>{t(`items.${productId}`)}</h1>
               <p className="text-gray-500 mt-1">

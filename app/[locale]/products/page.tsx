@@ -3,6 +3,7 @@ import { PRODUCT_LIST } from '@/lib/products';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default async function ProductsPage({
   params,
@@ -31,13 +32,27 @@ export default async function ProductsPage({
             <Link
               key={product.id}
               href={`/${locale}/products/${product.id}`}
-              className={`group bg-gradient-to-br ${product.from} ${product.to} border ${product.border} rounded-2xl p-5 hover:shadow-lg hover:scale-[1.02] transition-all`}
+              className={`group bg-gradient-to-br ${product.from} ${product.to} border ${product.border} rounded-2xl overflow-hidden hover:shadow-lg hover:scale-[1.02] transition-all`}
             >
-              <span className="text-4xl block mb-3">{product.emoji}</span>
-              <h2 className={`font-bold text-sm ${product.text}`}>{t(`items.${product.id}`)}</h2>
-              <p className="text-xs text-gray-500 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                →
-              </p>
+              {product.image ? (
+                <div className={`relative w-full aspect-square ${product.fit === 'contain' ? 'p-5' : ''}`}>
+                  <Image
+                    src={product.image}
+                    alt=""
+                    fill
+                    className={product.fit === 'contain' ? 'object-contain' : 'object-cover'}
+                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                  />
+                </div>
+              ) : (
+                <div className="flex items-center justify-center aspect-square">
+                  <span className="text-5xl">{product.emoji}</span>
+                </div>
+              )}
+              <div className="px-4 pb-4 pt-2">
+                <h2 className={`font-bold text-sm ${product.text}`}>{t(`items.${product.id}`)}</h2>
+                <p className="text-xs text-gray-400 mt-0.5 opacity-0 group-hover:opacity-100 transition-opacity">→</p>
+              </div>
             </Link>
           ))}
         </div>
