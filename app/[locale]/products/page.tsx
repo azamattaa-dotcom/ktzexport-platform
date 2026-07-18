@@ -34,21 +34,15 @@ export default async function ProductsPage({
               href={`/${locale}/products/${product.id}`}
               className={`group bg-gradient-to-br ${product.from} ${product.to} border ${product.border} rounded-2xl overflow-hidden hover:shadow-lg hover:scale-[1.02] transition-all`}
             >
-              {product.image ? (
-                <div className="relative w-full aspect-square">
-                  <Image
-                    src={product.image}
-                    alt=""
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                  />
-                </div>
-              ) : (
-                <div className="flex items-center justify-center aspect-square">
-                  <span className="text-5xl">{product.emoji}</span>
-                </div>
-              )}
+              <div className="relative w-full aspect-square">
+                <Image
+                  src={product.image}
+                  alt=""
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                />
+              </div>
               <div className="px-4 pb-4 pt-2">
                 <h2 className={`font-bold text-sm ${product.text}`}>{t(`items.${product.id}`)}</h2>
                 <p className="text-xs text-gray-400 mt-0.5 opacity-0 group-hover:opacity-100 transition-opacity">→</p>

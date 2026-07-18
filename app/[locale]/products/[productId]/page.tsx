@@ -36,19 +36,15 @@ export default async function ProductPage({
             ← {tc('backToProducts')}
           </Link>
           <div className="flex items-center gap-4">
-            {product.image ? (
-              <div className="relative w-24 h-24 rounded-2xl overflow-hidden flex-shrink-0 shadow-lg">
-                <Image
-                  src={product.image}
-                  alt=""
-                  fill
-                  className="object-cover"
-                  priority
-                />
-              </div>
-            ) : (
-              <span className="text-6xl">{product.emoji}</span>
-            )}
+            <div className="relative w-24 h-24 rounded-2xl overflow-hidden flex-shrink-0 shadow-lg">
+              <Image
+                src={product.image}
+                alt=""
+                fill
+                className="object-cover"
+                priority
+              />
+            </div>
             <div>
               <h1 className={`text-3xl font-bold ${product.text}`}>{t(`items.${productId}`)}</h1>
               <p className="text-gray-500 mt-1">

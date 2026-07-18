@@ -6,7 +6,7 @@ export const PRODUCT_LIST = [
   { id: 'bran',        emoji: '🟤', image: '/products/bran.jpg',        from: 'from-stone-100',  to: 'to-amber-100',    border: 'border-stone-300',  text: 'text-stone-800' },
   { id: 'flaxseed',    emoji: '🫐', image: '/products/flaxseed.jpg',    from: 'from-indigo-50',  to: 'to-blue-100',     border: 'border-indigo-300', text: 'text-indigo-800' },
   { id: 'sunflower',   emoji: '🌻', image: '/products/sunflower.jpg',   from: 'from-yellow-100', to: 'to-amber-50',     border: 'border-yellow-300', text: 'text-yellow-900' },
-  { id: 'corn',        emoji: '🌽', image: null,                        from: 'from-orange-50',  to: 'to-yellow-100',   border: 'border-orange-300', text: 'text-orange-800' },
+  { id: 'corn',        emoji: '🌽', image: '/products/corn.jpg',         from: 'from-orange-50',  to: 'to-yellow-100',   border: 'border-orange-300', text: 'text-orange-800' },
 ] as const;
 
 export type ProductId = (typeof PRODUCT_LIST)[number]['id'];
