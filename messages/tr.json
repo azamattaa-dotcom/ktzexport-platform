@@ -9,7 +9,11 @@
     "registerSupplier": "Tedarikçi Ol",
     "adminPanel": "Yönetici Paneli",
     "cabinet": "Hesabım",
-    "login": "Giriş Yap"
+    "login": "Giriş Yap",
+    "register": "Kayıt Ol",
+    "loginCabinet": "Hesabım",
+    "roleSupplier": "Tedarikçi",
+    "roleBuyer": "Alıcı"
   },
   "hero": {
     "badge": "Kazakistan Tarım İhracatı",
@@ -53,7 +57,7 @@
   "whyUs": {
     "title": "Neden KTZ Export",
     "reason1Title": "Kendi Lojistiği",
-    "reason1Desc": "Kazakistan → Çin ve Orta Asya konteyner trenleri. Lojistik koşulları ve maliyeti varış istasyonuna göre talep üzerine belirlenir.",
+    "reason1Desc": "Konteyner trenleri, kapalı vagonlar ve tahıl silosu vagonları — Kazakistan → Çin ve Orta Asya güzergahları. Maliyet talep üzerine belirlenir.",
     "reason2Title": "Doğrulanmış Tedarikçiler",
     "reason2Desc": "Tüm tedarikçiler doğrulama sürecinden geçer. Yalnızca güvenilir ortaklar.",
     "reason3Title": "Hukuki Koruma",

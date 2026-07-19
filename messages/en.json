@@ -9,7 +9,11 @@
     "registerSupplier": "Become a Supplier",
     "adminPanel": "Admin Panel",
     "cabinet": "My Account",
-    "login": "Log In"
+    "login": "Log In",
+    "register": "Register",
+    "loginCabinet": "My Account",
+    "roleSupplier": "Supplier",
+    "roleBuyer": "Buyer"
   },
   "hero": {
     "badge": "Kazakh Agricultural Export",
@@ -53,7 +57,7 @@
   "whyUs": {
     "title": "Why KTZ Export",
     "reason1Title": "Own Logistics",
-    "reason1Desc": "Container trains Kazakhstan → China and Central Asia. Logistics cost and terms are agreed on request depending on the destination station.",
+    "reason1Desc": "Container trains, covered wagons and hopper grain cars — routes Kazakhstan → China and Central Asia. Cost agreed on request.",
     "reason2Title": "Verified Suppliers",
     "reason2Desc": "All suppliers go through verification. Only reliable partners.",
     "reason3Title": "Legal Protection",
