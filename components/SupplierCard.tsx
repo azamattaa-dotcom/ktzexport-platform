@@ -19,10 +19,9 @@ interface Props {
   supplier: Supplier;
   productId: string;
   locale: string;
-  isAdmin?: boolean;
 }
 
-export default function SupplierCard({ supplier, productId, locale, isAdmin }: Props) {
+export default function SupplierCard({ supplier, productId, locale }: Props) {
   const [expanded, setExpanded] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState(emptyForm);
@@ -49,11 +48,7 @@ export default function SupplierCard({ supplier, productId, locale, isAdmin }: P
     const res = await fetch('/api/request', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        supplierCompany: supplier.companyName,
-        productId,
-        ...form,
-      }),
+      body: JSON.stringify({ supplierCompany: supplier.companyName, productId, ...form }),
     });
     setSending(false);
     if (res.ok) {
@@ -69,7 +64,7 @@ export default function SupplierCard({ supplier, productId, locale, isAdmin }: P
 
   return (
     <div className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
-      {/* Main row — always visible */}
+      {/* Main row */}
       <button
         onClick={() => setExpanded(!expanded)}
         className="w-full text-left px-6 py-5 hover:bg-gray-50 transition-colors"
@@ -118,23 +113,12 @@ export default function SupplierCard({ supplier, productId, locale, isAdmin }: P
       {/* Expanded detail */}
       {expanded && (
         <div className="border-t border-gray-100 px-6 py-5 space-y-5">
-          <div className={`grid gap-4 ${isAdmin ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1'}`}>
-            {/* Contacts — admin only */}
-            {isAdmin && (
-              <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 space-y-2">
-                <h3 className="text-xs font-semibold text-blue-500 uppercase tracking-wide">Контакты</h3>
-                <p className="text-sm text-gray-800 font-medium">{supplier.contactName}</p>
-                <p className="text-sm text-gray-600">{supplier.email}</p>
-                <p className="text-sm text-gray-600">{supplier.phone}</p>
-              </div>
-            )}
-            {/* Volume */}
-            <div className="bg-gray-50 rounded-xl p-4 space-y-2">
-              <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Объём</h3>
-              {detail?.availableVolume && <p className="text-sm text-gray-800">Доступно: <span className="font-medium">{detail.availableVolume}</span></p>}
-              {detail?.minOrder && <p className="text-sm text-gray-800">Мин. заказ: <span className="font-medium">{detail.minOrder}</span></p>}
-              <p className="text-sm text-gray-600">Годовой: {supplier.annualVolume}</p>
-            </div>
+          {/* Volume */}
+          <div className="bg-gray-50 rounded-xl p-4 space-y-2">
+            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Объём</h3>
+            {detail?.availableVolume && <p className="text-sm text-gray-800">Доступно: <span className="font-medium">{detail.availableVolume}</span></p>}
+            {detail?.minOrder && <p className="text-sm text-gray-800">Мин. заказ: <span className="font-medium">{detail.minOrder}</span></p>}
+            <p className="text-sm text-gray-600">Годовой: {supplier.annualVolume}</p>
           </div>
 
           {/* Characteristics */}
@@ -168,80 +152,51 @@ export default function SupplierCard({ supplier, productId, locale, isAdmin }: P
             )}
           </div>
 
-          {/* Request form — buyers only */}
-          {!isAdmin && (
-            <div className="border-t border-gray-100 pt-4">
-              {sent ? (
-                <div className="bg-green-50 border border-green-200 rounded-xl px-4 py-3 text-sm text-green-700">
-                  ✓ Запрос отправлен — мы свяжемся с вами в течение 24 часов
+          {/* Request form */}
+          <div className="border-t border-gray-100 pt-4">
+            {sent ? (
+              <div className="bg-green-50 border border-green-200 rounded-xl px-4 py-3 text-sm text-green-700">
+                ✓ Запрос отправлен — мы свяжемся с вами в течение 24 часов
+              </div>
+            ) : showForm ? (
+              <form onSubmit={handleRequest} className="space-y-3">
+                <h3 className="text-sm font-semibold text-gray-700">Запрос поставщику</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <input required placeholder="Ваше имя *" value={form.name}
+                    onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
+                    className="border border-gray-200 rounded-lg px-3 py-2 text-sm w-full" />
+                  <input required type="email" placeholder="Email *" value={form.email}
+                    onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))}
+                    className="border border-gray-200 rounded-lg px-3 py-2 text-sm w-full" />
+                  <input placeholder="Телефон" value={form.phone}
+                    onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))}
+                    className="border border-gray-200 rounded-lg px-3 py-2 text-sm w-full" />
+                  <input placeholder="Интересующий объём" value={form.volume}
+                    onChange={(e) => setForm((p) => ({ ...p, volume: e.target.value }))}
+                    className="border border-gray-200 rounded-lg px-3 py-2 text-sm w-full" />
                 </div>
-              ) : showForm ? (
-                <form onSubmit={handleRequest} className="space-y-3">
-                  <h3 className="text-sm font-semibold text-gray-700">Запрос поставщику</h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <input
-                      required
-                      placeholder="Ваше имя *"
-                      value={form.name}
-                      onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
-                      className="border border-gray-200 rounded-lg px-3 py-2 text-sm w-full"
-                    />
-                    <input
-                      required
-                      type="email"
-                      placeholder="Email *"
-                      value={form.email}
-                      onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))}
-                      className="border border-gray-200 rounded-lg px-3 py-2 text-sm w-full"
-                    />
-                    <input
-                      placeholder="Телефон"
-                      value={form.phone}
-                      onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))}
-                      className="border border-gray-200 rounded-lg px-3 py-2 text-sm w-full"
-                    />
-                    <input
-                      placeholder="Интересующий объём"
-                      value={form.volume}
-                      onChange={(e) => setForm((p) => ({ ...p, volume: e.target.value }))}
-                      className="border border-gray-200 rounded-lg px-3 py-2 text-sm w-full"
-                    />
-                  </div>
-                  <textarea
-                    rows={2}
-                    placeholder="Сообщение (необязательно)"
-                    value={form.message}
-                    onChange={(e) => setForm((p) => ({ ...p, message: e.target.value }))}
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm resize-none"
-                  />
-                  {sendErr && <p className="text-xs text-red-500">{sendErr}</p>}
-                  <div className="flex gap-2">
-                    <button
-                      type="submit"
-                      disabled={sending}
-                      className="bg-primary-700 hover:bg-primary-800 disabled:bg-primary-400 text-white font-medium px-4 py-2 rounded-lg text-sm transition-colors"
-                    >
-                      {sending ? 'Отправляем...' : 'Отправить запрос'}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => { setShowForm(false); setSendErr(''); }}
-                      className="text-gray-500 text-sm px-3 py-2 hover:text-gray-700 transition-colors"
-                    >
-                      Отмена
-                    </button>
-                  </div>
-                </form>
-              ) : (
-                <button
-                  onClick={() => setShowForm(true)}
-                  className="bg-primary-700 hover:bg-primary-800 text-white font-semibold px-5 py-2.5 rounded-xl text-sm transition-colors"
-                >
-                  Отправить запрос →
-                </button>
-              )}
-            </div>
-          )}
+                <textarea rows={2} placeholder="Сообщение (необязательно)" value={form.message}
+                  onChange={(e) => setForm((p) => ({ ...p, message: e.target.value }))}
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm resize-none" />
+                {sendErr && <p className="text-xs text-red-500">{sendErr}</p>}
+                <div className="flex gap-2">
+                  <button type="submit" disabled={sending}
+                    className="bg-primary-700 hover:bg-primary-800 disabled:bg-primary-400 text-white font-medium px-4 py-2 rounded-lg text-sm transition-colors">
+                    {sending ? 'Отправляем...' : 'Отправить запрос'}
+                  </button>
+                  <button type="button" onClick={() => { setShowForm(false); setSendErr(''); }}
+                    className="text-gray-500 text-sm px-3 py-2 hover:text-gray-700 transition-colors">
+                    Отмена
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <button onClick={() => setShowForm(true)}
+                className="bg-primary-700 hover:bg-primary-800 text-white font-semibold px-5 py-2.5 rounded-xl text-sm transition-colors">
+                Отправить запрос →
+              </button>
+            )}
+          </div>
         </div>
       )}
     </div>
