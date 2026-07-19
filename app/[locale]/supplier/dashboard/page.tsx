@@ -3,6 +3,7 @@ import { jwtVerify } from 'jose';
 import { db } from '@/lib/db';
 import { redirect } from 'next/navigation';
 import SupplierProductManager from '@/components/SupplierProductManager';
+import SupplierMessagesPanel from '@/components/SupplierMessagesPanel';
 import Link from 'next/link';
 
 const secret = new TextEncoder().encode(process.env.JWT_SECRET ?? 'fallback-secret');
@@ -23,6 +24,13 @@ export default async function SupplierDashboard({ params }: { params: { locale: 
   if (!supplier) redirect(`/${params.locale}/supplier/login`);
 
   const isImage = supplier.letterheadBase64?.startsWith('data:image');
+
+  const VOLUME_LABELS: Record<string, string> = {
+    lt1000: 'до 1 000 т/год',
+    '1000_5000': '1 000 – 5 000 т/год',
+    '5000_20000': '5 000 – 20 000 т/год',
+    gt20000: 'более 20 000 т/год',
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -47,7 +55,7 @@ export default async function SupplierDashboard({ params }: { params: { locale: 
 
       <main className="max-w-3xl mx-auto px-4 py-8 space-y-6">
 
-        {/* Company info card */}
+        {/* Company info */}
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
           <div className="bg-gradient-to-r from-primary-700 to-primary-800 px-6 py-5 flex items-center gap-4">
             <div className="w-14 h-14 rounded-xl bg-white/20 flex items-center justify-center text-white font-bold text-2xl">
@@ -74,7 +82,7 @@ export default async function SupplierDashboard({ params }: { params: { locale: 
             </div>
             <div>
               <p className="text-gray-400 text-xs">Годовой объём</p>
-              <p className="text-gray-800 font-medium">{supplier.annualVolume}</p>
+              <p className="text-gray-800 font-medium">{VOLUME_LABELS[supplier.annualVolume] ?? supplier.annualVolume}</p>
             </div>
           </div>
         </div>
@@ -101,6 +109,12 @@ export default async function SupplierDashboard({ params }: { params: { locale: 
             )}
           </div>
         )}
+
+        {/* Messages */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+          <h2 className="text-base font-semibold text-gray-900 mb-4">💬 Сообщения от покупателей</h2>
+          <SupplierMessagesPanel />
+        </div>
 
         {/* Product management */}
         <div>

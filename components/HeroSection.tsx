@@ -51,26 +51,26 @@ export default function HeroSection() {
               href={`/${locale}/suppliers/register`}
               className="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 border border-white/30 font-semibold px-8 py-3.5 rounded-xl transition-all backdrop-blur-sm"
             >
-              {t('ctaSupplier')}
+              {t('ctaSupplier')} →
             </Link>
             <Link
               href={`/${locale}/logistics`}
               className="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 border border-white/30 font-semibold px-8 py-3.5 rounded-xl transition-all backdrop-blur-sm"
             >
-              {t('ctaLogistics')}
+              {t('ctaLogistics')} →
             </Link>
           </div>
 
-          {/* Stats */}
-          <div className="mt-14 grid grid-cols-3 gap-6 max-w-sm">
+          {/* Stats — Kazakhstan market data */}
+          <div className="mt-14 grid grid-cols-3 gap-6 max-w-lg">
             {[
-              { value: '500K+', label: t('stat1') },
-              { value: '12+',   label: t('stat2') },
-              { value: '50+',   label: t('stat3') },
+              { value: '8 млн т',  label: t('stat1') },
+              { value: '80+',      label: t('stat2') },
+              { value: '$3 млрд',  label: t('stat3') },
             ].map((stat) => (
               <div key={stat.label} className="text-center">
-                <div className="text-2xl font-bold text-wheat-400">{stat.value}</div>
-                <div className="text-xs text-primary-200 mt-1">{stat.label}</div>
+                <div className="text-xl font-bold text-wheat-400">{stat.value}</div>
+                <div className="text-xs text-primary-200 mt-1 leading-tight">{stat.label}</div>
               </div>
             ))}
           </div>

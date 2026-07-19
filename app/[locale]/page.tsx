@@ -14,14 +14,22 @@ function SupplierCTA() {
     <section className="py-20 bg-primary-700 text-white text-center">
       <div className="max-w-2xl mx-auto px-4">
         <div className="text-4xl mb-4">🌾</div>
-        <h2 className="text-3xl font-bold mb-4">{t('registerTitle')}</h2>
-        <p className="text-primary-100 mb-8">{t('registerSubtitle')}</p>
-        <Link
-          href={`/${locale}/suppliers/register`}
-          className="inline-block bg-white text-primary-700 font-semibold px-8 py-3.5 rounded-xl hover:bg-primary-50 transition-colors shadow-lg"
-        >
-          {t('submit')} →
-        </Link>
+        <h2 className="text-3xl font-bold mb-4">{t('ctaTitle')}</h2>
+        <p className="text-primary-100 mb-8 max-w-lg mx-auto">{t('ctaSubtitle')}</p>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Link
+            href={`/${locale}/suppliers/register`}
+            className="inline-block bg-white text-primary-700 font-semibold px-8 py-3.5 rounded-xl hover:bg-primary-50 transition-colors shadow-lg"
+          >
+            {t('ctaRegister')} →
+          </Link>
+          <Link
+            href={`/${locale}/supplier/login`}
+            className="inline-block bg-white/10 hover:bg-white/20 border border-white/30 text-white font-semibold px-8 py-3.5 rounded-xl transition-colors"
+          >
+            {t('ctaLoginHint')} {t('ctaLogin')} →
+          </Link>
+        </div>
       </div>
     </section>
   );

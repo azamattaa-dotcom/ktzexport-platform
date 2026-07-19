@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import type { Supplier } from '@/lib/db';
 import { PRODUCT_LIST } from '@/lib/products';
+import SupplierChat from './SupplierChat';
 
 const PRODUCT_LABELS: Record<string, Record<string, string>> = {
   ru: { flour_feed: 'Кормовая мука', flour_wheat: 'Пшеничная мука', wheat: 'Пшеница', barley: 'Ячмень', bran: 'Пшеничные отруби', flaxseed: 'Семена льна', sunflower: 'Семена подсолнечника', corn: 'Кукуруза' },
@@ -11,9 +12,14 @@ const PRODUCT_LABELS: Record<string, Record<string, string>> = {
   tr: { flour_feed: 'Yem Unu', flour_wheat: 'Buğday Unu', wheat: 'Buğday', barley: 'Arpa', bran: 'Buğday Kepeği', flaxseed: 'Keten Tohumu', sunflower: 'Ayçiçeği Tohumu', corn: 'Mısır' },
 };
 
-const CURRENCY_SYMBOL: Record<string, string> = { USD: '$', KZT: '₸' };
+const VOLUME_LABELS: Record<string, string> = {
+  lt1000: 'до 1 000 т/год',
+  '1000_5000': '1 000 – 5 000 т/год',
+  '5000_20000': '5 000 – 20 000 т/год',
+  gt20000: 'более 20 000 т/год',
+};
 
-const emptyForm = { name: '', email: '', phone: '', volume: '', message: '' };
+const CURRENCY_SYMBOL: Record<string, string> = { USD: '$', KZT: '₸' };
 
 interface Props {
   supplier: Supplier;
@@ -23,41 +29,18 @@ interface Props {
 
 export default function SupplierCard({ supplier, productId, locale }: Props) {
   const [expanded, setExpanded] = useState(false);
-  const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState(emptyForm);
-  const [sending, setSending] = useState(false);
-  const [sent, setSent] = useState(false);
-  const [sendErr, setSendErr] = useState('');
 
   const detail = supplier.productDetails?.[productId];
   const price = detail?.price ?? supplier.productPrices?.[productId];
   const labels = PRODUCT_LABELS[locale] ?? PRODUCT_LABELS.ru;
   const isImage = supplier.letterheadBase64?.startsWith('data:image');
+  const volumeLabel = VOLUME_LABELS[supplier.annualVolume] ?? supplier.annualVolume;
 
   function formatPrice() {
     if (!price) return null;
     const sym = CURRENCY_SYMBOL[price.currency] ?? '';
     if (price.type === 'fixed') return `${sym}${price.fixed?.toLocaleString()} / ${price.unit}`;
     return `${sym}${price.min?.toLocaleString()} – ${price.max?.toLocaleString()} / ${price.unit}`;
-  }
-
-  async function handleRequest(e: React.FormEvent) {
-    e.preventDefault();
-    setSending(true);
-    setSendErr('');
-    const res = await fetch('/api/request', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ supplierCompany: supplier.companyName, productId, ...form }),
-    });
-    setSending(false);
-    if (res.ok) {
-      setSent(true);
-      setShowForm(false);
-      setForm(emptyForm);
-    } else {
-      setSendErr('Ошибка отправки. Попробуйте ещё раз.');
-    }
   }
 
   const priceStr = formatPrice();
@@ -78,6 +61,7 @@ export default function SupplierCard({ supplier, productId, locale }: Props) {
               <h2 className="font-bold text-gray-900 truncate">{supplier.companyName}</h2>
               <p className="text-xs text-gray-400 mt-0.5">
                 {supplier.country}{supplier.elevatorName ? ` · ${supplier.elevatorName}` : ''}
+                {supplier.loadingStation ? ` · 🚉 ${supplier.loadingStation}` : ''}
               </p>
               <div className="flex flex-wrap gap-1 mt-2">
                 {supplier.products.map((pid) => {
@@ -118,7 +102,7 @@ export default function SupplierCard({ supplier, productId, locale }: Props) {
             <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Объём</h3>
             {detail?.availableVolume && <p className="text-sm text-gray-800">Доступно: <span className="font-medium">{detail.availableVolume}</span></p>}
             {detail?.minOrder && <p className="text-sm text-gray-800">Мин. заказ: <span className="font-medium">{detail.minOrder}</span></p>}
-            <p className="text-sm text-gray-600">Годовой: {supplier.annualVolume}</p>
+            {volumeLabel && <p className="text-sm text-gray-600">Годовой: <span className="font-medium">{volumeLabel}</span></p>}
           </div>
 
           {/* Characteristics */}
@@ -152,50 +136,10 @@ export default function SupplierCard({ supplier, productId, locale }: Props) {
             )}
           </div>
 
-          {/* Request form */}
+          {/* Chat */}
           <div className="border-t border-gray-100 pt-4">
-            {sent ? (
-              <div className="bg-green-50 border border-green-200 rounded-xl px-4 py-3 text-sm text-green-700">
-                ✓ Запрос отправлен — мы свяжемся с вами в течение 24 часов
-              </div>
-            ) : showForm ? (
-              <form onSubmit={handleRequest} className="space-y-3">
-                <h3 className="text-sm font-semibold text-gray-700">Запрос поставщику</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <input required placeholder="Ваше имя *" value={form.name}
-                    onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
-                    className="border border-gray-200 rounded-lg px-3 py-2 text-sm w-full" />
-                  <input required type="email" placeholder="Email *" value={form.email}
-                    onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))}
-                    className="border border-gray-200 rounded-lg px-3 py-2 text-sm w-full" />
-                  <input placeholder="Телефон" value={form.phone}
-                    onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))}
-                    className="border border-gray-200 rounded-lg px-3 py-2 text-sm w-full" />
-                  <input placeholder="Интересующий объём" value={form.volume}
-                    onChange={(e) => setForm((p) => ({ ...p, volume: e.target.value }))}
-                    className="border border-gray-200 rounded-lg px-3 py-2 text-sm w-full" />
-                </div>
-                <textarea rows={2} placeholder="Сообщение (необязательно)" value={form.message}
-                  onChange={(e) => setForm((p) => ({ ...p, message: e.target.value }))}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm resize-none" />
-                {sendErr && <p className="text-xs text-red-500">{sendErr}</p>}
-                <div className="flex gap-2">
-                  <button type="submit" disabled={sending}
-                    className="bg-primary-700 hover:bg-primary-800 disabled:bg-primary-400 text-white font-medium px-4 py-2 rounded-lg text-sm transition-colors">
-                    {sending ? 'Отправляем...' : 'Отправить запрос'}
-                  </button>
-                  <button type="button" onClick={() => { setShowForm(false); setSendErr(''); }}
-                    className="text-gray-500 text-sm px-3 py-2 hover:text-gray-700 transition-colors">
-                    Отмена
-                  </button>
-                </div>
-              </form>
-            ) : (
-              <button onClick={() => setShowForm(true)}
-                className="bg-primary-700 hover:bg-primary-800 text-white font-semibold px-5 py-2.5 rounded-xl text-sm transition-colors">
-                Отправить запрос →
-              </button>
-            )}
+            <h3 className="text-sm font-semibold text-gray-700 mb-3">Написать поставщику</h3>
+            <SupplierChat supplierId={supplier.id} productId={productId} supplierName={supplier.companyName} />
           </div>
         </div>
       )}

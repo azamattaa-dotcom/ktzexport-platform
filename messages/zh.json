@@ -4,25 +4,28 @@
     "suppliers": "供应商",
     "forBuyers": "买家服务",
     "forSellers": "供应商服务",
+    "logistics": "物流",
     "contact": "联系我们",
     "registerSupplier": "成为供应商",
     "adminPanel": "管理面板",
-    "cabinet": "个人账户"
+    "cabinet": "个人账户",
+    "login": "登录"
   },
   "hero": {
     "badge": "哈萨克斯坦农业出口",
     "title": "哈萨克斯坦农产品，直达全球市场",
-    "subtitle": "直接供应粮食、面粉和油籽到中国、中亚和欧洲。价格含物流费用。",
+    "subtitle": "直接供应粮食、面粉和油籽到中国、中亚和欧洲。物流费用按需核算。",
     "ctaBuyer": "查找产品",
     "ctaSupplier": "成为供应商",
-    "stat1": "出口吨数",
-    "stat2": "合作国家",
-    "stat3": "供应商",
-    "ctaLogistics": "物流"
+    "ctaLogistics": "物流",
+    "stat1": "哈萨克斯坦谷物出口/年",
+    "stat2": "进口国家",
+    "stat3": "农业出口规模"
   },
   "products": {
     "title": "我们的产品",
     "subtitle": "种类齐全的哈萨克斯坦农产品，附质量证书",
+    "backHome": "首页",
     "items": {
       "flour_feed": "饲料面粉",
       "flour_wheat": "小麦粉",
@@ -40,8 +43,8 @@
     "subtitle": "从询价到交货的简单流程",
     "step1Title": "选择产品",
     "step1Desc": "在目录中找到所需产品，比较不同供应商的报价",
-    "step2Title": "询价与谈判",
-    "step2Desc": "通过平台内部聊天联系供应商，商定合作条款",
+    "step2Title": "与供应商聊天",
+    "step2Desc": "通过平台内置聊天直接联系供应商，商定交货条款",
     "step3Title": "在线签署合同",
     "step3Desc": "使用电子签名在平台上签署具有法律效力的合同",
     "step4Title": "一站式交货",
@@ -61,6 +64,11 @@
   "supplier": {
     "registerTitle": "供应商注册",
     "registerSubtitle": "填写表格，我们将审核并与您联系",
+    "ctaTitle": "在KTZ Export成为供应商",
+    "ctaSubtitle": "获取中国、中亚和欧洲买家渠道。注册免费。",
+    "ctaRegister": "立即申请",
+    "ctaLogin": "登录账户",
+    "ctaLoginHint": "已注册？",
     "companyName": "公司名称",
     "country": "国家",
     "contactName": "联系人",
@@ -126,8 +134,10 @@
     "about": "关于我们",
     "contact": "联系我们",
     "forSuppliers": "供应商服务",
+    "logistics": "物流",
+    "contract": "合同模板",
     "rights": "版权所有",
-    "email": "info@ktzexport.com",
+    "email": "info@ktzexport.kz",
     "phone": "+7 (702) 661-34-44"
   }
 }

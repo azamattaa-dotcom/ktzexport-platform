@@ -4,25 +4,28 @@
     "suppliers": "Tedarikçiler",
     "forBuyers": "Alıcılar İçin",
     "forSellers": "Tedarikçiler İçin",
+    "logistics": "Lojistik",
     "contact": "İletişim",
     "registerSupplier": "Tedarikçi Ol",
     "adminPanel": "Yönetici Paneli",
-    "cabinet": "Hesabım"
+    "cabinet": "Hesabım",
+    "login": "Giriş Yap"
   },
   "hero": {
     "badge": "Kazakistan Tarım İhracatı",
     "title": "Kazakistan Tarım Ürünleri Küresel Pazarlar İçin",
-    "subtitle": "Çin, Orta Asya ve Avrupa'ya tahıl, un ve yağlı tohum doğrudan tedariki. Lojistik fiyata dahildir.",
+    "subtitle": "Çin, Orta Asya ve Avrupa'ya tahıl, un ve yağlı tohum doğrudan tedariki. Lojistik maliyeti talep üzerine hesaplanır.",
     "ctaBuyer": "Ürün Bul",
     "ctaSupplier": "Tedarikçi Ol",
-    "stat1": "İhraç Edilen Ton",
-    "stat2": "Ortak Ülke",
-    "stat3": "Tedarikçi",
-    "ctaLogistics": "Lojistik"
+    "ctaLogistics": "Lojistik",
+    "stat1": "KZ Tahıl İhracatı / Yıl",
+    "stat2": "İthalatçı Ülke",
+    "stat3": "Tarım İhracat Hacmi"
   },
   "products": {
     "title": "Ürünlerimiz",
     "subtitle": "Kalite sertifikalı geniş Kazakistan tarım ürünleri yelpazesi",
+    "backHome": "Ana Sayfa",
     "items": {
       "flour_feed": "Yem Unu",
       "flour_wheat": "Buğday Unu",
@@ -40,8 +43,8 @@
     "subtitle": "Talepten teslimata basit süreç",
     "step1Title": "Ürün Seçin",
     "step1Desc": "Katalogda ihtiyacınız olan ürünü bulun ve farklı tedarikçilerin tekliflerini karşılaştırın",
-    "step2Title": "Talep ve Müzakere",
-    "step2Desc": "Platform içi sohbet üzerinden tedarikçiyle iletişime geçin ve şartları belirleyin",
+    "step2Title": "Tedarikçiyle Sohbet",
+    "step2Desc": "Platform içi sohbet aracılığıyla tedarikçiyle doğrudan iletişime geçin ve teslimat şartlarını kararlaştırın",
     "step3Title": "Online Sözleşme İmzalama",
     "step3Desc": "E-imza ile yasal bağlayıcı sözleşmeyi doğrudan platformda imzalayın",
     "step4Title": "Anahtar Teslim Teslimat",
@@ -61,6 +64,11 @@
   "supplier": {
     "registerTitle": "Tedarikçi Kaydı",
     "registerSubtitle": "Formu doldurun — inceleyip sizinle iletişime geçeceğiz",
+    "ctaTitle": "KTZ Export'ta Tedarikçi Olun",
+    "ctaSubtitle": "Çin, Orta Asya ve Avrupa'daki alıcılara erişin. Kayıt ücretsizdir.",
+    "ctaRegister": "Başvuru Yap",
+    "ctaLogin": "Hesaba Giriş",
+    "ctaLoginHint": "Zaten kayıtlı mısınız?",
     "companyName": "Şirket Adı",
     "country": "Ülke",
     "contactName": "İrtibat Kişisi",
@@ -126,8 +134,10 @@
     "about": "Hakkımızda",
     "contact": "İletişim",
     "forSuppliers": "Tedarikçiler İçin",
+    "logistics": "Lojistik",
+    "contract": "Örnek Sözleşme",
     "rights": "Tüm hakları saklıdır",
-    "email": "info@ktzexport.com",
+    "email": "info@ktzexport.kz",
     "phone": "+7 (702) 661-34-44"
   }
 }

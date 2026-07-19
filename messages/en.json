@@ -4,25 +4,28 @@
     "suppliers": "Suppliers",
     "forBuyers": "For Buyers",
     "forSellers": "For Suppliers",
+    "logistics": "Logistics",
     "contact": "Contact",
     "registerSupplier": "Become a Supplier",
     "adminPanel": "Admin Panel",
-    "cabinet": "My Account"
+    "cabinet": "My Account",
+    "login": "Log In"
   },
   "hero": {
     "badge": "Kazakh Agricultural Export",
     "title": "Kazakh Agricultural Products for Global Markets",
-    "subtitle": "Direct supply of grain, flour and oilseeds to China, Central Asia and Europe. Logistics included in price.",
+    "subtitle": "Direct supply of grain, flour and oilseeds to China, Central Asia and Europe. Logistics cost calculated on request.",
     "ctaBuyer": "Find Products",
     "ctaSupplier": "Become a Supplier",
-    "stat1": "Tonnes Exported",
-    "stat2": "Partner Countries",
-    "stat3": "Suppliers",
-    "ctaLogistics": "Logistics"
+    "ctaLogistics": "Logistics",
+    "stat1": "KZ Grain Export / Year",
+    "stat2": "Importing Countries",
+    "stat3": "Agricultural Export Volume"
   },
   "products": {
     "title": "Our Products",
     "subtitle": "Wide range of Kazakh agricultural products with quality certificates",
+    "backHome": "Home",
     "items": {
       "flour_feed": "Feed Flour",
       "flour_wheat": "Wheat Flour",
@@ -40,8 +43,8 @@
     "subtitle": "Simple process from request to delivery",
     "step1Title": "Choose Products",
     "step1Desc": "Find the product you need in the catalog and compare offers from different suppliers",
-    "step2Title": "Request & Negotiate",
-    "step2Desc": "Contact the supplier through the platform's internal chat and agree on terms",
+    "step2Title": "Chat with Supplier",
+    "step2Desc": "Message the supplier directly through the platform's built-in chat and agree on delivery terms",
     "step3Title": "Sign Contract Online",
     "step3Desc": "Sign a legally binding contract with electronic signature — no paper, no couriers",
     "step4Title": "End-to-End Delivery",
@@ -61,6 +64,11 @@
   "supplier": {
     "registerTitle": "Supplier Registration",
     "registerSubtitle": "Fill in the form — we will review and contact you",
+    "ctaTitle": "Become a Supplier on KTZ Export",
+    "ctaSubtitle": "Get access to buyers in China, Central Asia and Europe. Registration is free.",
+    "ctaRegister": "Apply Now",
+    "ctaLogin": "Log In to Account",
+    "ctaLoginHint": "Already registered?",
     "companyName": "Company Name",
     "country": "Country",
     "contactName": "Contact Person",
@@ -126,8 +134,10 @@
     "about": "About Us",
     "contact": "Contact",
     "forSuppliers": "For Suppliers",
+    "logistics": "Logistics",
+    "contract": "Template Contract",
     "rights": "All rights reserved",
-    "email": "info@ktzexport.com",
+    "email": "info@ktzexport.kz",
     "phone": "+7 (702) 661-34-44"
   }
 }

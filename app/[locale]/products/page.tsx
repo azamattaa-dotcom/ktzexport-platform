@@ -18,8 +18,8 @@ export default async function ProductsPage({
       <Header />
       <div className="bg-gradient-to-br from-primary-900 to-primary-700 py-14 px-4">
         <div className="max-w-5xl mx-auto">
-          <Link href={`/${locale}#products`} className="text-primary-200 hover:text-white text-sm mb-4 inline-block">
-            ← {t('title')}
+          <Link href={`/${locale}`} className="text-primary-200 hover:text-white text-sm mb-4 inline-block">
+            ← {t('backHome')}
           </Link>
           <h1 className="text-3xl font-bold text-white">{t('title')}</h1>
           <p className="text-primary-200 mt-2">{t('subtitle')}</p>
@@ -45,7 +45,7 @@ export default async function ProductsPage({
               </div>
               <div className="px-4 pb-4 pt-2">
                 <h2 className={`font-bold text-sm ${product.text}`}>{t(`items.${product.id}`)}</h2>
-                <p className="text-xs text-gray-400 mt-0.5 opacity-0 group-hover:opacity-100 transition-opacity">→</p>
+                <p className="text-xs text-primary-600 mt-0.5 opacity-0 group-hover:opacity-100 transition-opacity">→</p>
               </div>
             </Link>
           ))}

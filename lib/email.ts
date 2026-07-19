@@ -132,6 +132,47 @@ Email: ${params.buyerEmail}
   await send(NOTIFICATION_EMAIL, `Запрос покупателя — ${product} (${params.supplierCompany})`, body, params.buyerEmail);
 }
 
+export async function notifyChatMessage(params: {
+  supplierEmail: string;
+  supplierCompany: string;
+  buyerName: string;
+  buyerEmail: string;
+  productLabel: string;
+  content: string;
+}) {
+  const body = `Новое сообщение от покупателя — KTZ Export
+
+Покупатель: ${params.buyerName} (${params.buyerEmail})
+Товар: ${params.productLabel}
+
+Сообщение:
+${params.content}
+
+---
+Ответить в личном кабинете: ${SITE_URL}/ru/supplier/dashboard`;
+
+  await send(params.supplierEmail, `Сообщение от ${params.buyerName} — ${params.productLabel}`, body, params.buyerEmail);
+}
+
+export async function notifyChatReply(params: {
+  buyerEmail: string;
+  supplierCompany: string;
+  productLabel: string;
+  content: string;
+}) {
+  const body = `${params.supplierCompany} ответил на ваш запрос — KTZ Export
+
+Товар: ${params.productLabel}
+
+Сообщение от поставщика:
+${params.content}
+
+---
+Посмотреть переписку: ${SITE_URL}`;
+
+  await send(params.buyerEmail, `Ответ от ${params.supplierCompany}`, body);
+}
+
 export async function sendSupplierInvite(supplier: {
   companyName: string; email: string; inviteToken: string;
 }) {
