@@ -8,6 +8,11 @@ const COUNTRIES = [
   'Туркменистан', 'Афганистан', 'Китай', 'Турция', 'Другое',
 ];
 
+const LOADING_STATIONS = [
+  'Костанай', 'Кокшетау', 'Петропавловск', 'Алматы', 'Павлодар',
+  'Астана', 'Актобе', 'Шымкент', 'Другая',
+];
+
 const MAX_FILE_BYTES = 2 * 1024 * 1024;
 
 export default function SupplierRegistrationForm() {
@@ -18,6 +23,7 @@ export default function SupplierRegistrationForm() {
     companyName: '', country: '', contactName: '',
     email: '', phone: '', products: [] as string[],
     annualVolume: '', elevatorName: '', description: '',
+    loadingStation: '', loadingStationCustom: '',
   });
   const [letterheadBase64, setLetterheadBase64] = useState<string>('');
   const [letterheadFileName, setLetterheadFileName] = useState<string>('');
@@ -52,6 +58,8 @@ export default function SupplierRegistrationForm() {
     if (!form.phone)       errs.phone       = t('requiredField');
     if (!form.products.length)  errs.products    = t('requiredField');
     if (!form.annualVolume)     errs.annualVolume = t('requiredField');
+    if (!form.loadingStation)   errs.loadingStation = t('requiredField');
+    if (form.loadingStation === 'Другая' && !form.loadingStationCustom) errs.loadingStation = t('requiredField');
     return errs;
   }
 
@@ -70,10 +78,13 @@ export default function SupplierRegistrationForm() {
     setStatus('submitting');
 
     try {
+      const loadingStation = form.loadingStation === 'Другая'
+        ? form.loadingStationCustom
+        : form.loadingStation;
       const res = await fetch('/api/suppliers/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...form, letterheadBase64, letterheadFileName }),
+        body: JSON.stringify({ ...form, loadingStation, letterheadBase64, letterheadFileName }),
       });
       setStatus(res.ok ? 'success' : 'error');
     } catch {
@@ -125,6 +136,24 @@ export default function SupplierRegistrationForm() {
         <input className={inputClass('elevatorName')} value={form.elevatorName}
           onChange={(e) => setForm({ ...form, elevatorName: e.target.value })}
           placeholder="Например: Элеватор Астана-1" />
+      </div>
+
+      {/* Loading Station */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Станция погрузки *</label>
+        <select className={inputClass('loadingStation')} value={form.loadingStation}
+          onChange={(e) => setForm({ ...form, loadingStation: e.target.value, loadingStationCustom: '' })}>
+          <option value="">— Выберите станцию —</option>
+          {LOADING_STATIONS.map((s) => <option key={s} value={s}>{s}</option>)}
+        </select>
+        {form.loadingStation === 'Другая' && (
+          <input className={`${inputClass('loadingStation')} mt-2`}
+            placeholder="Укажите станцию погрузки"
+            value={form.loadingStationCustom}
+            onChange={(e) => setForm({ ...form, loadingStationCustom: e.target.value })} />
+        )}
+        {errors.loadingStation && <p className="text-red-500 text-xs mt-1">{errors.loadingStation}</p>}
+        <p className="text-xs text-gray-400 mt-1">Откуда будет отгружаться товар</p>
       </div>
 
       {/* Contact + Email + Phone */}

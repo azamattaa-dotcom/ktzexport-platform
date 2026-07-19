@@ -17,9 +17,12 @@ const PRODUCT_LABELS: Record<string, string> = {
   sunflower: 'Семена подсолнечника', corn: 'Кукуруза',
 };
 
+const LOADING_STATIONS = ['Костанай', 'Кокшетау', 'Петропавловск', 'Алматы', 'Павлодар', 'Астана', 'Актобе', 'Шымкент', 'Другая'];
+
 const emptyForm = {
   companyName: '', country: 'Казахстан', contactName: '', email: '', phone: '',
-  products: [] as string[], annualVolume: '', description: '', elevatorName: '', password: '',
+  products: [] as string[], annualVolume: '', description: '', elevatorName: '',
+  loadingStation: '', password: '',
 };
 
 export default function AdminDashboard() {
@@ -181,6 +184,15 @@ export default function AdminDashboard() {
                   className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" placeholder="Элеватор г. Астана" />
               </div>
               <div>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Станция погрузки</label>
+                <select value={createForm.loadingStation}
+                  onChange={(e) => setCreateForm((p) => ({ ...p, loadingStation: e.target.value }))}
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm">
+                  <option value="">— Выберите —</option>
+                  {LOADING_STATIONS.map((s) => <option key={s} value={s}>{s}</option>)}
+                </select>
+              </div>
+              <div>
                 <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Пароль * (мин. 8 символов)</label>
                 <input required minLength={8} type="password" value={createForm.password}
                   onChange={(e) => setCreateForm((p) => ({ ...p, password: e.target.value }))}
@@ -267,6 +279,7 @@ export default function AdminDashboard() {
                       <span>📞 {supplier.phone}</span>
                       <span>📦 {supplier.products.map((p) => PRODUCT_LABELS[p] ?? p).join(', ')}</span>
                       <span>⚖️ {supplier.annualVolume}</span>
+                      {supplier.loadingStation && <span>🚉 {supplier.loadingStation}</span>}
                     </div>
                     {supplier.description && (
                       <p className="mt-3 text-sm text-gray-500 border-t border-gray-50 pt-3">{supplier.description}</p>

@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
     const {
       companyName, country, contactName, email, phone,
       products, annualVolume, elevatorName, description,
-      letterheadBase64, letterheadFileName,
+      loadingStation, letterheadBase64, letterheadFileName,
     } = body;
 
     if (!companyName || !country || !contactName || !email || !phone || !products?.length || !annualVolume) {
@@ -33,6 +33,7 @@ export async function POST(req: NextRequest) {
       products,
       annualVolume,
       elevatorName: elevatorName?.trim() ?? '',
+      loadingStation: loadingStation?.trim() ?? '',
       description: description?.trim() ?? '',
       letterheadBase64: letterheadBase64 ?? undefined,
       letterheadFileName: letterheadFileName ?? undefined,
@@ -46,6 +47,7 @@ export async function POST(req: NextRequest) {
       phone: supplier.phone,
       products: supplier.products,
       elevatorName: supplier.elevatorName,
+      loadingStation: supplier.loadingStation,
     });
 
     return NextResponse.json({ success: true, id: supplier.id }, { status: 201 });

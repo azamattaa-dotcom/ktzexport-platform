@@ -30,6 +30,7 @@ export interface Supplier {
   annualVolume: string;
   description: string;
   elevatorName: string;
+  loadingStation?: string;
   letterheadBase64?: string;
   letterheadFileName?: string;
   productPrices?: Record<string, ProductPrice>;

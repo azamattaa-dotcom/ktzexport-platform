@@ -33,12 +33,14 @@ async function send(to: string, subject: string, text: string, replyTo?: string)
 export async function notifyAdminNewSupplier(supplier: {
   companyName: string; country: string; contactName: string;
   email: string; phone: string; products: string[]; elevatorName: string;
+  loadingStation?: string;
 }) {
   const body = `Новая заявка поставщика на KTZ Export:
 
 Компания: ${supplier.companyName}
 Страна: ${supplier.country}
-Элеватор/склад: ${supplier.elevatorName}
+Элеватор/склад: ${supplier.elevatorName || '—'}
+Станция погрузки: ${supplier.loadingStation || '—'}
 Контакт: ${supplier.contactName}
 Email: ${supplier.email}
 Телефон: ${supplier.phone}
