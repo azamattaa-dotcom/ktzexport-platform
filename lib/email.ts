@@ -43,6 +43,39 @@ Email: ${supplier.email}
   await send(NOTIFICATION_EMAIL, `Новая заявка: ${supplier.companyName}`, body);
 }
 
+const PRODUCT_LABELS_RU: Record<string, string> = {
+  flour_feed: 'Кормовая мука', flour_wheat: 'Пшеничная мука', wheat: 'Пшеница',
+  barley: 'Ячмень', bran: 'Пшеничные отруби', flaxseed: 'Семена льна',
+  sunflower: 'Семена подсолнечника', corn: 'Кукуруза',
+};
+
+export async function sendBuyerRequest(params: {
+  supplierCompany: string;
+  productId: string;
+  buyerName: string;
+  buyerEmail: string;
+  buyerPhone?: string;
+  volume?: string;
+  message?: string;
+}) {
+  const product = PRODUCT_LABELS_RU[params.productId] ?? params.productId;
+  const body = `Новый запрос покупателя на KTZ Export
+
+Поставщик: ${params.supplierCompany}
+Товар: ${product}
+
+Покупатель:
+Имя: ${params.buyerName}
+Email: ${params.buyerEmail}
+Телефон: ${params.buyerPhone || 'не указан'}
+Интересующий объём: ${params.volume || 'не указан'}
+Сообщение: ${params.message || '—'}
+
+Ответить покупателю: ${params.buyerEmail}`;
+
+  await send(NOTIFICATION_EMAIL, `Запрос покупателя — ${product} (${params.supplierCompany})`, body);
+}
+
 export async function sendSupplierInvite(supplier: {
   companyName: string; email: string; inviteToken: string;
 }) {

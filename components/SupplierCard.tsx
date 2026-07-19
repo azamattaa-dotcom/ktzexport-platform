@@ -13,6 +13,8 @@ const PRODUCT_LABELS: Record<string, Record<string, string>> = {
 
 const CURRENCY_SYMBOL: Record<string, string> = { USD: '$', KZT: '₸' };
 
+const emptyForm = { name: '', email: '', phone: '', volume: '', message: '' };
+
 interface Props {
   supplier: Supplier;
   productId: string;
@@ -22,6 +24,12 @@ interface Props {
 
 export default function SupplierCard({ supplier, productId, locale, isAdmin }: Props) {
   const [expanded, setExpanded] = useState(false);
+  const [showForm, setShowForm] = useState(false);
+  const [form, setForm] = useState(emptyForm);
+  const [sending, setSending] = useState(false);
+  const [sent, setSent] = useState(false);
+  const [sendErr, setSendErr] = useState('');
+
   const detail = supplier.productDetails?.[productId];
   const price = detail?.price ?? supplier.productPrices?.[productId];
   const labels = PRODUCT_LABELS[locale] ?? PRODUCT_LABELS.ru;
@@ -32,6 +40,29 @@ export default function SupplierCard({ supplier, productId, locale, isAdmin }: P
     const sym = CURRENCY_SYMBOL[price.currency] ?? '';
     if (price.type === 'fixed') return `${sym}${price.fixed?.toLocaleString()} / ${price.unit}`;
     return `${sym}${price.min?.toLocaleString()} – ${price.max?.toLocaleString()} / ${price.unit}`;
+  }
+
+  async function handleRequest(e: React.FormEvent) {
+    e.preventDefault();
+    setSending(true);
+    setSendErr('');
+    const res = await fetch('/api/request', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        supplierCompany: supplier.companyName,
+        productId,
+        ...form,
+      }),
+    });
+    setSending(false);
+    if (res.ok) {
+      setSent(true);
+      setShowForm(false);
+      setForm(emptyForm);
+    } else {
+      setSendErr('Ошибка отправки. Попробуйте ещё раз.');
+    }
   }
 
   const priceStr = formatPrice();
@@ -45,7 +76,6 @@ export default function SupplierCard({ supplier, productId, locale, isAdmin }: P
       >
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-4 min-w-0">
-            {/* Logo */}
             <div className="w-12 h-12 rounded-xl bg-primary-100 flex items-center justify-center text-primary-700 font-bold text-lg shrink-0">
               {supplier.companyName.charAt(0).toUpperCase()}
             </div>
@@ -54,7 +84,6 @@ export default function SupplierCard({ supplier, productId, locale, isAdmin }: P
               <p className="text-xs text-gray-400 mt-0.5">
                 {supplier.country}{supplier.elevatorName ? ` · ${supplier.elevatorName}` : ''}
               </p>
-              {/* Product tags */}
               <div className="flex flex-wrap gap-1 mt-2">
                 {supplier.products.map((pid) => {
                   const p = PRODUCT_LIST.find((x) => x.id === pid);
@@ -68,7 +97,6 @@ export default function SupplierCard({ supplier, productId, locale, isAdmin }: P
             </div>
           </div>
 
-          {/* Price + expand icon */}
           <div className="flex items-center gap-4 shrink-0">
             <div className="text-right">
               {priceStr ? (
@@ -117,7 +145,7 @@ export default function SupplierCard({ supplier, productId, locale, isAdmin }: P
             </div>
           )}
 
-          {/* Documents row */}
+          {/* Documents */}
           <div className="flex flex-wrap gap-3">
             {detail?.certificateBase64 && (
               <a href={detail.certificateBase64} download={detail.certificateFileName ?? 'certificate'}
@@ -139,6 +167,81 @@ export default function SupplierCard({ supplier, productId, locale, isAdmin }: P
               )
             )}
           </div>
+
+          {/* Request form — buyers only */}
+          {!isAdmin && (
+            <div className="border-t border-gray-100 pt-4">
+              {sent ? (
+                <div className="bg-green-50 border border-green-200 rounded-xl px-4 py-3 text-sm text-green-700">
+                  ✓ Запрос отправлен — мы свяжемся с вами в течение 24 часов
+                </div>
+              ) : showForm ? (
+                <form onSubmit={handleRequest} className="space-y-3">
+                  <h3 className="text-sm font-semibold text-gray-700">Запрос поставщику</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <input
+                      required
+                      placeholder="Ваше имя *"
+                      value={form.name}
+                      onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
+                      className="border border-gray-200 rounded-lg px-3 py-2 text-sm w-full"
+                    />
+                    <input
+                      required
+                      type="email"
+                      placeholder="Email *"
+                      value={form.email}
+                      onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))}
+                      className="border border-gray-200 rounded-lg px-3 py-2 text-sm w-full"
+                    />
+                    <input
+                      placeholder="Телефон"
+                      value={form.phone}
+                      onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))}
+                      className="border border-gray-200 rounded-lg px-3 py-2 text-sm w-full"
+                    />
+                    <input
+                      placeholder="Интересующий объём"
+                      value={form.volume}
+                      onChange={(e) => setForm((p) => ({ ...p, volume: e.target.value }))}
+                      className="border border-gray-200 rounded-lg px-3 py-2 text-sm w-full"
+                    />
+                  </div>
+                  <textarea
+                    rows={2}
+                    placeholder="Сообщение (необязательно)"
+                    value={form.message}
+                    onChange={(e) => setForm((p) => ({ ...p, message: e.target.value }))}
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm resize-none"
+                  />
+                  {sendErr && <p className="text-xs text-red-500">{sendErr}</p>}
+                  <div className="flex gap-2">
+                    <button
+                      type="submit"
+                      disabled={sending}
+                      className="bg-primary-700 hover:bg-primary-800 disabled:bg-primary-400 text-white font-medium px-4 py-2 rounded-lg text-sm transition-colors"
+                    >
+                      {sending ? 'Отправляем...' : 'Отправить запрос'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { setShowForm(false); setSendErr(''); }}
+                      className="text-gray-500 text-sm px-3 py-2 hover:text-gray-700 transition-colors"
+                    >
+                      Отмена
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                <button
+                  onClick={() => setShowForm(true)}
+                  className="bg-primary-700 hover:bg-primary-800 text-white font-semibold px-5 py-2.5 rounded-xl text-sm transition-colors"
+                >
+                  Отправить запрос →
+                </button>
+              )}
+            </div>
+          )}
         </div>
       )}
     </div>
