@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import type { Supplier, ProductDetail, ProductPrice } from '@/lib/db';
+import { containsContactInfo, CONTACT_BLOCK_MESSAGE } from '@/lib/contactValidator';
 
 const PRODUCT_LABELS: Record<string, string> = {
   flour_feed: 'Кормовая мука', flour_wheat: 'Пшеничная мука', wheat: 'Пшеница',
@@ -32,6 +33,14 @@ export default function SupplierProductManager({ supplier }: Props) {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [expanded, setExpanded] = useState<string | null>(supplier.products[0] ?? null);
+  const [contactErrors, setContactErrors] = useState<Record<string, boolean>>(() => {
+    const errs: Record<string, boolean> = {};
+    for (const pid of supplier.products) {
+      const chars = supplier.productDetails?.[pid]?.characteristics ?? '';
+      if (chars && containsContactInfo(chars)) errs[pid] = true;
+    }
+    return errs;
+  });
 
   function updateDetail(pid: string, patch: Partial<ProductDetail>) {
     setDetails((prev) => ({ ...prev, [pid]: { ...prev[pid], ...patch } }));
@@ -165,9 +174,16 @@ export default function SupplierProductManager({ supplier }: Props) {
                     rows={3}
                     placeholder="Белок, влажность, клейковина, ГОСТ..."
                     value={d.characteristics ?? ''}
-                    onChange={(e) => updateDetail(pid, { characteristics: e.target.value })}
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm resize-none"
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      updateDetail(pid, { characteristics: val });
+                      setContactErrors((prev) => ({ ...prev, [pid]: containsContactInfo(val) }));
+                    }}
+                    className={`w-full border rounded-lg px-3 py-2 text-sm resize-none ${contactErrors[pid] ? 'border-red-400 bg-red-50' : 'border-gray-200'}`}
                   />
+                  {contactErrors[pid] && (
+                    <p className="mt-1 text-xs text-red-600">{CONTACT_BLOCK_MESSAGE}</p>
+                  )}
                 </div>
 
                 {/* Certificate */}
@@ -198,7 +214,7 @@ export default function SupplierProductManager({ supplier }: Props) {
 
       <button
         onClick={handleSave}
-        disabled={saving}
+        disabled={saving || Object.values(contactErrors).some(Boolean)}
         className="w-full bg-primary-700 hover:bg-primary-800 disabled:bg-primary-400 text-white font-semibold py-3 rounded-xl transition-colors"
       >
         {saving ? 'Сохраняем...' : saved ? '✓ Сохранено' : 'Сохранить изменения'}

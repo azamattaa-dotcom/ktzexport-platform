@@ -89,22 +89,12 @@ export default function SupplierCard({ supplier, productId, locale }: Props) {
       {/* Expanded detail */}
       {expanded && (
         <div className="border-t border-gray-100 px-6 py-5 space-y-5">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* Contact */}
-            <div className="bg-gray-50 rounded-xl p-4 space-y-2">
-              <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Контакты</h3>
-              <p className="text-sm text-gray-800">{supplier.contactName}</p>
-              <p className="text-sm text-gray-600">{supplier.email}</p>
-              <p className="text-sm text-gray-600">{supplier.phone}</p>
-            </div>
-
-            {/* Volume */}
-            <div className="bg-gray-50 rounded-xl p-4 space-y-2">
-              <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Объём</h3>
-              {detail?.availableVolume && <p className="text-sm text-gray-800">Доступно: <span className="font-medium">{detail.availableVolume}</span></p>}
-              {detail?.minOrder && <p className="text-sm text-gray-800">Мин. заказ: <span className="font-medium">{detail.minOrder}</span></p>}
-              <p className="text-sm text-gray-600">Годовой: {supplier.annualVolume}</p>
-            </div>
+          {/* Volume */}
+          <div className="bg-gray-50 rounded-xl p-4 space-y-2">
+            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Объём</h3>
+            {detail?.availableVolume && <p className="text-sm text-gray-800">Доступно: <span className="font-medium">{detail.availableVolume}</span></p>}
+            {detail?.minOrder && <p className="text-sm text-gray-800">Мин. заказ: <span className="font-medium">{detail.minOrder}</span></p>}
+            <p className="text-sm text-gray-600">Годовой: {supplier.annualVolume}</p>
           </div>
 
           {/* Characteristics */}

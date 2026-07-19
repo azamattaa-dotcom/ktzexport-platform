@@ -3,11 +3,23 @@ import { useEffect, useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import type { Supplier } from '@/lib/db';
+import { PRODUCT_LIST } from '@/lib/products';
 
 const STATUS_COLORS: Record<string, string> = {
   pending:  'bg-yellow-100 text-yellow-800',
   approved: 'bg-green-100 text-green-800',
   rejected: 'bg-red-100 text-red-800',
+};
+
+const PRODUCT_LABELS: Record<string, string> = {
+  flour_feed: 'Кормовая мука', flour_wheat: 'Пшеничная мука', wheat: 'Пшеница',
+  barley: 'Ячмень', bran: 'Пшеничные отруби', flaxseed: 'Семена льна',
+  sunflower: 'Семена подсолнечника', corn: 'Кукуруза',
+};
+
+const emptyForm = {
+  companyName: '', country: 'Казахстан', contactName: '', email: '', phone: '',
+  products: [] as string[], annualVolume: '', description: '', elevatorName: '', password: '',
 };
 
 export default function AdminDashboard() {
@@ -17,6 +29,10 @@ export default function AdminDashboard() {
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [filter, setFilter] = useState<'all' | 'pending' | 'approved' | 'rejected'>('all');
   const [loading, setLoading] = useState(true);
+  const [showCreate, setShowCreate] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [createForm, setCreateForm] = useState(emptyForm);
+  const [createErr, setCreateErr] = useState('');
 
   useEffect(() => {
     fetch('/api/admin/suppliers')
@@ -36,6 +52,44 @@ export default function AdminDashboard() {
     if (res.ok) {
       setSuppliers((prev) => prev.map((s) => s.id === id ? { ...s, status } : s));
     }
+  }
+
+  async function deleteSupplier(id: string, companyName: string) {
+    if (!confirm(`Удалить поставщика «${companyName}»? Это действие необратимо.`)) return;
+    const res = await fetch(`/api/admin/suppliers/${id}`, { method: 'DELETE' });
+    if (res.ok) {
+      setSuppliers((prev) => prev.filter((s) => s.id !== id));
+    }
+  }
+
+  async function handleCreate(e: React.FormEvent) {
+    e.preventDefault();
+    setCreateErr('');
+    setCreating(true);
+    const res = await fetch('/api/admin/suppliers', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(createForm),
+    });
+    setCreating(false);
+    if (res.ok) {
+      const s = await res.json();
+      setSuppliers((prev) => [s, ...prev]);
+      setShowCreate(false);
+      setCreateForm(emptyForm);
+    } else {
+      const data = await res.json();
+      setCreateErr(data.error || 'Ошибка при создании');
+    }
+  }
+
+  function toggleProduct(pid: string) {
+    setCreateForm((prev) => ({
+      ...prev,
+      products: prev.products.includes(pid)
+        ? prev.products.filter((p) => p !== pid)
+        : [...prev.products, pid],
+    }));
   }
 
   async function handleLogout() {
@@ -68,7 +122,110 @@ export default function AdminDashboard() {
       </header>
 
       <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
-        <h1 className="text-2xl font-bold text-gray-900 mb-6">{t('suppliersTitle')}</h1>
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl font-bold text-gray-900">{t('suppliersTitle')}</h1>
+          <button
+            onClick={() => { setShowCreate(!showCreate); setCreateErr(''); }}
+            className="bg-primary-700 hover:bg-primary-800 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
+          >
+            {showCreate ? '✕ Отмена' : '+ Создать поставщика'}
+          </button>
+        </div>
+
+        {/* Create Supplier Form */}
+        {showCreate && (
+          <form onSubmit={handleCreate} className="bg-white rounded-2xl border border-primary-200 shadow-sm p-6 mb-6 space-y-4">
+            <h2 className="font-bold text-gray-900 text-lg">Новый поставщик</h2>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Компания *</label>
+                <input required value={createForm.companyName}
+                  onChange={(e) => setCreateForm((p) => ({ ...p, companyName: e.target.value }))}
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" placeholder="ТОО Агрохолдинг" />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Страна *</label>
+                <input required value={createForm.country}
+                  onChange={(e) => setCreateForm((p) => ({ ...p, country: e.target.value }))}
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" placeholder="Казахстан" />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Контактное лицо *</label>
+                <input required value={createForm.contactName}
+                  onChange={(e) => setCreateForm((p) => ({ ...p, contactName: e.target.value }))}
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" placeholder="Иванов Иван" />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Email *</label>
+                <input required type="email" value={createForm.email}
+                  onChange={(e) => setCreateForm((p) => ({ ...p, email: e.target.value }))}
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" placeholder="info@company.kz" />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Телефон *</label>
+                <input required value={createForm.phone}
+                  onChange={(e) => setCreateForm((p) => ({ ...p, phone: e.target.value }))}
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" placeholder="+7 701 000 00 00" />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Годовой объём</label>
+                <input value={createForm.annualVolume}
+                  onChange={(e) => setCreateForm((p) => ({ ...p, annualVolume: e.target.value }))}
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" placeholder="10 000 тонн/год" />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Элеватор</label>
+                <input value={createForm.elevatorName}
+                  onChange={(e) => setCreateForm((p) => ({ ...p, elevatorName: e.target.value }))}
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" placeholder="Элеватор г. Астана" />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Пароль * (мин. 8 символов)</label>
+                <input required minLength={8} type="password" value={createForm.password}
+                  onChange={(e) => setCreateForm((p) => ({ ...p, password: e.target.value }))}
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" placeholder="Минимум 8 символов" />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Описание</label>
+              <textarea rows={2} value={createForm.description}
+                onChange={(e) => setCreateForm((p) => ({ ...p, description: e.target.value }))}
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm resize-none" placeholder="Краткое описание компании" />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Продукты *</label>
+              <div className="flex flex-wrap gap-2">
+                {PRODUCT_LIST.map((p) => (
+                  <button
+                    key={p.id}
+                    type="button"
+                    onClick={() => toggleProduct(p.id)}
+                    className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
+                      createForm.products.includes(p.id)
+                        ? `bg-gradient-to-r ${p.from} ${p.to} ${p.text} ${p.border} font-medium`
+                        : 'bg-gray-100 text-gray-500 border-gray-200'
+                    }`}
+                  >
+                    {p.emoji} {PRODUCT_LABELS[p.id]}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {createErr && <p className="text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">{createErr}</p>}
+
+            <button
+              type="submit"
+              disabled={creating}
+              className="bg-primary-700 hover:bg-primary-800 disabled:bg-primary-400 text-white font-semibold px-6 py-2.5 rounded-lg transition-colors text-sm"
+            >
+              {creating ? 'Создаём...' : 'Создать поставщика'}
+            </button>
+          </form>
+        )}
 
         {/* Filter tabs */}
         <div className="flex gap-2 mb-6 flex-wrap">
@@ -96,10 +253,10 @@ export default function AdminDashboard() {
             {filtered.map((supplier) => (
               <div key={supplier.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
                 <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-                  <div className="flex-1">
+                  <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-3 mb-2">
                       <h2 className="font-bold text-gray-900">{supplier.companyName}</h2>
-                      <span className={`text-xs px-2.5 py-0.5 rounded-full font-medium ${STATUS_COLORS[supplier.status]}`}>
+                      <span className={`text-xs px-2.5 py-0.5 rounded-full font-medium shrink-0 ${STATUS_COLORS[supplier.status]}`}>
                         {t(`status.${supplier.status}` as any)}
                       </span>
                     </div>
@@ -108,7 +265,7 @@ export default function AdminDashboard() {
                       <span>👤 {supplier.contactName}</span>
                       <span>📧 {supplier.email}</span>
                       <span>📞 {supplier.phone}</span>
-                      <span>📦 {supplier.products.join(', ')}</span>
+                      <span>📦 {supplier.products.map((p) => PRODUCT_LABELS[p] ?? p).join(', ')}</span>
                       <span>⚖️ {supplier.annualVolume}</span>
                     </div>
                     {supplier.description && (
@@ -119,23 +276,31 @@ export default function AdminDashboard() {
                     </p>
                   </div>
 
-                  {/* Actions */}
-                  {supplier.status === 'pending' && (
-                    <div className="flex gap-2 shrink-0">
+                  {/* Actions — always visible for all statuses */}
+                  <div className="flex gap-2 shrink-0 flex-wrap">
+                    {supplier.status !== 'approved' && (
                       <button
                         onClick={() => updateStatus(supplier.id, 'approved')}
-                        className="bg-green-600 hover:bg-green-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
+                        className="bg-green-600 hover:bg-green-700 text-white text-sm font-medium px-3 py-2 rounded-lg transition-colors"
                       >
                         {t('approve')} ✓
                       </button>
+                    )}
+                    {supplier.status !== 'rejected' && (
                       <button
                         onClick={() => updateStatus(supplier.id, 'rejected')}
-                        className="bg-red-500 hover:bg-red-600 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
+                        className="bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium px-3 py-2 rounded-lg transition-colors"
                       >
                         {t('reject')} ✗
                       </button>
-                    </div>
-                  )}
+                    )}
+                    <button
+                      onClick={() => deleteSupplier(supplier.id, supplier.companyName)}
+                      className="bg-red-500 hover:bg-red-600 text-white text-sm font-medium px-3 py-2 rounded-lg transition-colors"
+                    >
+                      Удалить
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}

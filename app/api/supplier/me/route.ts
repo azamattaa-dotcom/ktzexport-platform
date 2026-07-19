@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { jwtVerify } from 'jose';
 import { db, ProductDetail } from '@/lib/db';
 import { cookies } from 'next/headers';
+import { containsContactInfo, CONTACT_BLOCK_MESSAGE } from '@/lib/contactValidator';
 
 const secret = new TextEncoder().encode(process.env.JWT_SECRET ?? 'fallback-secret');
 
@@ -29,6 +30,13 @@ export async function PATCH(req: NextRequest) {
 
   try {
     const { productDetails } = await req.json() as { productDetails: Record<string, ProductDetail> };
+
+    for (const detail of Object.values(productDetails)) {
+      if (detail.characteristics && containsContactInfo(detail.characteristics)) {
+        return NextResponse.json({ error: CONTACT_BLOCK_MESSAGE }, { status: 422 });
+      }
+    }
+
     const updated = await db.suppliers.updateProductDetails(supplier.id, productDetails);
     if (!updated) return NextResponse.json({ error: 'Not found' }, { status: 404 });
     const { passwordHash, inviteToken, ...safe } = updated;

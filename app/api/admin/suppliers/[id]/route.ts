@@ -4,6 +4,15 @@ import { isAdminAuthenticated } from '@/lib/auth';
 import { sendSupplierInvite } from '@/lib/email';
 import { v4 as uuidv4 } from 'uuid';
 
+export async function DELETE(_req: NextRequest, { params }: { params: { id: string } }) {
+  if (!(await isAdminAuthenticated())) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+  const ok = await db.suppliers.delete(params.id);
+  if (!ok) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+  return NextResponse.json({ ok: true });
+}
+
 export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
   if (!(await isAdminAuthenticated())) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

@@ -69,16 +69,20 @@ export const db = {
       return (await readSuppliers()).find((s) => s.email === email);
     },
 
-    async create(data: Omit<Supplier, 'id' | 'status' | 'createdAt' | 'updatedAt' | 'inviteToken' | 'passwordHash'>): Promise<Supplier> {
+    async create(
+      data: Omit<Supplier, 'id' | 'status' | 'createdAt' | 'updatedAt' | 'inviteToken' | 'passwordHash'>,
+      opts?: { status?: Supplier['status']; passwordHash?: string }
+    ): Promise<Supplier> {
       const suppliers = await readSuppliers();
       const now = new Date().toISOString();
       const supplier: Supplier = {
         id: uuidv4(),
         ...data,
-        status: 'pending',
+        status: opts?.status ?? 'pending',
         createdAt: now,
         updatedAt: now,
       };
+      if (opts?.passwordHash) supplier.passwordHash = opts.passwordHash;
       suppliers.push(supplier);
       await writeSuppliers(suppliers);
       return supplier;
@@ -117,6 +121,15 @@ export const db = {
       suppliers[idx].inviteToken = undefined;
       suppliers[idx].updatedAt = new Date().toISOString();
       await writeSuppliers(suppliers);
+    },
+
+    async delete(id: string): Promise<boolean> {
+      const suppliers = await readSuppliers();
+      const idx = suppliers.findIndex((s) => s.id === id);
+      if (idx === -1) return false;
+      suppliers.splice(idx, 1);
+      await writeSuppliers(suppliers);
+      return true;
     },
   },
 };
