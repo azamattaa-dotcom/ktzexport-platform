@@ -2,7 +2,7 @@ const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const NOTIFICATION_EMAIL = process.env.NOTIFICATION_EMAIL ?? process.env.ADMIN_EMAIL ?? 'azamattaa@gmail.com';
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://ktzexport-platform.vercel.app';
 
-async function send(to: string, subject: string, text: string) {
+async function send(to: string, subject: string, text: string, replyTo?: string) {
   if (!RESEND_API_KEY) {
     console.log('[email] No RESEND_API_KEY — skipping email to', to);
     return;
@@ -11,7 +11,13 @@ async function send(to: string, subject: string, text: string) {
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ from: 'KTZ Export <onboarding@resend.dev>', to: [to], subject, text }),
+      body: JSON.stringify({
+        from: 'KTZ Export <onboarding@resend.dev>',
+        to: [to],
+        subject,
+        text,
+        ...(replyTo ? { reply_to: replyTo } : {}),
+      }),
     });
     if (!res.ok) {
       const err = await res.text();
@@ -73,7 +79,7 @@ Email: ${params.buyerEmail}
 
 Ответить покупателю: ${params.buyerEmail}`;
 
-  await send(NOTIFICATION_EMAIL, `Запрос покупателя — ${product} (${params.supplierCompany})`, body);
+  await send(NOTIFICATION_EMAIL, `Запрос покупателя — ${product} (${params.supplierCompany})`, body, params.buyerEmail);
 }
 
 export async function sendSupplierInvite(supplier: {
