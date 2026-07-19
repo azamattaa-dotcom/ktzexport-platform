@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
+import { useTranslations } from 'next-intl';
 
 interface Msg {
   id: string;
@@ -15,6 +16,7 @@ interface Props {
 }
 
 export default function SupplierChat({ supplierId, productId, supplierName }: Props) {
+  const t = useTranslations('chat');
   const [phase, setPhase] = useState<'loading' | 'identify' | 'chat'>('loading');
   const [buyerEmail, setBuyerEmail] = useState('');
   const [buyerName, setBuyerName] = useState('');
@@ -84,29 +86,29 @@ export default function SupplierChat({ supplierId, productId, supplierName }: Pr
   }
 
   function formatTime(ts: number) {
-    return new Date(ts).toLocaleString('ru-RU', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+    return new Date(ts).toLocaleString(undefined, { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
   }
 
   const field = 'w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400';
 
   if (phase === 'loading') {
-    return <div className="py-4 text-center text-gray-400 text-sm">Загрузка...</div>;
+    return <div className="py-4 text-center text-gray-400 text-sm">{t('loading')}</div>;
   }
 
   if (phase === 'identify') {
     return (
       <div>
-        <p className="text-sm text-gray-500 mb-3">Введите ваши данные, чтобы на��ать переписку с поставщиком</p>
+        <p className="text-sm text-gray-500 mb-3">{t('identifyDesc')}</p>
         <form onSubmit={handleIdentify} className="space-y-2">
           <input required value={identForm.name} onChange={(e) => setIdentForm((p) => ({ ...p, name: e.target.value }))}
-            placeholder="Ваше имя *" className={field} />
+            placeholder={t('yourName')} className={field} />
           <input required type="email" value={identForm.email}
             onChange={(e) => setIdentForm((p) => ({ ...p, email: e.target.value }))}
-            placeholder="Email *" className={field} />
+            placeholder={t('yourEmail')} className={field} />
           {identErr && <p className="text-red-500 text-xs">{identErr}</p>}
           <button type="submit"
             className="bg-primary-700 hover:bg-primary-800 text-white font-medium px-4 py-2 rounded-lg text-sm transition-colors">
-            Начать переписку →
+            {t('startChat')}
           </button>
         </form>
       </div>
@@ -119,7 +121,7 @@ export default function SupplierChat({ supplierId, productId, supplierName }: Pr
       <div className="h-52 overflow-y-auto space-y-2 mb-3 bg-gray-50 rounded-xl p-3 border border-gray-100">
         {messages.length === 0 ? (
           <p className="text-gray-400 text-xs text-center py-6">
-            Напишите первое сообщение поставщику {supplierName}
+            {t('emptyChat')} {supplierName}
           </p>
         ) : (
           messages.map((msg) => (
@@ -148,12 +150,12 @@ export default function SupplierChat({ supplierId, productId, supplierName }: Pr
         <input
           value={newMsg}
           onChange={(e) => setNewMsg(e.target.value)}
-          placeholder="Ваше сообщение..."
+          placeholder={t('placeholder')}
           className="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
         />
         <button type="submit" disabled={sending || !newMsg.trim()}
           className="bg-primary-700 hover:bg-primary-800 disabled:bg-primary-300 text-white px-4 py-2 rounded-xl text-sm font-medium transition-colors shrink-0">
-          {sending ? '...' : 'Отправить'}
+          {sending ? '...' : t('send')}
         </button>
       </form>
 
@@ -170,7 +172,7 @@ export default function SupplierChat({ supplierId, productId, supplierName }: Pr
           }}
           className="text-primary-600 hover:underline"
         >
-          изменить
+          {t('changeIdentity')}
         </button>
       </p>
     </div>

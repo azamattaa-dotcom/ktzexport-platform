@@ -1,11 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
-
-const PRODUCT_LABELS: Record<string, string> = {
-  flour_feed: 'Кормовая мука', flour_wheat: 'Пшеничная мука', wheat: 'Пшеница',
-  barley: 'Ячмень', bran: 'Пшеничные отруби', flaxseed: 'Семена льна',
-  sunflower: 'Се��ена подсолнечника', corn: 'Кукуруза',
-};
+import { useTranslations } from 'next-intl';
 
 interface Msg { id: string; fromType: 'buyer' | 'supplier'; content: string; timestamp: number; }
 interface Thread {
@@ -14,6 +9,8 @@ interface Thread {
 }
 
 export default function SupplierMessagesPanel() {
+  const t = useTranslations('chat');
+  const tp = useTranslations('products.items');
   const [threads, setThreads] = useState<Thread[]>([]);
   const [loading, setLoading] = useState(true);
   const [openId, setOpenId] = useState<string | null>(null);
@@ -58,18 +55,22 @@ export default function SupplierMessagesPanel() {
   }
 
   function formatTime(ts: number) {
-    return new Date(ts).toLocaleString('ru-RU', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+    return new Date(ts).toLocaleString(undefined, { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+  }
+
+  function productLabel(productId: string): string {
+    try { return tp(productId as any); } catch { return productId; }
   }
 
   if (loading) {
-    return <div className="py-8 text-center text-gray-400 text-sm">Загрузка сообщений...</div>;
+    return <div className="py-8 text-center text-gray-400 text-sm">{t('loadingMessages')}</div>;
   }
 
   if (threads.length === 0) {
     return (
       <div className="py-8 text-center text-gray-400">
         <div className="text-3xl mb-2">💬</div>
-        <p className="text-sm">Входящих сообщений пока нет</p>
+        <p className="text-sm">{t('noMessages')}</p>
       </div>
     );
   }
@@ -79,7 +80,6 @@ export default function SupplierMessagesPanel() {
       {threads.map((thread) => {
         const isOpen = openId === thread.id;
         const lastMsg = thread.messages[thread.messages.length - 1];
-        const unread = thread.messages.some((m) => m.fromType === 'buyer');
 
         return (
           <div key={thread.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
@@ -95,7 +95,7 @@ export default function SupplierMessagesPanel() {
                   </div>
                   <div className="flex items-center gap-2 mt-0.5">
                     <span className="text-xs text-primary-600 font-medium">
-                      {PRODUCT_LABELS[thread.productId] ?? thread.productId}
+                      {productLabel(thread.productId)}
                     </span>
                     {lastMsg && (
                       <span className="text-xs text-gray-400 truncate max-w-[200px]">· {lastMsg.content}</span>
@@ -114,13 +114,12 @@ export default function SupplierMessagesPanel() {
 
             {isOpen && (
               <div className="border-t border-gray-100 px-5 py-4">
-                {/* Messages */}
                 <div className="space-y-2 mb-4 max-h-64 overflow-y-auto">
                   {thread.messages.map((msg) => (
                     <div key={msg.id} className={`flex ${msg.fromType === 'supplier' ? 'justify-end' : 'justify-start'}`}>
                       <div className={`max-w-[80%] flex flex-col gap-0.5 ${msg.fromType === 'supplier' ? 'items-end' : 'items-start'}`}>
                         <span className="text-xs text-gray-400 px-1">
-                          {msg.fromType === 'buyer' ? thread.buyerName : 'Вы'} · {formatTime(msg.timestamp)}
+                          {msg.fromType === 'buyer' ? thread.buyerName : t('you')} · {formatTime(msg.timestamp)}
                         </span>
                         <div className={`px-3 py-2 rounded-xl text-sm ${
                           msg.fromType === 'supplier'
@@ -134,13 +133,12 @@ export default function SupplierMessagesPanel() {
                   ))}
                 </div>
 
-                {/* Reply */}
                 <div className="flex gap-2">
                   <input
                     value={reply}
                     onChange={(e) => setReply(e.target.value)}
                     onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendReply(thread); } }}
-                    placeholder="Ответить..."
+                    placeholder={t('replyPlaceholder')}
                     className="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
                   />
                   <button
@@ -148,7 +146,7 @@ export default function SupplierMessagesPanel() {
                     disabled={sending || !reply.trim()}
                     className="bg-primary-700 hover:bg-primary-800 disabled:bg-primary-300 text-white px-4 py-2 rounded-xl text-sm font-medium transition-colors"
                   >
-                    {sending ? '...' : 'Ответить'}
+                    {sending ? '...' : t('reply')}
                   </button>
                 </div>
               </div>
