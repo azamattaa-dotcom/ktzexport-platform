@@ -17,7 +17,8 @@
     "ctaSupplier": "成为供应商",
     "stat1": "出口吨数",
     "stat2": "合作国家",
-    "stat3": "供应商"
+    "stat3": "供应商",
+    "ctaLogistics": "物流"
   },
   "products": {
     "title": "我们的产品",

@@ -4,7 +4,7 @@ const STEPS = [
   { num: '01', color: 'bg-primary-100 text-primary-700', icon: '🔍' },
   { num: '02', color: 'bg-wheat-100 text-wheat-600',     icon: '💬' },
   { num: '03', color: 'bg-blue-100 text-blue-700',       icon: '✍️' },
-  { num: '04', color: 'bg-green-100 text-green-700',     icon: '🚂' },
+  { num: '04', color: 'bg-blue-100 text-blue-700',       icon: '🚢' },
 ];
 
 export default function HowItWorks() {

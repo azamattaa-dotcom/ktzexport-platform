@@ -17,7 +17,8 @@
     "ctaSupplier": "Tedarikçi Ol",
     "stat1": "İhraç Edilen Ton",
     "stat2": "Ortak Ülke",
-    "stat3": "Tedarikçi"
+    "stat3": "Tedarikçi",
+    "ctaLogistics": "Lojistik"
   },
   "products": {
     "title": "Ürünlerimiz",

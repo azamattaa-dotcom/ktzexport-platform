@@ -17,7 +17,8 @@
     "ctaSupplier": "Become a Supplier",
     "stat1": "Tonnes Exported",
     "stat2": "Partner Countries",
-    "stat3": "Suppliers"
+    "stat3": "Suppliers",
+    "ctaLogistics": "Logistics"
   },
   "products": {
     "title": "Our Products",
