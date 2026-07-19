@@ -57,6 +57,54 @@ const PRODUCT_LABELS_RU: Record<string, string> = {
   sunflower: 'Семена подсолнечника', corn: 'Кукуруза',
 };
 
+export async function sendLogisticsRequest(params: {
+  transportType: string;
+  stationDeparture: string;
+  stationBorder: string;
+  stationDestination: string;
+  stationEmptyReturn?: string;
+  cargoName: string;
+  cargoCodeGNG?: string;
+  cargoCodeETSNG?: string;
+  containerSize?: string;
+  containerCount?: string;
+  wagonCount?: string;
+  month: string;
+  decade: string;
+  contactName: string;
+  contactCompany?: string;
+  contactEmail: string;
+  contactPhone?: string;
+}) {
+  const body = `Новый запрос на расчёт логистики — KTZ Export
+
+ТИП ТРАНСПОРТА: ${params.transportType}
+
+МАРШРУТ
+Станция отправления: ${params.stationDeparture}
+Пограничный переход: ${params.stationBorder}
+Станция назначения: ${params.stationDestination}${params.stationEmptyReturn ? `\nСтанция возврата порожнего: ${params.stationEmptyReturn}` : ''}
+
+ГРУЗ
+Наименование: ${params.cargoName}${params.cargoCodeGNG ? `\nКод ГНГ: ${params.cargoCodeGNG}` : ''}${params.cargoCodeETSNG ? `\nКод ЕТСНГ: ${params.cargoCodeETSNG}` : ''}${params.containerSize ? `\nПараметры контейнеров: ${params.containerSize}` : ''}${params.containerCount ? `\nКоличество контейнеров: ${params.containerCount}` : ''}
+Количество вагонов: ${params.wagonCount || '—'}
+
+СРОКИ
+Период: ${params.month}, ${params.decade}
+
+КОНТАКТНЫЕ ДАННЫЕ
+Имя: ${params.contactName}${params.contactCompany ? `\nКомпания: ${params.contactCompany}` : ''}
+Email: ${params.contactEmail}
+Телефон: ${params.contactPhone || '—'}`;
+
+  await send(
+    NOTIFICATION_EMAIL,
+    `Запрос логистики — ${params.transportType} (${params.stationDeparture} → ${params.stationDestination})`,
+    body,
+    params.contactEmail
+  );
+}
+
 export async function sendBuyerRequest(params: {
   supplierCompany: string;
   productId: string;

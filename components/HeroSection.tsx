@@ -55,9 +55,9 @@ export default function HeroSection() {
             </Link>
             <Link
               href={`/${locale}/logistics`}
-              className="inline-flex items-center justify-center gap-2 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-400/40 font-semibold px-8 py-3.5 rounded-xl transition-all backdrop-blur-sm"
+              className="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 border border-white/30 font-semibold px-8 py-3.5 rounded-xl transition-all backdrop-blur-sm"
             >
-              🚢 {t('ctaLogistics')}
+              {t('ctaLogistics')}
             </Link>
           </div>
 
