@@ -17,9 +17,10 @@ interface Props {
   supplier: Supplier;
   productId: string;
   locale: string;
+  isAdmin?: boolean;
 }
 
-export default function SupplierCard({ supplier, productId, locale }: Props) {
+export default function SupplierCard({ supplier, productId, locale, isAdmin }: Props) {
   const [expanded, setExpanded] = useState(false);
   const detail = supplier.productDetails?.[productId];
   const price = detail?.price ?? supplier.productPrices?.[productId];
@@ -89,12 +90,23 @@ export default function SupplierCard({ supplier, productId, locale }: Props) {
       {/* Expanded detail */}
       {expanded && (
         <div className="border-t border-gray-100 px-6 py-5 space-y-5">
-          {/* Volume */}
-          <div className="bg-gray-50 rounded-xl p-4 space-y-2">
-            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Объём</h3>
-            {detail?.availableVolume && <p className="text-sm text-gray-800">Доступно: <span className="font-medium">{detail.availableVolume}</span></p>}
-            {detail?.minOrder && <p className="text-sm text-gray-800">Мин. заказ: <span className="font-medium">{detail.minOrder}</span></p>}
-            <p className="text-sm text-gray-600">Годовой: {supplier.annualVolume}</p>
+          <div className={`grid gap-4 ${isAdmin ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1'}`}>
+            {/* Contacts — admin only */}
+            {isAdmin && (
+              <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 space-y-2">
+                <h3 className="text-xs font-semibold text-blue-500 uppercase tracking-wide">Контакты</h3>
+                <p className="text-sm text-gray-800 font-medium">{supplier.contactName}</p>
+                <p className="text-sm text-gray-600">{supplier.email}</p>
+                <p className="text-sm text-gray-600">{supplier.phone}</p>
+              </div>
+            )}
+            {/* Volume */}
+            <div className="bg-gray-50 rounded-xl p-4 space-y-2">
+              <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Объём</h3>
+              {detail?.availableVolume && <p className="text-sm text-gray-800">Доступно: <span className="font-medium">{detail.availableVolume}</span></p>}
+              {detail?.minOrder && <p className="text-sm text-gray-800">Мин. заказ: <span className="font-medium">{detail.minOrder}</span></p>}
+              <p className="text-sm text-gray-600">Годовой: {supplier.annualVolume}</p>
+            </div>
           </div>
 
           {/* Characteristics */}

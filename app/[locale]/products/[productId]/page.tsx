@@ -7,6 +7,7 @@ import Footer from '@/components/Footer';
 import Link from 'next/link';
 import Image from 'next/image';
 import SupplierCard from '@/components/SupplierCard';
+import { isAdminAuthenticated } from '@/lib/auth';
 
 export default async function ProductPage({
   params,
@@ -18,10 +19,11 @@ export default async function ProductPage({
   const product = PRODUCT_LIST.find((p) => p.id === productId);
   if (!product) notFound();
 
-  const [t, tc, allSuppliers] = await Promise.all([
+  const [t, tc, allSuppliers, isAdmin] = await Promise.all([
     getTranslations({ locale, namespace: 'products' }),
     getTranslations({ locale, namespace: 'catalog' }),
     db.suppliers.findAll(),
+    isAdminAuthenticated(),
   ]);
   const suppliers = allSuppliers.filter(
     (s) => s.status === 'approved' && s.products.includes(productId)
@@ -69,6 +71,7 @@ export default async function ProductPage({
                 supplier={supplier}
                 productId={productId}
                 locale={locale}
+                isAdmin={isAdmin}
               />
             ))}
           </div>
