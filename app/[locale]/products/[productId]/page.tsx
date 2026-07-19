@@ -9,6 +9,8 @@ import Image from 'next/image';
 import SupplierCard from '@/components/SupplierCard';
 import { isAdminAuthenticated } from '@/lib/auth';
 
+export const dynamic = 'force-dynamic';
+
 export default async function ProductPage({
   params,
 }: {
