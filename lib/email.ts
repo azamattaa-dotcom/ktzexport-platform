@@ -192,3 +192,60 @@ info@ktzexport.com`;
 
   await send(supplier.email, 'Заявка одобрена — KTZ Export', body);
 }
+
+// ── Buyer emails ─────────────────────────────────────────────────────────────
+
+export async function notifyAdminNewBuyer(buyer: {
+  companyName: string; country: string; registrationNumber: string;
+  directorName: string; contactName: string; email: string; phone: string;
+}) {
+  const body = `Новая заявка покупателя на KTZ Export:
+
+Компания: ${buyer.companyName}
+Страна: ${buyer.country}
+Регистрационный номер / БИН: ${buyer.registrationNumber}
+Директор: ${buyer.directorName}
+Контакт: ${buyer.contactName}
+Email: ${buyer.email}
+Телефон: ${buyer.phone}
+
+Проверить и одобрить: ${SITE_URL}/ru/admin?tab=buyers`;
+
+  await send(NOTIFICATION_EMAIL, `Новая заявка покупателя: ${buyer.companyName}`, body);
+}
+
+export async function sendBuyerInvite(buyer: {
+  companyName: string; email: string; inviteToken: string;
+}) {
+  const setupUrl = `${SITE_URL}/ru/buyer/setup/${buyer.inviteToken}`;
+  const body = `Уважаемый партнёр, ${buyer.companyName}!
+
+Ваша заявка покупателя на платформе KTZ Export одобрена. Верификация документов пройдена.
+
+Для доступа к платформе установите пароль по ссылке:
+${setupUrl}
+
+Ссылка действительна 7 дней.
+
+С уважением,
+Команда KTZ Export
+info@ktzexport.com`;
+
+  await send(buyer.email, 'Заявка покупателя одобрена — KTZ Export', body);
+}
+
+export async function notifyBuyerRejected(buyer: {
+  companyName: string; email: string; rejectionReason?: string;
+}) {
+  const body = `Уважаемый партнёр, ${buyer.companyName}!
+
+К сожалению, ваша заявка покупателя на платформе KTZ Export не прошла верификацию.
+
+${buyer.rejectionReason ? `Причина: ${buyer.rejectionReason}\n` : ''}
+Если вы считаете, что это ошибка, свяжитесь с нами: info@ktzexport.com
+
+С уважением,
+Команда KTZ Export`;
+
+  await send(buyer.email, 'Заявка покупателя отклонена — KTZ Export', body);
+}

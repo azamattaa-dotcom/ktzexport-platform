@@ -1,6 +1,40 @@
 import { kv } from '@vercel/kv';
 import { v4 as uuidv4 } from 'uuid';
 
+export interface BuyerDocument {
+  base64: string;
+  fileName: string;
+  fileType: string;
+}
+
+export interface Buyer {
+  id: string;
+  // Company
+  companyName: string;
+  country: string;
+  registrationNumber: string;
+  address: string;
+  directorName: string;
+  contactName: string;
+  email: string;
+  phone: string;
+  website?: string;
+  description?: string;
+  // Documents
+  charterDoc?: BuyerDocument;
+  registrationDoc?: BuyerDocument;
+  passportDoc?: BuyerDocument;
+  // Auth
+  passwordHash?: string;
+  inviteToken?: string;
+  // Status
+  status: 'pending' | 'approved' | 'rejected';
+  rejectionReason?: string;
+  adminNotes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface ProductPrice {
   type: 'fixed' | 'range';
   fixed?: number;
@@ -43,6 +77,7 @@ export interface Supplier {
 }
 
 const KV_KEY = 'suppliers';
+const BUYERS_KEY = 'buyers';
 
 async function readSuppliers(): Promise<Supplier[]> {
   return (await kv.get<Supplier[]>(KV_KEY)) ?? [];
@@ -130,6 +165,55 @@ export const db = {
       if (idx === -1) return false;
       suppliers.splice(idx, 1);
       await writeSuppliers(suppliers);
+      return true;
+    },
+  },
+
+  buyers: {
+    async findAll(): Promise<Buyer[]> {
+      return (await kv.get<Buyer[]>(BUYERS_KEY)) ?? [];
+    },
+
+    async findById(id: string): Promise<Buyer | undefined> {
+      return (await db.buyers.findAll()).find((b) => b.id === id);
+    },
+
+    async findByEmail(email: string): Promise<Buyer | undefined> {
+      return (await db.buyers.findAll()).find((b) => b.email === email);
+    },
+
+    async findByInviteToken(token: string): Promise<Buyer | undefined> {
+      return (await db.buyers.findAll()).find((b) => b.inviteToken === token);
+    },
+
+    async create(data: Omit<Buyer, 'id' | 'status' | 'createdAt' | 'updatedAt' | 'inviteToken' | 'passwordHash'>): Promise<Buyer> {
+      const all = await db.buyers.findAll();
+      const now = new Date().toISOString();
+      const buyer: Buyer = { id: uuidv4(), ...data, status: 'pending', createdAt: now, updatedAt: now };
+      all.push(buyer);
+      await kv.set(BUYERS_KEY, all);
+      return buyer;
+    },
+
+    async update(id: string, patch: Partial<Buyer>): Promise<Buyer | null> {
+      const all = await db.buyers.findAll();
+      const idx = all.findIndex((b) => b.id === id);
+      if (idx === -1) return null;
+      all[idx] = { ...all[idx], ...patch, updatedAt: new Date().toISOString() };
+      await kv.set(BUYERS_KEY, all);
+      return all[idx];
+    },
+
+    async setPassword(id: string, passwordHash: string): Promise<void> {
+      await db.buyers.update(id, { passwordHash, inviteToken: undefined });
+    },
+
+    async delete(id: string): Promise<boolean> {
+      const all = await db.buyers.findAll();
+      const idx = all.findIndex((b) => b.id === id);
+      if (idx === -1) return false;
+      all.splice(idx, 1);
+      await kv.set(BUYERS_KEY, all);
       return true;
     },
   },
