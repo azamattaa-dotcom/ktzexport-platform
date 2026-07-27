@@ -77,7 +77,7 @@ export default function Footer() {
 
         <div className="mt-10 pt-6 border-t border-primary-800 flex flex-col sm:flex-row justify-between items-center gap-2 text-xs text-primary-400">
           <p>© {new Date().getFullYear()} KTZ Export. {t('rights')}.</p>
-          <p>ТОО «KTZ Export» · БИН 240640023888 · г. Алматы</p>
+          <p>ТОО «KTZ Export» · БИН 260240023256 · г. Астана</p>
         </div>
       </div>
     </footer>
