@@ -1,7 +1,8 @@
 import { NextIntlClientProvider } from 'next-intl';
-import { getMessages } from 'next-intl/server';
+import { getMessages, getTranslations } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { locales } from '@/i18n/routing';
+import AgentChatWidget from '@/components/AgentChatWidget';
 import '../globals.css';
 
 export function generateStaticParams() {
@@ -19,17 +20,19 @@ export default async function LocaleLayout({
   if (!locales.includes(locale as any)) notFound();
 
   const messages = await getMessages();
+  const t = await getTranslations('meta');
 
   return (
     <html lang={locale} suppressHydrationWarning>
       <head>
-        <title>KTZ Export — Казахстанская агропродукция</title>
-        <meta name="description" content="B2B платформа для экспорта казахстанской агропродукции в Китай, Среднюю Азию и Европу" />
+        <title>{t('siteTitle')}</title>
+        <meta name="description" content={t('siteDescription')} />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>
       <body>
         <NextIntlClientProvider messages={messages}>
           {children}
+          <AgentChatWidget />
         </NextIntlClientProvider>
       </body>
     </html>

@@ -1,13 +1,8 @@
 'use client';
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import type { Supplier, ProductDetail, ProductPrice } from '@/lib/db';
 import { containsContactInfo, CONTACT_BLOCK_MESSAGE } from '@/lib/contactValidator';
-
-const PRODUCT_LABELS: Record<string, string> = {
-  flour_feed: 'Кормовая мука', flour_wheat: 'Пшеничная мука', wheat: 'Пшеница',
-  barley: 'Ячмень', bran: 'Пшеничные отруби', flaxseed: 'Семена льна',
-  sunflower: 'Семена подсолнечника', corn: 'Кукуруза',
-};
 
 const PRODUCT_EMOJI: Record<string, string> = {
   flour_feed: '🏭', flour_wheat: '🌾', wheat: '🌾', barley: '🌿',
@@ -23,6 +18,8 @@ function emptyDetail(): ProductDetail {
 }
 
 export default function SupplierProductManager({ supplier }: Props) {
+  const t = useTranslations('supplierProductManager');
+  const tp = useTranslations('products');
   const [details, setDetails] = useState<Record<string, ProductDetail>>(() => {
     const initial: Record<string, ProductDetail> = {};
     for (const pid of supplier.products) {
@@ -48,12 +45,12 @@ export default function SupplierProductManager({ supplier }: Props) {
   }
 
   function updatePrice(pid: string, patch: Partial<ProductPrice>) {
-    const current = details[pid]?.price ?? { type: 'fixed', currency: 'USD', unit: 'тонна' };
+    const current = details[pid]?.price ?? { type: 'fixed', currency: 'USD', unit: t('defaultUnit') };
     updateDetail(pid, { price: { ...current, ...patch } as ProductPrice });
   }
 
   function handleCertUpload(pid: string, file: File) {
-    if (file.size > 3 * 1024 * 1024) { alert('Файл слишком большой (макс. 3 МБ)'); return; }
+    if (file.size > 3 * 1024 * 1024) { alert(t('fileTooLarge')); return; }
     const reader = new FileReader();
     reader.onload = (e) => {
       updateDetail(pid, { certificateBase64: e.target?.result as string, certificateFileName: file.name });
@@ -87,7 +84,7 @@ export default function SupplierProductManager({ supplier }: Props) {
             >
               <div className="flex items-center gap-3">
                 <span className="text-2xl">{PRODUCT_EMOJI[pid]}</span>
-                <span className="font-semibold text-gray-900">{PRODUCT_LABELS[pid] ?? pid}</span>
+                <span className="font-semibold text-gray-900">{tp(`items.${pid}` as any) ?? pid}</span>
               </div>
               <div className="flex items-center gap-4">
                 {price ? (
@@ -97,7 +94,7 @@ export default function SupplierProductManager({ supplier }: Props) {
                       : `${price.currency === 'USD' ? '$' : '₸'}${price.min?.toLocaleString()} – ${price.max?.toLocaleString()} / ${price.unit}`}
                   </span>
                 ) : (
-                  <span className="text-xs text-gray-400">Цена не указана</span>
+                  <span className="text-xs text-gray-400">{t('priceNotSet')}</span>
                 )}
                 <svg className={`w-4 h-4 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -110,15 +107,15 @@ export default function SupplierProductManager({ supplier }: Props) {
               <div className="border-t border-gray-100 px-6 py-5 space-y-5">
                 {/* Price */}
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Цена</label>
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">{t('priceLabel')}</label>
                   <div className="flex gap-3 flex-wrap">
                     <select
                       value={price?.type ?? 'fixed'}
                       onChange={(e) => updatePrice(pid, { type: e.target.value as 'fixed' | 'range' })}
                       className="border border-gray-200 rounded-lg px-3 py-2 text-sm"
                     >
-                      <option value="fixed">Фиксированная</option>
-                      <option value="range">Диапазон</option>
+                      <option value="fixed">{t('priceFixed')}</option>
+                      <option value="range">{t('priceRange')}</option>
                     </select>
                     <select
                       value={price?.currency ?? 'USD'}
@@ -130,8 +127,8 @@ export default function SupplierProductManager({ supplier }: Props) {
                     </select>
                     <input
                       type="text"
-                      placeholder="Единица (тонна, кг...)"
-                      value={price?.unit ?? 'тонна'}
+                      placeholder={t('unitPlaceholder')}
+                      value={price?.unit ?? t('defaultUnit')}
                       onChange={(e) => updatePrice(pid, { unit: e.target.value })}
                       className="border border-gray-200 rounded-lg px-3 py-2 text-sm w-36"
                     />
@@ -139,13 +136,13 @@ export default function SupplierProductManager({ supplier }: Props) {
                   <div className="flex gap-3 mt-2">
                     {price?.type === 'range' ? (
                       <>
-                        <input type="number" placeholder="От" value={price?.min ?? ''} onChange={(e) => updatePrice(pid, { min: +e.target.value })}
+                        <input type="number" placeholder={t('fromPlaceholder')} value={price?.min ?? ''} onChange={(e) => updatePrice(pid, { min: +e.target.value })}
                           className="border border-gray-200 rounded-lg px-3 py-2 text-sm w-32" />
-                        <input type="number" placeholder="До" value={price?.max ?? ''} onChange={(e) => updatePrice(pid, { max: +e.target.value })}
+                        <input type="number" placeholder={t('toPlaceholder')} value={price?.max ?? ''} onChange={(e) => updatePrice(pid, { max: +e.target.value })}
                           className="border border-gray-200 rounded-lg px-3 py-2 text-sm w-32" />
                       </>
                     ) : (
-                      <input type="number" placeholder="Цена" value={price?.fixed ?? ''} onChange={(e) => updatePrice(pid, { fixed: +e.target.value })}
+                      <input type="number" placeholder={t('pricePlaceholder')} value={price?.fixed ?? ''} onChange={(e) => updatePrice(pid, { fixed: +e.target.value })}
                         className="border border-gray-200 rounded-lg px-3 py-2 text-sm w-32" />
                     )}
                   </div>
@@ -154,14 +151,14 @@ export default function SupplierProductManager({ supplier }: Props) {
                 {/* Volume */}
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Доступный объём</label>
-                    <input type="text" placeholder="напр. 500 тонн" value={d.availableVolume ?? ''}
+                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">{t('availableVolumeLabel')}</label>
+                    <input type="text" placeholder={t('availableVolumePlaceholder')} value={d.availableVolume ?? ''}
                       onChange={(e) => updateDetail(pid, { availableVolume: e.target.value })}
                       className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Мин. заказ</label>
-                    <input type="text" placeholder="напр. 20 тонн" value={d.minOrder ?? ''}
+                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">{t('minOrderLabel')}</label>
+                    <input type="text" placeholder={t('minOrderPlaceholder')} value={d.minOrder ?? ''}
                       onChange={(e) => updateDetail(pid, { minOrder: e.target.value })}
                       className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
                   </div>
@@ -169,10 +166,10 @@ export default function SupplierProductManager({ supplier }: Props) {
 
                 {/* Characteristics */}
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Характеристики</label>
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">{t('characteristicsLabel')}</label>
                   <textarea
                     rows={3}
-                    placeholder="Белок, влажность, клейковина, ГОСТ..."
+                    placeholder={t('characteristicsPlaceholder')}
                     value={d.characteristics ?? ''}
                     onChange={(e) => {
                       const val = e.target.value;
@@ -188,7 +185,7 @@ export default function SupplierProductManager({ supplier }: Props) {
 
                 {/* Certificate */}
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Сертификат / документ</label>
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">{t('certificateLabel')}</label>
                   {d.certificateFileName ? (
                     <div className="flex items-center gap-3">
                       <a href={d.certificateBase64} download={d.certificateFileName}
@@ -196,11 +193,11 @@ export default function SupplierProductManager({ supplier }: Props) {
                         📄 {d.certificateFileName}
                       </a>
                       <button onClick={() => updateDetail(pid, { certificateBase64: undefined, certificateFileName: undefined })}
-                        className="text-xs text-red-400 hover:text-red-600">Удалить</button>
+                        className="text-xs text-red-400 hover:text-red-600">{t('deleteLabel')}</button>
                     </div>
                   ) : (
                     <label className="cursor-pointer flex items-center gap-2 text-sm text-gray-500 border-2 border-dashed border-gray-200 rounded-lg px-4 py-3 hover:border-primary-300 transition-colors">
-                      <span>📎 Прикрепить PDF или изображение (макс. 3 МБ)</span>
+                      <span>{t('attachLabel')}</span>
                       <input type="file" accept=".pdf,.jpg,.jpeg,.png" className="hidden"
                         onChange={(e) => { const f = e.target.files?.[0]; if (f) handleCertUpload(pid, f); }} />
                     </label>
@@ -217,7 +214,7 @@ export default function SupplierProductManager({ supplier }: Props) {
         disabled={saving || Object.values(contactErrors).some(Boolean)}
         className="w-full bg-primary-700 hover:bg-primary-800 disabled:bg-primary-400 text-white font-semibold py-3 rounded-xl transition-colors"
       >
-        {saving ? 'Сохраняем...' : saved ? '✓ Сохранено' : 'Сохранить изменения'}
+        {saving ? t('saving') : saved ? t('saved') : t('saveChanges')}
       </button>
     </div>
   );

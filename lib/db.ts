@@ -12,14 +12,26 @@ export interface Buyer {
   // Company
   companyName: string;
   country: string;
-  registrationNumber: string;
-  address: string;
-  directorName: string;
+  registrationNumber: string;   // БИН / ИНН / USCC / Tax ID
+  legalAddress: string;
+  postalAddress: string;
+  // Signatory
+  signatoryName: string;        // ФИО подписанта
+  signatoryType: string;        // Директор | Генеральный директор | Законный представитель | custom
+  signatoryCustomType?: string; // если тип = "other"
+  // Contact
   contactName: string;
   email: string;
   phone: string;
   website?: string;
   description?: string;
+  // Banking
+  bankName: string;
+  swift: string;
+  bankAccount: string;
+  bankCurrency: string;
+  // Logistics
+  unloadingRegion: string;
   // Documents
   charterDoc?: BuyerDocument;
   registrationDoc?: BuyerDocument;

@@ -7,18 +7,47 @@ import { PRODUCT_LIST } from '@/lib/products';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
+// ── Chat lead types ────────────────────────────────────────────────────────
+
+interface LeadMessage {
+  id: string;
+  from: 'visitor' | 'admin';
+  content: string;
+  timestamp: string;
+}
+
+interface ChatLead {
+  id: string;
+  status: 'new' | 'active' | 'closed';
+  intent: 'buyer' | 'supplier' | 'other';
+  product?: string;
+  volume?: string;
+  contact: string;
+  messages: LeadMessage[];
+  createdAt: string;
+  updatedAt: string;
+}
+
 interface BuyerLight {
   id: string;
   companyName: string;
   country: string;
   registrationNumber: string;
-  address: string;
-  directorName: string;
+  legalAddress: string;
+  postalAddress: string;
+  signatoryName: string;
+  signatoryType: string;
+  signatoryCustomType?: string;
   contactName: string;
   email: string;
   phone: string;
   website?: string;
   description?: string;
+  bankName: string;
+  swift: string;
+  bankAccount: string;
+  bankCurrency: string;
+  unloadingRegion: string;
   status: 'pending' | 'approved' | 'rejected';
   rejectionReason?: string;
   adminNotes?: string;
@@ -33,6 +62,12 @@ interface BuyerFull extends BuyerLight {
   registrationDoc?: { base64: string; fileName: string };
   passportDoc?: { base64: string; fileName: string };
 }
+
+const SIGNATORY_LABELS: Record<string, string> = {
+  director:  'Директор',
+  ceo:       'Генеральный директор',
+  legal_rep: 'Законный представитель / 法定代表人',
+};
 
 // ── Constants ──────────────────────────────────────────────────────────────
 
@@ -166,36 +201,77 @@ function BuyerDetail({ buyer, onClose, onUpdate }: {
           </div>
 
           {/* Company info */}
-          <div className="bg-gray-50 rounded-xl p-4 space-y-2 text-sm">
-            <p className="font-semibold text-gray-500 text-xs uppercase tracking-wide mb-3">Данные компании</p>
-            <div className="grid grid-cols-2 gap-x-4 gap-y-2">
-              {[
-                ['Страна', buyer.country],
-                ['Рег. номер / БИН', buyer.registrationNumber],
-                ['Директор', buyer.directorName],
-                ['Контакт', buyer.contactName],
-                ['Email', buyer.email],
-                ['Телефон', buyer.phone],
-                ...(buyer.website ? [['Сайт', buyer.website]] : []),
-              ].map(([k, v]) => (
-                <div key={k}>
-                  <span className="text-gray-400 text-xs">{k}</span>
-                  <p className="text-gray-900 font-medium">{v}</p>
+          <div className="space-y-4 text-sm">
+            {/* Main */}
+            <div className="bg-gray-50 rounded-xl p-4">
+              <p className="font-semibold text-gray-500 text-xs uppercase tracking-wide mb-3">Компания</p>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+                {[
+                  ['Страна', buyer.country],
+                  ['Рег. номер / БИН / USCC', buyer.registrationNumber],
+                  ['Юридический адрес', buyer.legalAddress],
+                  ['Почтовый адрес', buyer.postalAddress],
+                  ['Email', buyer.email],
+                  ['Телефон', buyer.phone],
+                  ['Контактное лицо', buyer.contactName],
+                  ...(buyer.website ? [['Сайт', buyer.website]] : []),
+                ].map(([k, v]) => (
+                  <div key={k}>
+                    <span className="text-gray-400 text-xs">{k}</span>
+                    <p className="text-gray-900 font-medium break-words">{v}</p>
+                  </div>
+                ))}
+              </div>
+              {buyer.description && (
+                <div className="border-t border-gray-200 pt-3 mt-3">
+                  <span className="text-gray-400 text-xs">О компании</span>
+                  <p className="text-gray-700 mt-0.5">{buyer.description}</p>
                 </div>
-              ))}
+              )}
             </div>
-            {buyer.address && (
-              <div className="border-t border-gray-200 pt-2 mt-2">
-                <span className="text-gray-400 text-xs">Адрес</span>
-                <p className="text-gray-900 font-medium">{buyer.address}</p>
+
+            {/* Signatory */}
+            <div className="bg-gray-50 rounded-xl p-4">
+              <p className="font-semibold text-gray-500 text-xs uppercase tracking-wide mb-3">Подписант</p>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+                <div>
+                  <span className="text-gray-400 text-xs">ФИО</span>
+                  <p className="text-gray-900 font-medium">{buyer.signatoryName}</p>
+                </div>
+                <div>
+                  <span className="text-gray-400 text-xs">Должность</span>
+                  <p className="text-gray-900 font-medium">
+                    {buyer.signatoryType === 'other'
+                      ? buyer.signatoryCustomType
+                      : SIGNATORY_LABELS[buyer.signatoryType] ?? buyer.signatoryType}
+                  </p>
+                </div>
               </div>
-            )}
-            {buyer.description && (
-              <div className="border-t border-gray-200 pt-2 mt-2">
-                <span className="text-gray-400 text-xs">О компании</span>
-                <p className="text-gray-700">{buyer.description}</p>
+            </div>
+
+            {/* Banking */}
+            <div className="bg-gray-50 rounded-xl p-4">
+              <p className="font-semibold text-gray-500 text-xs uppercase tracking-wide mb-3">Банковские реквизиты</p>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+                {[
+                  ['Банк', buyer.bankName],
+                  ['БИК / SWIFT', buyer.swift],
+                  ['Номер счёта', buyer.bankAccount],
+                  ['Валюта', buyer.bankCurrency],
+                ].map(([k, v]) => (
+                  <div key={k}>
+                    <span className="text-gray-400 text-xs">{k}</span>
+                    <p className="text-gray-900 font-medium">{v}</p>
+                  </div>
+                ))}
               </div>
-            )}
+            </div>
+
+            {/* Logistics */}
+            <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+              <p className="font-semibold text-blue-500 text-xs uppercase tracking-wide mb-1">Регион выгрузки</p>
+              <p className="text-blue-900 font-semibold">{buyer.unloadingRegion}</p>
+            </div>
           </div>
 
           {/* Documents */}
@@ -318,7 +394,7 @@ export default function AdminDashboard() {
   const router = useRouter();
 
   // Tabs
-  const [tab, setTab] = useState<'suppliers' | 'buyers'>('suppliers');
+  const [tab, setTab] = useState<'suppliers' | 'buyers' | 'chats'>('suppliers');
 
   // Suppliers state
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
@@ -334,6 +410,13 @@ export default function AdminDashboard() {
   const [buyerFilter, setBuyerFilter] = useState<'all' | 'pending' | 'approved' | 'rejected'>('all');
   const [loadingBuyers, setLoadingBuyers] = useState(false);
   const [selectedBuyer, setSelectedBuyer] = useState<BuyerLight | null>(null);
+
+  // Chats state
+  const [leads, setLeads] = useState<ChatLead[]>([]);
+  const [loadingLeads, setLoadingLeads] = useState(false);
+  const [selectedLead, setSelectedLead] = useState<ChatLead | null>(null);
+  const [adminReply, setAdminReply] = useState('');
+  const [sendingReply, setSendingReply] = useState(false);
 
   // Load suppliers
   useEffect(() => {
@@ -353,6 +436,20 @@ export default function AdminDashboard() {
       .then((r) => r.ok ? r.json() : [])
       .then((data) => setBuyers(data))
       .finally(() => setLoadingBuyers(false));
+  }, [tab]);
+
+  // Load + poll leads
+  useEffect(() => {
+    if (tab !== 'chats') return;
+    setLoadingLeads(true);
+    fetch('/api/admin/chat').then((r) => r.ok ? r.json() : []).then(setLeads).finally(() => setLoadingLeads(false));
+    const interval = setInterval(() => {
+      fetch('/api/admin/chat').then((r) => r.ok ? r.json() : []).then((data) => {
+        setLeads(data);
+        setSelectedLead((prev) => prev ? data.find((l: ChatLead) => l.id === prev.id) ?? prev : null);
+      });
+    }, 4000);
+    return () => clearInterval(interval);
   }, [tab]);
 
   // Suppliers actions
@@ -398,6 +495,32 @@ export default function AdminDashboard() {
   async function handleLogout() {
     await fetch('/api/admin/logout', { method: 'POST' });
     router.push(`/${locale}/admin/login`);
+  }
+
+  async function sendAdminReply(e: React.FormEvent) {
+    e.preventDefault();
+    if (!selectedLead || !adminReply.trim()) return;
+    setSendingReply(true);
+    const res = await fetch(`/api/admin/chat/${selectedLead.id}/reply`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content: adminReply.trim() }),
+    });
+    setSendingReply(false);
+    if (res.ok) {
+      setAdminReply('');
+      const updated: ChatLead[] = await fetch('/api/admin/chat').then((r) => r.json());
+      setLeads(updated);
+      setSelectedLead(updated.find((l) => l.id === selectedLead.id) ?? null);
+    }
+  }
+
+  async function closeLead(id: string) {
+    await fetch(`/api/admin/chat/${id}/reply`, {
+      method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: 'closed' }),
+    });
+    setLeads((prev) => prev.map((l) => l.id === id ? { ...l, status: 'closed' } : l));
+    setSelectedLead((prev) => prev?.id === id ? { ...prev, status: 'closed' } : prev);
   }
 
   // Derived
@@ -448,6 +571,15 @@ export default function AdminDashboard() {
             Покупатели
             {buyerCounts.pending > 0 && (
               <span className="ml-2 bg-yellow-500 text-white text-xs rounded-full px-1.5 py-0.5">{buyerCounts.pending}</span>
+            )}
+          </button>
+          <button onClick={() => setTab('chats')}
+            className={`px-5 py-2 rounded-lg text-sm font-medium transition-colors ${tab === 'chats' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-700'}`}>
+            Чаты
+            {leads.filter((l) => l.status === 'new').length > 0 && (
+              <span className="ml-2 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5">
+                {leads.filter((l) => l.status === 'new').length}
+              </span>
             )}
           </button>
         </div>
@@ -636,8 +768,9 @@ export default function AdminDashboard() {
                         <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-500">
                           <span>🌍 {buyer.country}</span>
                           <span>🔢 {buyer.registrationNumber}</span>
-                          <span>👤 {buyer.directorName}</span>
+                          <span>👤 {buyer.signatoryName}</span>
                           <span>📧 {buyer.email}</span>
+                          <span>📍 {buyer.unloadingRegion}</span>
                         </div>
                         <div className="flex gap-3 mt-2 text-xs">
                           {[
@@ -661,6 +794,155 @@ export default function AdminDashboard() {
               </div>
             )}
           </>
+        )}
+        {/* ── CHATS TAB ── */}
+        {tab === 'chats' && (
+          <div className="flex gap-6 h-[calc(100vh-220px)] min-h-[400px]">
+
+            {/* Lead list */}
+            <div className="w-72 shrink-0 flex flex-col gap-2 overflow-y-auto">
+              <div className="flex items-center justify-between mb-2">
+                <h1 className="text-xl font-bold text-gray-900">Чаты</h1>
+                <span className="text-xs text-gray-400">{leads.length} лидов</span>
+              </div>
+
+              {loadingLeads ? (
+                <div className="text-center py-8 text-gray-400 text-sm">Загружаем...</div>
+              ) : leads.length === 0 ? (
+                <div className="text-center py-8 text-gray-400 text-sm">Лидов пока нет</div>
+              ) : leads.map((lead) => (
+                <button key={lead.id}
+                  onClick={() => setSelectedLead(lead)}
+                  className={`w-full text-left p-4 rounded-xl border transition-all ${
+                    selectedLead?.id === lead.id
+                      ? 'bg-primary-50 border-primary-300 shadow-sm'
+                      : 'bg-white border-gray-100 hover:border-primary-200 hover:shadow-sm'
+                  }`}>
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0 flex-1">
+                      <p className="font-semibold text-gray-900 text-sm truncate">{lead.contact}</p>
+                      <p className="text-xs text-gray-500 mt-0.5">
+                        {lead.intent === 'buyer' ? '🛒 Покупатель' : lead.intent === 'supplier' ? '🚜 Поставщик' : '—'}
+                        {lead.product ? ` · ${lead.product}` : ''}
+                      </p>
+                    </div>
+                    <div className="flex flex-col items-end gap-1 shrink-0">
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                        lead.status === 'new' ? 'bg-red-100 text-red-700' :
+                        lead.status === 'active' ? 'bg-green-100 text-green-700' :
+                        'bg-gray-100 text-gray-500'
+                      }`}>
+                        {lead.status === 'new' ? 'Новый' : lead.status === 'active' ? 'Активный' : 'Закрыт'}
+                      </span>
+                      <span className="text-xs text-gray-400">
+                        {new Date(lead.createdAt).toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit' })}
+                      </span>
+                    </div>
+                  </div>
+                  {lead.messages.length > 0 && (
+                    <p className="text-xs text-gray-400 mt-1.5 truncate">
+                      {lead.messages[lead.messages.length - 1].from === 'admin' ? '↩ ' : ''}
+                      {lead.messages[lead.messages.length - 1].content}
+                    </p>
+                  )}
+                </button>
+              ))}
+            </div>
+
+            {/* Chat panel */}
+            <div className="flex-1 bg-white rounded-2xl border border-gray-100 shadow-sm flex flex-col overflow-hidden">
+              {!selectedLead ? (
+                <div className="flex-1 flex items-center justify-center text-gray-400">
+                  <div className="text-center space-y-2">
+                    <div className="text-4xl">💬</div>
+                    <p className="text-sm">Выберите лид слева</p>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  {/* Chat header */}
+                  <div className="border-b border-gray-100 px-5 py-4 flex items-center justify-between shrink-0">
+                    <div>
+                      <p className="font-bold text-gray-900">{selectedLead.contact}</p>
+                      <p className="text-xs text-gray-500 mt-0.5">
+                        {selectedLead.intent === 'buyer' ? '🛒 Покупатель' : '🚜 Поставщик'}
+                        {selectedLead.product && ` · ${selectedLead.product}`}
+                        {selectedLead.volume && ` · ${selectedLead.volume}`}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${
+                        selectedLead.status === 'new' ? 'bg-red-100 text-red-700' :
+                        selectedLead.status === 'active' ? 'bg-green-100 text-green-700' :
+                        'bg-gray-100 text-gray-500'
+                      }`}>
+                        {selectedLead.status === 'new' ? 'Новый' : selectedLead.status === 'active' ? 'Активный' : 'Закрыт'}
+                      </span>
+                      {selectedLead.status !== 'closed' && (
+                        <button onClick={() => closeLead(selectedLead.id)}
+                          className="text-xs text-gray-400 hover:text-gray-600 border border-gray-200 px-2.5 py-1 rounded-lg transition-colors">
+                          Закрыть
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Lead info */}
+                  <div className="bg-gray-50 border-b border-gray-100 px-5 py-3 flex gap-6 text-xs text-gray-500 shrink-0 flex-wrap">
+                    <span>📅 {new Date(selectedLead.createdAt).toLocaleString('ru-RU')}</span>
+                    {selectedLead.product && <span>📦 {selectedLead.product}</span>}
+                    {selectedLead.volume && <span>⚖️ {selectedLead.volume}</span>}
+                  </div>
+
+                  {/* Messages */}
+                  <div className="flex-1 overflow-y-auto px-5 py-4 space-y-3">
+                    {selectedLead.messages.length === 0 ? (
+                      <div className="text-center py-8 text-gray-400 text-sm">
+                        Посетитель оставил контакт, но ещё не написал сообщений.<br />
+                        Напишите первым — ответ придёт в чат-виджет.
+                      </div>
+                    ) : selectedLead.messages.map((m) => (
+                      <div key={m.id} className={`flex ${m.from === 'admin' ? 'justify-end' : 'justify-start'}`}>
+                        <div className={`max-w-[75%] px-4 py-3 rounded-2xl text-sm leading-relaxed ${
+                          m.from === 'admin'
+                            ? 'bg-primary-700 text-white rounded-br-sm'
+                            : 'bg-gray-100 text-gray-800 rounded-bl-sm'
+                        }`}>
+                          <p className="whitespace-pre-wrap">{m.content}</p>
+                          <p className={`text-xs mt-1 ${m.from === 'admin' ? 'text-white/60' : 'text-gray-400'}`}>
+                            {m.from === 'admin' ? 'Вы' : 'Посетитель'} · {new Date(m.timestamp).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Reply input */}
+                  {selectedLead.status !== 'closed' ? (
+                    <form onSubmit={sendAdminReply}
+                      className="border-t border-gray-100 px-4 py-3 flex gap-2 items-end shrink-0">
+                      <textarea
+                        value={adminReply}
+                        onChange={(e) => setAdminReply(e.target.value)}
+                        onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendAdminReply(e as unknown as React.FormEvent); } }}
+                        placeholder="Напишите ответ... (Enter — отправить, Shift+Enter — новая строка)"
+                        rows={2}
+                        className="flex-1 text-sm border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary-400 resize-none bg-gray-50"
+                      />
+                      <button type="submit" disabled={!adminReply.trim() || sendingReply}
+                        className="h-10 px-4 bg-primary-700 hover:bg-primary-800 disabled:opacity-40 text-white rounded-xl text-sm font-medium transition-colors shrink-0">
+                        {sendingReply ? '...' : 'Отправить'}
+                      </button>
+                    </form>
+                  ) : (
+                    <div className="border-t border-gray-100 px-4 py-3 text-center text-xs text-gray-400 shrink-0">
+                      Чат закрыт
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          </div>
         )}
       </main>
 

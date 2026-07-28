@@ -2,6 +2,53 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import PrintButton from './PrintButton';
 import Link from 'next/link';
+import { contractData } from './contractData';
+
+const LABELS = {
+  ru: {
+    back: '← На главную',
+    bannerTitle: 'Договор транспортно-экспедиторского обслуживания',
+    bannerSubtitle: 'Типовой договор ТОО «KTZ Export» на организацию перевозок контейнерным поездом',
+    revision: 'Актуальная редакция · 2026 г. · ТОО «KTZ Export»',
+    signatures: 'РЕКВИЗИТЫ И ПОДПИСИ СТОРОН',
+    forwarderLabel: 'Экспедитор',
+    customerLabel: 'Заказчик',
+    signatureLine: '_________________ / _________________',
+    signatureHint: '(подпись)       (Ф.И.О.)',
+    ceoLine: 'Генеральный директор',
+  },
+  en: {
+    back: '← Home',
+    bannerTitle: 'Freight Forwarding Services Agreement',
+    bannerSubtitle: 'Standard agreement of KTZ Export LLP for organizing container train transportation',
+    revision: 'Current revision · 2026 · KTZ Export LLP',
+    signatures: 'ADDRESSES AND SIGNATURES OF THE PARTIES',
+    forwarderLabel: 'Forwarder',
+    customerLabel: 'Customer',
+    signatureLine: '_________________ / _________________',
+    signatureHint: '(signature)       (full name)',
+    ceoLine: 'General Director',
+  },
+} as const;
+
+const REQUISITES = {
+  ru: [
+    'ТОО «KTZ Export»',
+    'БИН: 260240023256',
+    'AO «ForteBank», ИИК KZ5196503F0016071682 USD, БИК IRTYKZKA',
+    'Корр. банк: Bank of New York Mellon, New York, USA, SWIFT IRVTUS3N, счёт 8900548533',
+    'Республика Казахстан, г. Астана, ул. Сарайшык 4, подъезд 6, кв. 239, 010000',
+    'info@ktzexport.kz · +7 702 66 13 444',
+  ],
+  en: [
+    '"KTZ Export" LLP',
+    'BIN: 260240023256',
+    'JSC «ForteBank», acc. KZ5196503F0016071682 USD, BIC IRTYKZKA',
+    'Corr. bank: Bank of New York Mellon, New York, USA, SWIFT IRVTUS3N, account 8900548533',
+    'Republic of Kazakhstan, Astana city, Saraishyk street 4, entrance 6, apt. 239, 010000',
+    'info@ktzexport.kz · +7 702 66 13 444',
+  ],
+} as const;
 
 export default async function ContractPage({
   params,
@@ -9,6 +56,10 @@ export default async function ContractPage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
+  const lang = locale === 'en' ? 'en' : 'ru';
+  const t = LABELS[lang];
+  const doc = contractData[lang];
+  const req = REQUISITES[lang];
 
   return (
     <>
@@ -26,203 +77,74 @@ export default async function ContractPage({
       <div className="bg-gradient-to-r from-primary-800 to-primary-700 text-white py-10 px-4 no-print">
         <div className="max-w-4xl mx-auto">
           <Link href={`/${locale}`} className="text-primary-200 hover:text-white text-sm mb-3 inline-block">
-            ← На главную
+            {t.back}
           </Link>
-          <h1 className="text-2xl font-bold">Типовой договор поста��ки и логистических услуг</h1>
-          <p className="text-primary-200 mt-1 text-sm">Шаблон договора трейдинга и организации перевозки</p>
+          <h1 className="text-2xl font-bold">{t.bannerTitle}</h1>
+          <p className="text-primary-200 mt-1 text-sm">{t.bannerSubtitle}</p>
         </div>
       </div>
 
       <main className="max-w-4xl mx-auto px-4 py-10 contract-page">
-        {/* Actions */}
         <div className="flex justify-between items-center mb-8 no-print">
-          <p className="text-sm text-gray-500">Актуал��ная редакция · 2025 г. · ТОО «KTZ Export»</p>
+          <p className="text-sm text-gray-500">{t.revision}</p>
           <PrintButton />
         </div>
 
-        {/* Contract */}
         <article className="prose max-w-none text-gray-800 space-y-6 text-sm leading-relaxed">
-
           <div className="text-center space-y-1 mb-8">
-            <h2 className="text-lg font-bold uppercase tracking-wide">
-              ДОГОВОР ПОСТАВКИ И ЛОГИСТИЧЕСКИХ УСЛУГ № ____
-            </h2>
-            <p className="text-gray-500">г. Алматы &nbsp;&nbsp;&nbsp; «___» ____________ 2025 г.</p>
+            <h2 className="text-lg font-bold uppercase tracking-wide">{doc.docTitle}</h2>
+            <p className="text-gray-500">{doc.dateLine}</p>
           </div>
 
-          <p>
-            <strong>ТОО «KTZ Export»</strong> (БИН: 240640023888), именуемое в дальнейшем <strong>«Агент»</strong> / <strong>«Поставщик»</strong>,
-            в лице директора, действующего на ос��овании Устава, с одной стороны, и
-          </p>
-          <p>
-            <strong>____________________________</strong>, именуемое в дальнейшем <strong>«Покупатель»</strong> / <strong>«Принципал»</strong>,
-            в ли��е _________________________________, действующего на основании _______________,
-            с другой стороны, совместно именуемы�� <strong>«Стороны»</strong>, заключили настоящий договор о нижеследующем:
-          </p>
+          {doc.preamble.map((p, i) => (
+            <p key={`pre-${i}`}>{p}</p>
+          ))}
 
           <hr className="border-gray-200" />
 
-          <section>
-            <h3 className="font-bold text-base">1. ПРЕДМЕТ ДОГОВОРА</h3>
-            <p>1.1. Поставщик обязуется поставить, а Покупатель — принять и оплатить сельскохозяйственную
-            продукцию казахстанского происхождения (далее — «Т��вар») согласно Спецификации,
-            являющейся неотъемлемой частью настоящего Договора.</p>
-            <p>1.2. Агент оказывает трей��ерские услуги по организации поставки То��ара от производителей
-            Республики Казахстан, включая поиск, отбор и верификацию поставщиков, контро��ь качества
-            на этапе отгрузки и оформление товаросопроводительных документов.</p>
-            <p>1.3. Наименование, количество, ассортимент, качество и цена Товара определяются
-            в Спецификациях, которые подписываются Сторонами отдел��но к каждой партии.</p>
-          </section>
-
-          <section>
-            <h3 className="font-bold text-base">2. КАЧЕСТВО И КОЛИЧЕСТВО ТОВАРА</h3>
-            <p>2.1. ��ачество Товара должно соответствовать действующим стандартам Республики Казахстан
-            (ГОСТ, СТ РК) и условиям, указанным в Спецификации.</p>
-            <p>2.2. Количество Товара определяется в Спецификации и подтверждается транспортной накладной /
-            коносаментом. Допустимое отклонение по весу: ±2% от заявленного количества.</p>
-            <p>2.3. Качество подтверждается сертификатом качества, выданным аккредитованной лабораторией
-            или элеватором в момент отгрузки.</p>
-          </section>
-
-          <section>
-            <h3 className="font-bold text-base">3. ЦЕНА И ПОРЯДОК РАСЧЁТОВ</h3>
-            <p>3.1. Цена Товара устанавливается в долларах США (USD) или тенге (KZT) в соответствии
-            со Спецификацией и указыв��ется с учётом всех примен��мых налогов и сборов.</p>
-            <p>3.2. Порядок оплаты:</p>
-            <ul className="list-disc ml-6 space-y-1">
-              <li>30% — предоплата в течение 5 (пяти) банковских дней с даты подписания Спецификации;</li>
-              <li>70% — до отправки Тов��ра, по предъявлении документов об отгрузке.</li>
-            </ul>
-            <p>3.3. Реквизиты для оплаты указываются в счёте-фактуре, выставляемом Пос��авщиком.
-            Бан��овские комиссии несёт По��упатель.</p>
-          </section>
-
-          <section>
-            <h3 className="font-bold text-base">4. ��РЕЙДЕРС��ИЕ УСЛУГИ</h3>
-            <p>4.1. В рамках трейдерских услуг Агент осуществляет:</p>
-            <ul className="list-disc ml-6 space-y-1">
-              <li>поиск и верификацию производит��лей / поставщиков Товара;</li>
-              <li>контроль качества на этапе отгрузки и оформление сертификатов;</li>
-              <li>организацию погрузки на станции отправления;</li>
-              <li>оформление товаросопроводительных и таможенных документов на экспорт.</li>
-            </ul>
-            <p>4.2. Вознаграждение Аг��нта включено в стоимость Товара, указанную в Спецификации,
-            если иное не предусмотрено отдельным соглашением Сторон.</p>
-          </section>
-
-          <section>
-            <h3 className="font-bold text-base">5. ЛОГИСТИКА И ДОСТАВКА</h3>
-            <p>5.1. Органи��ацию транспортировки Товара осуществляет Агент в соответствии
-            с условиями Спецификации.</p>
-            <p>5.2. Маршруты перевозки:</p>
-            <ul className="list-disc ml-6 space-y-1">
-              <li>Казахстан → КНР (пограничные переходы: Достык–Алашанькоу, Алтынколь–Хоргос, Актау–Порт);</li>
-              <li>Казахстан → Средняя Азия (переходы: Сарыагаш, Болашак);</li>
-              <li>иные направления — по согласованию Сторон.</li>
-            </ul>
-            <p>5.3. Виды транспорта: контейн��рные поезда (40-фут / 20-фут), крытые ��агоны,
-            хоппер-зерновозы, полувагоны.</p>
-            <p>5.4. Стоимость логистических услуг о��ределя��тся отдельно в Спецификации
-            или в приложении к настоящему Договору.</p>
-            <p>5.5. Базис поставки (Инкотермс 2020): <strong>FCA</strong> (станция отгрузки, Казахст��н),
-            если иное ��е согласовано в Спецификации.</p>
-            <p>5.6. Срок поставки о��ределяе��ся Спецификацией. Отсчёт срока начинается
-            с момента поступления предоплаты в полном объёме.</p>
-          </section>
-
-          <section>
-            <h3 className="font-bold text-base">6. ПЕРЕХОД ПРАВА СОБСТ��ЕННОСТИ И РИСКОВ</h3>
-            <p>6.1. Право собственности на Товар и риск случайной гибели или повреждения переходят
-            к Покупателю в момент передачи Товара первому перевозчику на станции отгрузки.</p>
-            <p>6.2. С момента передачи Товара перевозчику все риски, связанные с транспортировкой,
-            несёт Покупатель, если иное не установлено Спецификацией.</p>
-          </section>
-
-          <section>
-            <h3 className="font-bold text-base">7. ОТВЕТСТВЕННОСТЬ СТОРОН</h3>
-            <p>7.1. За нарушение сроков оплаты Покупатель уплачивает пеню в размере 0,1%
-            от суммы задолженности за каждый день просрочки.</p>
-            <p>7.2. За нарушение сроков поставки Поставщик уплачивает пеню в размере 0,1%
-            от стоимости недопоставленного Товара за каждый день просрочки.</p>
-            <p>7.3. Совокупная ответственность каждой из Сторон ограни��ена стоимостью
-            соответствующей Спецификации.</p>
-          </section>
-
-          <section>
-            <h3 className="font-bold text-base">8. ФОРС-МАЖОР</h3>
-            <p>8.1. Стороны освобождаются от ответственност�� за ненадлежащее исполнение обязательств,
-            если это явилось следствием обстоятельств непреодолимой силы (стихийные бедствия,
-            военные действия, решения государственных органов, эпидемии и т.п.).</p>
-            <p>8.2. Сторона, для к��торой наступили форс-мажорные обстоятельства, обязана ��ведомить
-            другую Сторону в течение 5 (пяти) рабочих дней с момента их возникновения,
-            приложив подтверждающие документы.</p>
-          </section>
-
-          <section>
-            <h3 className="font-bold text-base">9. КОНФИДЕНЦИАЛЬНОСТЬ</h3>
-            <p>9.1. Стороны обязуются не разглашать третьим лицам конфиденциальную информацию
-            (в том числе сведения о ценах, объёмах, партнёрах), ставшую ��звестной
-            в связи �� исполнением настоящего Договора.</p>
-          </section>
-
-          <section>
-            <h3 className="font-bold text-base">10. РАЗР��ШЕНИЕ СПОРОВ</h3>
-            <p>10.1. Все споры разрешаются путём переговоров. При недостижении согласия —
-            в специализ��рованном межрайонном эконом��ческом суде по месту нахождения Агента
-            (г. Алматы) в соответствии с законодательством Республики Казахстан.</p>
-          </section>
-
-          <section>
-            <h3 className="font-bold text-base">11. СРОК ДЕЙСТВИЯ И РАСТОРЖЕНИЕ</h3>
-            <p>11.1. Договор вступает в силу с момента подписания и действует до полного
-            исполнения Сторонами своих обязательств.</p>
-            <p>11.2. ��оговор может быть расторгнут по взаимному согласию Ст��рон либо в одностороннем
-            порядке с уведомлением другой Стороны за 30 (тридцать) календарных дней.</p>
-          </section>
-
-          <section>
-            <h3 className="font-bold text-base">12. ПРОЧИЕ УСЛОВИЯ</h3>
-            <p>12.1. Настоящий Договор составлен на русском языке в двух экземплярах,
-            имеющих одинаковую юридическую силу.</p>
-            <p>12.2. Изм��нения и дополнения к Договору действительны только в письменной форме,
-            подписанной уполномоченными представителями Сторон.</p>
-            <p>12.3. Неотъемлемыми частями настоящего Договора являются подписанные Сторонами
-            Спецификации к каждой партии Товара.</p>
-          </section>
+          {doc.sections.map((section, si) => (
+            <section key={si}>
+              <h3 className="font-bold text-base">
+                {si + 1}. {section.title}
+              </h3>
+              {section.paragraphs.map((p, pi) => (
+                <p key={pi}>
+                  <span className="text-gray-400 mr-1">{si + 1}.{pi + 1}</span>
+                  {p}
+                </p>
+              ))}
+            </section>
+          ))}
 
           <hr className="border-gray-300 mt-8" />
 
-          {/* Signatures */}
           <section>
-            <h3 className="font-bold text-base mb-6">РЕКВИЗИТЫ И ПОДПИСИ СТОРОН</h3>
+            <h3 className="font-bold text-base mb-6">{t.signatures}</h3>
             <div className="grid grid-cols-2 gap-8 text-sm">
               <div className="space-y-1">
-                <p className="font-semibold">Агент / Поставщик</p>
-                <p>ТОО «KTZ Export»</p>
-                <p>БИН: 240640023888</p>
-                <p>г. Алматы, Казахстан</p>
-                <p>info@ktzexport.kz</p>
-                <p>+7 (702) 661-34-44</p>
+                <p className="font-semibold">{t.forwarderLabel}</p>
+                {req.map((line, i) => (
+                  <p key={i}>{line}</p>
+                ))}
                 <div className="mt-8 pt-2 border-t border-gray-400">
-                  <p className="text-gray-500">_________________ / _________________</p>
-                  <p className="text-xs text-gray-400">(подпись) &nbsp;&nbsp;&nbsp; (ФИО)</p>
+                  <p className="text-gray-500">{t.signatureLine}</p>
+                  <p className="text-xs text-gray-400">{t.signatureHint}</p>
                 </div>
               </div>
               <div className="space-y-1">
-                <p className="font-semibold">Покупатель / Принципал</p>
+                <p className="font-semibold">{t.customerLabel}</p>
                 <p>________________________________</p>
                 <p>________________________________</p>
                 <p>________________________________</p>
                 <p>________________________________</p>
                 <p>________________________________</p>
                 <div className="mt-8 pt-2 border-t border-gray-400">
-                  <p className="text-gray-500">_________________ / _________________</p>
-                  <p className="text-xs text-gray-400">(подпись) &nbsp;&nbsp;&nbsp; (ФИО)</p>
+                  <p className="text-gray-500">{t.signatureLine}</p>
+                  <p className="text-xs text-gray-400">{t.signatureHint}</p>
                 </div>
               </div>
             </div>
           </section>
-
         </article>
 
         <div className="mt-10 no-print flex justify-center">

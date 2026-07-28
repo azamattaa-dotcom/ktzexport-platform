@@ -124,7 +124,7 @@ export default function SupplierRegistrationForm() {
           <select className={inputClass('country')} value={form.country}
             onChange={(e) => setForm({ ...form, country: e.target.value })}>
             <option value="">—</option>
-            {COUNTRIES.map((c) => <option key={c} value={c}>{c}</option>)}
+            {COUNTRIES.map((c) => <option key={c} value={c}>{t(`countries.${c}`)}</option>)}
           </select>
           {errors.country && <p className="text-red-500 text-xs mt-1">{errors.country}</p>}
         </div>
@@ -135,25 +135,25 @@ export default function SupplierRegistrationForm() {
         <label className="block text-sm font-medium text-gray-700 mb-1">{t('elevatorName')}</label>
         <input className={inputClass('elevatorName')} value={form.elevatorName}
           onChange={(e) => setForm({ ...form, elevatorName: e.target.value })}
-          placeholder="Например: Элеватор Астана-1" />
+          placeholder={t('elevatorPlaceholder')} />
       </div>
 
       {/* Loading Station */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Станция погрузки *</label>
+        <label className="block text-sm font-medium text-gray-700 mb-1">{t('loadingStationLabel')} *</label>
         <select className={inputClass('loadingStation')} value={form.loadingStation}
           onChange={(e) => setForm({ ...form, loadingStation: e.target.value, loadingStationCustom: '' })}>
-          <option value="">— Выберите станцию —</option>
-          {LOADING_STATIONS.map((s) => <option key={s} value={s}>{s}</option>)}
+          <option value="">— {t('selectStation')} —</option>
+          {LOADING_STATIONS.map((s) => <option key={s} value={s}>{t(`loadingStations.${s}`)}</option>)}
         </select>
         {form.loadingStation === 'Другая' && (
           <input className={`${inputClass('loadingStation')} mt-2`}
-            placeholder="Укажите станцию погрузки"
+            placeholder={t('specifyStation')}
             value={form.loadingStationCustom}
             onChange={(e) => setForm({ ...form, loadingStationCustom: e.target.value })} />
         )}
         {errors.loadingStation && <p className="text-red-500 text-xs mt-1">{errors.loadingStation}</p>}
-        <p className="text-xs text-gray-400 mt-1">Откуда будет отгружаться товар</p>
+        <p className="text-xs text-gray-400 mt-1">{t('loadingStationHint')}</p>
       </div>
 
       {/* Contact + Email + Phone */}

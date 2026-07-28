@@ -1,8 +1,10 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 
 export default function SupplierSetupPage() {
+  const t = useTranslations('supplierSetup');
   const { token, locale } = useParams() as { token: string; locale: string };
   const router = useRouter();
 
@@ -31,8 +33,8 @@ export default function SupplierSetupPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (password.length < 8) { setError('Пароль должен быть не менее 8 символов'); return; }
-    if (password !== confirm)  { setError('Пароли не совпадают'); return; }
+    if (password.length < 8) { setError(t('passwordTooShort')); return; }
+    if (password !== confirm)  { setError(t('passwordMismatch')); return; }
     setError('');
     setLoading(true);
 
@@ -46,13 +48,13 @@ export default function SupplierSetupPage() {
       router.push(`/${locale}/supplier/login?setup=success`);
     } else {
       const d = await res.json();
-      setError(d.error ?? 'Ошибка. Попробуйте снова.');
+      setError(d.error ?? t('errorDefault'));
       setLoading(false);
     }
   }
 
   if (tokenValid === null) {
-    return <div className="min-h-screen flex items-center justify-center text-gray-400">Проверяем ссылку...</div>;
+    return <div className="min-h-screen flex items-center justify-center text-gray-400">{t('checkingLink')}</div>;
   }
 
   if (tokenValid === false) {
@@ -60,8 +62,8 @@ export default function SupplierSetupPage() {
       <div className="min-h-screen flex items-center justify-center px-4">
         <div className="text-center max-w-sm">
           <div className="text-5xl mb-4">⛔</div>
-          <h1 className="text-xl font-bold text-gray-900 mb-2">Ссылка недействительна</h1>
-          <p className="text-gray-500 text-sm">Ссылка устарела или уже была использована. Обратитесь к администратору: info@ktzexport.com</p>
+          <h1 className="text-xl font-bold text-gray-900 mb-2">{t('invalidLinkTitle')}</h1>
+          <p className="text-gray-500 text-sm">{t('invalidLinkDesc')}</p>
         </div>
       </div>
     );
@@ -74,13 +76,13 @@ export default function SupplierSetupPage() {
           <div className="w-12 h-12 bg-primary-700 rounded-xl flex items-center justify-center mx-auto mb-3">
             <span className="text-white font-bold">KTZ</span>
           </div>
-          <h1 className="text-xl font-bold text-gray-900">Создание кабинета поставщика</h1>
+          <h1 className="text-xl font-bold text-gray-900">{t('title')}</h1>
           <p className="text-gray-500 text-sm mt-1">{companyName}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email (логин)</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('emailLabel')}</label>
             <input
               type="email"
               value={email}
@@ -89,18 +91,18 @@ export default function SupplierSetupPage() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Пароль *</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('passwordLabel')}</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Минимум 8 символов"
+              placeholder={t('passwordPlaceholder')}
               className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
               required
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Подтвердите пароль *</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('confirmPasswordLabel')}</label>
             <input
               type="password"
               value={confirm}
@@ -119,7 +121,7 @@ export default function SupplierSetupPage() {
             disabled={loading}
             className="w-full bg-primary-700 hover:bg-primary-800 disabled:bg-primary-400 text-white font-semibold py-3 rounded-xl transition-colors"
           >
-            {loading ? 'Сохраняем...' : 'Создать кабинет'}
+            {loading ? t('saving') : t('submit')}
           </button>
         </form>
       </div>

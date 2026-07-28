@@ -1,6 +1,7 @@
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const NOTIFICATION_EMAIL = process.env.NOTIFICATION_EMAIL ?? process.env.ADMIN_EMAIL ?? 'azamattaa@gmail.com';
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://ktzexport-platform.vercel.app';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://ktzexport.com';
+const FROM_EMAIL = process.env.FROM_EMAIL ?? 'KTZ Export <onboarding@resend.dev>';
 
 async function send(to: string, subject: string, text: string, replyTo?: string) {
   if (!RESEND_API_KEY) {
@@ -12,7 +13,7 @@ async function send(to: string, subject: string, text: string, replyTo?: string)
       method: 'POST',
       headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        from: 'KTZ Export <onboarding@resend.dev>',
+        from: FROM_EMAIL,
         to: [to],
         subject,
         text,
@@ -197,17 +198,27 @@ info@ktzexport.com`;
 
 export async function notifyAdminNewBuyer(buyer: {
   companyName: string; country: string; registrationNumber: string;
-  directorName: string; contactName: string; email: string; phone: string;
+  signatoryName: string; signatoryType: string; signatoryCustomType?: string;
+  contactName: string; email: string; phone: string;
+  legalAddress: string; unloadingRegion: string;
+  bankName: string; swift: string; bankAccount: string; bankCurrency: string;
 }) {
+  const signatory = buyer.signatoryType === 'other'
+    ? buyer.signatoryCustomType
+    : { director: 'Директор', ceo: 'Ген. директор', legal_rep: 'Законный представитель' }[buyer.signatoryType] ?? buyer.signatoryType;
+
   const body = `Новая заявка покупателя на KTZ Export:
 
 Компания: ${buyer.companyName}
 Страна: ${buyer.country}
-Регистрационный номер / БИН: ${buyer.registrationNumber}
-Директор: ${buyer.directorName}
+Рег. номер / БИН / USCC: ${buyer.registrationNumber}
+Юридический адрес: ${buyer.legalAddress}
+Подписант: ${buyer.signatoryName} (${signatory})
 Контакт: ${buyer.contactName}
 Email: ${buyer.email}
 Телефон: ${buyer.phone}
+Регион выгрузки: ${buyer.unloadingRegion}
+Банк: ${buyer.bankName} | SWIFT: ${buyer.swift} | Счёт: ${buyer.bankAccount} (${buyer.bankCurrency})
 
 Проверить и одобрить: ${SITE_URL}/ru/admin?tab=buyers`;
 
@@ -248,4 +259,25 @@ ${buyer.rejectionReason ? `Причина: ${buyer.rejectionReason}\n` : ''}
 Команда KTZ Export`;
 
   await send(buyer.email, 'Заявка покупателя отклонена — KTZ Export', body);
+}
+
+// ── Chat lead emails ──────────────────────────────────────────────────────────
+
+export async function notifyAdminNewChatLead(lead: {
+  contact: string;
+  intent: string;
+  product?: string;
+  volume?: string;
+}) {
+  const intentLabel = lead.intent === 'buyer' ? 'Покупатель' : lead.intent === 'supplier' ? 'Поставщик' : 'Не определено';
+  const body = `Новый лид из чата на KTZ Export:
+
+Контакт: ${lead.contact}
+Интерес: ${intentLabel}
+${lead.product ? `Продукт: ${lead.product}` : ''}
+${lead.volume ? `Объём / сроки: ${lead.volume}` : ''}
+
+Ответить в чате: ${SITE_URL}/ru/admin?tab=chats`;
+
+  await send(NOTIFICATION_EMAIL, `Новый лид из чата: ${lead.contact}`, body);
 }
