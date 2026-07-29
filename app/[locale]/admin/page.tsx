@@ -3,29 +3,18 @@ import { useEffect, useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import type { Supplier } from '@/lib/db';
+import type { ChatLead } from '@/lib/chat-leads';
 import { PRODUCT_LIST } from '@/lib/products';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
-// ── Chat lead types ────────────────────────────────────────────────────────
-
-interface LeadMessage {
-  id: string;
-  from: 'visitor' | 'admin';
-  content: string;
-  timestamp: string;
-}
-
-interface ChatLead {
-  id: string;
-  status: 'new' | 'active' | 'closed';
-  intent: 'buyer' | 'supplier' | 'other';
-  product?: string;
-  volume?: string;
-  contact: string;
-  messages: LeadMessage[];
-  createdAt: string;
-  updatedAt: string;
+function leadIntentLabel(intent: ChatLead['intent']): string {
+  switch (intent) {
+    case 'buyer': return '🛒 Покупатель';
+    case 'supplier': return '🚜 Поставщик';
+    case 'logistics_order': return '📦🚉 Заявка (товар + логистика)';
+    default: return '—';
+  }
 }
 
 interface BuyerLight {
@@ -822,7 +811,7 @@ export default function AdminDashboard() {
                     <div className="min-w-0 flex-1">
                       <p className="font-semibold text-gray-900 text-sm truncate">{lead.contact}</p>
                       <p className="text-xs text-gray-500 mt-0.5">
-                        {lead.intent === 'buyer' ? '🛒 Покупатель' : lead.intent === 'supplier' ? '🚜 Поставщик' : '—'}
+                        {leadIntentLabel(lead.intent)}
                         {lead.product ? ` · ${lead.product}` : ''}
                       </p>
                     </div>
@@ -865,7 +854,7 @@ export default function AdminDashboard() {
                     <div>
                       <p className="font-bold text-gray-900">{selectedLead.contact}</p>
                       <p className="text-xs text-gray-500 mt-0.5">
-                        {selectedLead.intent === 'buyer' ? '🛒 Покупатель' : '🚜 Поставщик'}
+                        {leadIntentLabel(selectedLead.intent)}
                         {selectedLead.product && ` · ${selectedLead.product}`}
                         {selectedLead.volume && ` · ${selectedLead.volume}`}
                       </p>
@@ -893,6 +882,34 @@ export default function AdminDashboard() {
                     {selectedLead.product && <span>📦 {selectedLead.product}</span>}
                     {selectedLead.volume && <span>⚖️ {selectedLead.volume}</span>}
                   </div>
+
+                  {/* Order context (product + logistics) */}
+                  {selectedLead.orderContext && (
+                    <div className="bg-primary-50 border-b border-primary-100 px-5 py-4 shrink-0 space-y-2">
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-1 text-xs text-gray-700">
+                        {selectedLead.orderContext.productName && (
+                          <span>📦 Товар: <b>{selectedLead.orderContext.productName}</b></span>
+                        )}
+                        {selectedLead.orderContext.supplierName && (
+                          <span>🏭 Поставщик: <b>{selectedLead.orderContext.supplierName}</b></span>
+                        )}
+                        <span>🌉 Маршрут: <b>{selectedLead.orderContext.borderLabel} → {selectedLead.orderContext.returnStationLabel}</b></span>
+                        <span>📦 Контейнеров: <b>{selectedLead.orderContext.containers}</b></span>
+                        <span>🚉 Логистика: <b>${selectedLead.orderContext.logisticsPerContainer}/конт.</b></span>
+                        {typeof selectedLead.orderContext.productPricePerTon === 'number' && (
+                          <span>💲 Товар: <b>${selectedLead.orderContext.productPricePerTon}/т</b></span>
+                        )}
+                      </div>
+                      <a
+                        href={`/${locale}/admin/protocol/${selectedLead.id}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 text-xs font-medium text-primary-700 hover:text-primary-900 bg-white border border-primary-200 hover:border-primary-300 px-3 py-1.5 rounded-lg transition-colors"
+                      >
+                        📄 Сформировать протокол договорной цены →
+                      </a>
+                    </div>
+                  )}
 
                   {/* Messages */}
                   <div className="flex-1 overflow-y-auto px-5 py-4 space-y-3">

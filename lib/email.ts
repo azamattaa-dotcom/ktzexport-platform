@@ -281,3 +281,29 @@ ${lead.volume ? `Объём / сроки: ${lead.volume}` : ''}
 
   await send(NOTIFICATION_EMAIL, `Новый лид из чата: ${lead.contact}`, body);
 }
+
+export async function notifyAdminNewLogisticsOrder(lead: {
+  contact: string;
+  productName?: string;
+  supplierName?: string;
+  borderLabel: string;
+  returnStationLabel: string;
+  containers: number;
+  productPricePerTon?: number;
+  ratePerTon: number;
+  logisticsPerContainer: number;
+}) {
+  const body = `Новая заявка (товар + логистика) на KTZ Export:
+
+Контакт: ${lead.contact}
+${lead.productName ? `Товар: ${lead.productName}` : ''}
+${lead.supplierName ? `Поставщик: ${lead.supplierName}` : ''}
+Маршрут: ${lead.borderLabel} → ${lead.returnStationLabel}
+Контейнеров: ${lead.containers}
+Логистика: $${lead.logisticsPerContainer} / контейнер (≈ $${lead.ratePerTon.toFixed(2)}/т)
+${lead.productPricePerTon ? `Цена товара: $${lead.productPricePerTon}/т` : ''}
+
+Открыть заявку и сформировать протокол цены: ${SITE_URL}/ru/admin?tab=chats`;
+
+  await send(NOTIFICATION_EMAIL, `Новая заявка: ${lead.contact}`, body);
+}

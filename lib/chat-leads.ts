@@ -8,13 +8,32 @@ export interface LeadMessage {
   timestamp: string;
 }
 
+export interface OrderContext {
+  productId?: string;
+  productName?: string;
+  supplierId?: string;
+  supplierName?: string;
+  productPricePerTon?: number;
+  productCurrency?: string;
+  productUnit?: string;
+  border: string;
+  borderLabel: string;
+  returnStationId: string;
+  returnStationLabel: string;
+  containers: number;
+  ratePerTon: number;
+  logisticsPerContainer: number;
+  totalPerTon?: number;
+}
+
 export interface ChatLead {
   id: string;
   status: 'new' | 'active' | 'closed';
-  intent: 'buyer' | 'supplier' | 'other';
+  intent: 'buyer' | 'supplier' | 'other' | 'logistics_order';
   product?: string;
   volume?: string;
   contact: string;
+  orderContext?: OrderContext;
   messages: LeadMessage[];
   createdAt: string;
   updatedAt: string;
@@ -46,6 +65,7 @@ export const chatLeads = {
     product?: string;
     volume?: string;
     contact: string;
+    orderContext?: OrderContext;
   }): Promise<ChatLead> {
     const all = await readAll();
     const now = new Date().toISOString();

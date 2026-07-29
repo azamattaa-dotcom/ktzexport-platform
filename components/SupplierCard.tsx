@@ -152,7 +152,15 @@ export default function SupplierCard({ supplier, productId, locale }: Props) {
                   compact
                   product={
                     price?.type === 'fixed' && typeof price.fixed === 'number'
-                      ? { pricePerTon: price.fixed, currency: price.currency, unit: price.unit }
+                      ? {
+                          pricePerTon: price.fixed,
+                          currency: price.currency,
+                          unit: price.unit,
+                          productId,
+                          productName: getProductLabel(productId),
+                          supplierId: supplier.id,
+                          supplierName: supplier.companyName,
+                        }
                       : undefined
                   }
                 />
