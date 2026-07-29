@@ -1,54 +1,30 @@
-// Fixed-rate logistics pricing for container train shipments.
-// Covers the common route: Northern Kazakhstan -> Altynkol/Dostyk -> major China return stations.
-// Anything outside this rule is out of scope for instant pricing ("on request").
+// Pure pricing helpers for container train logistics. These take the current
+// LogisticsConfig (borders/stations/rates, editable by admins — see
+// lib/logistics-config.ts) as a parameter rather than hardcoding it, so
+// rates/stations can change without a code deploy.
 
-export const FLAT_RATE_BORDER_KEYS = ['altynkol', 'dostyk'] as const;
-export type FlatRateBorderKey = (typeof FLAT_RATE_BORDER_KEYS)[number];
+import type { LogisticsConfig } from './logistics-config';
 
-// The headline price: $800 for one 40ft container on an eligible route.
-export const FLAT_RATE_USD_PER_40FT = 800;
-
-// Reference load used only to express the $800 as a per-ton rate, so it can
-// be added to product prices (which are quoted per ton). Not a real-world
-// measurement of any specific shipment — just FLAT_RATE_USD_PER_40FT / 26.
-export const REFERENCE_TONS_PER_40FT = 26;
-
-export const RATE_USD_PER_TON = FLAT_RATE_USD_PER_40FT / REFERENCE_TONS_PER_40FT;
-
-export interface ReturnStation {
-  id: string;
-  en: string;
-  ru: string;
+export function findBorder(config: LogisticsConfig, borderId: string) {
+  return config.borders.find((b) => b.id === borderId);
 }
 
-export const FLAT_RATE_RETURN_STATIONS: ReturnStation[] = [
-  { id: 'shanghai',     en: 'Shanghai',     ru: 'Шанхай' },
-  { id: 'taicang',      en: 'Taicang',      ru: 'Тайцан' },
-  { id: 'tianjin',      en: 'Tianjin',      ru: 'Тяньцзинь' },
-  { id: 'qingdao',      en: 'Qingdao',      ru: 'Циндао' },
-  { id: 'ningbo',       en: 'Ningbo',       ru: 'Нинбо' },
-  { id: 'shenzhen',     en: 'Shenzhen',     ru: 'Шэньчжэнь' },
-  { id: 'guangzhou',    en: 'Guangzhou',    ru: 'Гуанчжоу' },
-  { id: 'yiwu',         en: 'Yiwu',         ru: 'Иу' },
-  { id: 'lianyungang',  en: 'Lianyungang',  ru: 'Ляньюньган' },
-];
-
-export function isFlatRateBorder(border: string): border is FlatRateBorderKey {
-  return (FLAT_RATE_BORDER_KEYS as readonly string[]).includes(border);
-}
-
-export function isFlatRateReturnStation(stationId: string): boolean {
-  return FLAT_RATE_RETURN_STATIONS.some((s) => s.id === stationId);
+export function findStation(config: LogisticsConfig, stationId: string) {
+  return config.stations.find((s) => s.id === stationId);
 }
 
 /**
- * Returns the flat USD price for one 40ft container, or null if this
- * route falls outside the fixed-rate rule (needs a manual quote).
+ * Returns the flat USD price for one 40ft container on this border+station,
+ * or null if the combination isn't covered (needs a manual quote).
  */
-export function getContainerFlatQuote(border: string, returnStationId: string): number | null {
-  if (!isFlatRateBorder(border)) return null;
-  if (!isFlatRateReturnStation(returnStationId)) return null;
-  return FLAT_RATE_USD_PER_40FT;
+export function getContainerFlatQuote(
+  config: LogisticsConfig,
+  borderId: string,
+  stationId: string
+): number | null {
+  if (!findBorder(config, borderId)) return null;
+  const station = findStation(config, stationId);
+  return station ? station.pricePerContainer : null;
 }
 
 /**
@@ -63,7 +39,7 @@ export function isCombinableWithTonPrice(currency: string, unit: string): boolea
 export interface PerTonBreakdown {
   /** (a) Product price, as quoted by the supplier. */
   productPerTon: number;
-  /** (b) Fixed logistics overhead per ton — always FLAT_RATE_USD_PER_40FT / REFERENCE_TONS_PER_40FT,
+  /** (b) Fixed logistics overhead per ton — pricePerContainer / referenceTonsPerContainer,
    *  regardless of the actual tonnage a given container ends up carrying. */
   logisticsPerTon: number;
   /** (c) Sum of the two. Actual container/order totals depend on real tonnage,
@@ -73,15 +49,20 @@ export interface PerTonBreakdown {
 
 /**
  * Per-ton breakdown only. Deliberately does NOT multiply by any assumed
- * tonnage — actual container weight varies (26-28t+) and the seller is paid
- * on real weight, so a "per container" total here would misstate their
- * revenue. Logistics is a flat $800/container either way; expressing it per
- * ton is just a fixed reference number for combining with product price.
+ * tonnage — actual container weight varies and the seller is paid on real
+ * weight, so a "per container" total here would misstate their revenue.
+ * Logistics is a flat rate per container either way; expressing it per ton
+ * is just a fixed reference number for combining with product price.
  */
-export function getPerTonBreakdown(productPricePerTon: number): PerTonBreakdown {
+export function getPerTonBreakdown(
+  productPricePerTon: number,
+  pricePerContainer: number,
+  referenceTonsPerContainer: number
+): PerTonBreakdown {
+  const logisticsPerTon = pricePerContainer / referenceTonsPerContainer;
   return {
     productPerTon: productPricePerTon,
-    logisticsPerTon: RATE_USD_PER_TON,
-    totalPerTon: productPricePerTon + RATE_USD_PER_TON,
+    logisticsPerTon,
+    totalPerTon: productPricePerTon + logisticsPerTon,
   };
 }

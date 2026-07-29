@@ -1,19 +1,11 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
-  FLAT_RATE_BORDER_KEYS,
-  FLAT_RATE_RETURN_STATIONS,
-  REFERENCE_TONS_PER_40FT,
   getContainerFlatQuote,
   isCombinableWithTonPrice,
   getPerTonBreakdown,
-  type FlatRateBorderKey,
 } from '@/lib/logistics-pricing';
-
-const BORDER_LABELS: Record<FlatRateBorderKey, string> = {
-  altynkol: 'Алтынколь (эксп.) — Хоргос',
-  dostyk: 'Достык (эксп.) — Алашанькоу',
-};
+import type { LogisticsConfig } from '@/lib/logistics-config';
 
 interface ProductPriceInfo {
   pricePerTon: number;
@@ -33,28 +25,38 @@ interface Props {
 }
 
 export default function LogisticsEstimator({ onNeedsQuote, compact, product }: Props) {
-  const [border, setBorder] = useState<FlatRateBorderKey | ''>('');
+  const [config, setConfig] = useState<LogisticsConfig | null>(null);
+  const [border, setBorder] = useState('');
   const [returnStation, setReturnStation] = useState('');
   const [containers, setContainers] = useState(1);
   const [contact, setContact] = useState('');
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
 
-  const perContainer = border && returnStation
-    ? getContainerFlatQuote(border, returnStation)
+  useEffect(() => {
+    fetch('/api/logistics/config')
+      .then((r) => r.ok ? r.json() : null)
+      .then(setConfig)
+      .catch(() => setConfig(null));
+  }, []);
+
+  const perContainer = config && border && returnStation
+    ? getContainerFlatQuote(config, border, returnStation)
     : null;
 
   const showResult = border !== '' && returnStation !== '';
   const logisticsTotal = perContainer !== null ? perContainer * containers : null;
 
   const canCombine = !!product && isCombinableWithTonPrice(product.currency, product.unit);
-  const breakdown = perContainer !== null && canCombine
-    ? getPerTonBreakdown(product!.pricePerTon)
+  const breakdown = perContainer !== null && canCombine && config
+    ? getPerTonBreakdown(product!.pricePerTon, perContainer, config.referenceTonsPerContainer)
     : null;
 
   async function submitOrder() {
-    if (!contact.trim() || perContainer === null || !border || !returnStation) return;
+    if (!contact.trim() || perContainer === null || !border || !returnStation || !config) return;
     setSubmitStatus('sending');
-    const returnStationLabel = FLAT_RATE_RETURN_STATIONS.find((s) => s.id === returnStation);
+    const borderLabel = config.borders.find((b) => b.id === border)?.label ?? border;
+    const stationInfo = config.stations.find((s) => s.id === returnStation);
+    const returnStationLabel = stationInfo ? `${stationInfo.ru} (${stationInfo.en})` : returnStation;
     try {
       const res = await fetch('/api/logistics/order', {
         method: 'POST',
@@ -69,9 +71,9 @@ export default function LogisticsEstimator({ onNeedsQuote, compact, product }: P
           productCurrency: product?.currency,
           productUnit: product?.unit,
           border,
-          borderLabel: BORDER_LABELS[border],
+          borderLabel,
           returnStationId: returnStation,
-          returnStationLabel: returnStationLabel ? `${returnStationLabel.ru} (${returnStationLabel.en})` : returnStation,
+          returnStationLabel,
           containers,
           ratePerTon: breakdown?.logisticsPerTon,
           logisticsPerContainer: perContainer,
@@ -84,6 +86,10 @@ export default function LogisticsEstimator({ onNeedsQuote, compact, product }: P
     }
   }
 
+  if (!config) {
+    return <div className="text-sm text-gray-400">Загружаем тарифы...</div>;
+  }
+
   return (
     <div className={compact ? 'space-y-3' : 'space-y-4'}>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -91,12 +97,12 @@ export default function LogisticsEstimator({ onNeedsQuote, compact, product }: P
           <label className="block text-xs font-medium text-gray-600 mb-1">Погранпереход</label>
           <select
             value={border}
-            onChange={(e) => setBorder(e.target.value as FlatRateBorderKey | '')}
+            onChange={(e) => setBorder(e.target.value)}
             className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
           >
             <option value="">Выберите</option>
-            {FLAT_RATE_BORDER_KEYS.map((key) => (
-              <option key={key} value={key}>{BORDER_LABELS[key]}</option>
+            {config.borders.map((b) => (
+              <option key={b.id} value={b.id}>{b.label}</option>
             ))}
           </select>
         </div>
@@ -109,7 +115,7 @@ export default function LogisticsEstimator({ onNeedsQuote, compact, product }: P
             className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
           >
             <option value="">Выберите</option>
-            {FLAT_RATE_RETURN_STATIONS.map((s) => (
+            {config.stations.map((s) => (
               <option key={s.id} value={s.id}>{s.ru} ({s.en})</option>
             ))}
             <option value="__other__">Другая станция</option>
@@ -142,7 +148,7 @@ export default function LogisticsEstimator({ onNeedsQuote, compact, product }: P
                   </p>
                 </div>
                 <p className="text-xs text-gray-500">
-                  Логистика — фиксированная стоимость перевозки одного 40-фут. контейнера (${perContainer.toLocaleString()}), выраженная здесь как расход на тонну от базы {REFERENCE_TONS_PER_40FT} т. Она не меняется от того, сколько тонн реально войдёт в контейнер (26, 27 или 28) — итоговая сумма зависит от фактического веса и считается по цене за тонну.
+                  Логистика — фиксированная стоимость перевозки одного 40-фут. контейнера (${perContainer.toLocaleString()}), выраженная здесь как расход на тонну от базы {config.referenceTonsPerContainer} т. Она не меняется от того, сколько тонн реально войдёт в контейнер — итоговая сумма зависит от фактического веса и считается по цене за тонну.
                 </p>
               </>
             ) : (

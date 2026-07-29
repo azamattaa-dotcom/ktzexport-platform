@@ -3,7 +3,7 @@ import { useMemo, useState } from 'react';
 import type { Supplier } from '@/lib/db';
 import type { ChatLead } from '@/lib/chat-leads';
 
-type Granularity = 'week' | 'month' | 'quarter';
+type Granularity = 'week' | 'month' | 'quarter' | 'year';
 
 interface BuyerLike {
   status: string;
@@ -40,6 +40,9 @@ function periodKey(date: Date, granularity: Granularity): string {
   if (granularity === 'month') {
     return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
   }
+  if (granularity === 'year') {
+    return `${date.getFullYear()}`;
+  }
   const q = Math.floor(date.getMonth() / 3) + 1;
   return `${date.getFullYear()}-Q${q}`;
 }
@@ -56,6 +59,9 @@ function periodLabel(key: string, granularity: Granularity): string {
     const [y, m] = key.split('-');
     const d = new Date(Number(y), Number(m) - 1, 1);
     return d.toLocaleDateString('ru-RU', { month: 'long', year: 'numeric' });
+  }
+  if (granularity === 'year') {
+    return key;
   }
   const [y, q] = key.split('-');
   return `${q} ${y}`;
@@ -112,6 +118,7 @@ const GRANULARITY_LABELS: Record<Granularity, string> = {
   week: 'Еженедельно',
   month: 'Ежемесячно',
   quarter: 'Ежеквартально',
+  year: 'Ежегодно',
 };
 
 export default function AnalyticsPanel({
@@ -146,7 +153,7 @@ export default function AnalyticsPanel({
     <div className="space-y-6">
       {/* Granularity switcher */}
       <div className="flex gap-1 bg-gray-100 rounded-xl p-1 w-fit">
-        {(['week', 'month', 'quarter'] as Granularity[]).map((g) => (
+        {(['week', 'month', 'quarter', 'year'] as Granularity[]).map((g) => (
           <button
             key={g}
             onClick={() => setGranularity(g)}

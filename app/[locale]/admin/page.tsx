@@ -6,6 +6,7 @@ import type { Supplier } from '@/lib/db';
 import type { ChatLead } from '@/lib/chat-leads';
 import { PRODUCT_LIST } from '@/lib/products';
 import AnalyticsPanel from '@/components/admin/AnalyticsPanel';
+import LogisticsConfigPanel from '@/components/admin/LogisticsConfigPanel';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -384,7 +385,7 @@ export default function AdminDashboard() {
   const router = useRouter();
 
   // Tabs
-  const [tab, setTab] = useState<'suppliers' | 'buyers' | 'chats' | 'analytics'>('suppliers');
+  const [tab, setTab] = useState<'suppliers' | 'buyers' | 'chats' | 'analytics' | 'logistics'>('suppliers');
 
   // Suppliers state
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
@@ -588,6 +589,10 @@ export default function AdminDashboard() {
           <button onClick={() => setTab('analytics')}
             className={`px-5 py-2 rounded-lg text-sm font-medium transition-colors ${tab === 'analytics' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-700'}`}>
             Аналитика
+          </button>
+          <button onClick={() => setTab('logistics')}
+            className={`px-5 py-2 rounded-lg text-sm font-medium transition-colors ${tab === 'logistics' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-700'}`}>
+            Логистика
           </button>
         </div>
 
@@ -983,6 +988,10 @@ export default function AdminDashboard() {
         {/* ── ANALYTICS TAB ── */}
         {tab === 'analytics' && (
           <AnalyticsPanel suppliers={suppliers} buyers={buyers} leads={leads} />
+        )}
+
+        {tab === 'logistics' && (
+          <LogisticsConfigPanel />
         )}
       </main>
 
