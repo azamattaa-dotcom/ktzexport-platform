@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl';
 import type { Supplier } from '@/lib/db';
 import { PRODUCT_LIST } from '@/lib/products';
 import SupplierChat from './SupplierChat';
+import LogisticsEstimator from './LogisticsEstimator';
 
 const CURRENCY_SYMBOL: Record<string, string> = { USD: '$', KZT: '₸' };
 
@@ -18,6 +19,7 @@ export default function SupplierCard({ supplier, productId, locale }: Props) {
   const tp = useTranslations('products.items');
   const tv = useTranslations('supplier.volumes');
   const [expanded, setExpanded] = useState(false);
+  const [showLogistics, setShowLogistics] = useState(false);
 
   const detail = supplier.productDetails?.[productId];
   const price = detail?.price ?? supplier.productPrices?.[productId];
@@ -129,6 +131,25 @@ export default function SupplierCard({ supplier, productId, locale }: Props) {
                   📎 {supplier.letterheadFileName ?? tc('letterhead')}
                 </a>
               )
+            )}
+          </div>
+
+          {/* Logistics */}
+          <div className="border-t border-gray-100 pt-4">
+            <button
+              type="button"
+              onClick={() => setShowLogistics((v) => !v)}
+              className="flex items-center justify-between w-full text-sm font-semibold text-gray-700 hover:text-primary-700 transition-colors"
+            >
+              <span>🚉 Рассчитать логистику к этому товару</span>
+              <svg className={`w-4 h-4 transition-transform ${showLogistics ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            {showLogistics && (
+              <div className="mt-3">
+                <LogisticsEstimator compact />
+              </div>
             )}
           </div>
 
