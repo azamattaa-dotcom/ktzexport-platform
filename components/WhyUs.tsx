@@ -1,5 +1,6 @@
 import { useTranslations } from 'next-intl';
 import { ShieldCheck, FileText, Globe2 } from 'lucide-react';
+import { BRAND_MARK } from '@/lib/brand';
 
 function KTZContainerSVG() {
   return (
@@ -19,8 +20,8 @@ function KTZContainerSVG() {
       <circle cx="80" cy="54" r="5" fill="#374151" />
       <circle cx="20" cy="54" r="2" fill="#6b7280" />
       <circle cx="80" cy="54" r="2" fill="#6b7280" />
-      {/* KTZ text */}
-      <text x="50" y="32" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold" fontFamily="Arial, sans-serif" letterSpacing="1">KTZ</text>
+      {/* Brand text */}
+      <text x="50" y="32" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold" fontFamily="Arial, sans-serif" letterSpacing="1">{BRAND_MARK}</text>
     </svg>
   );
 }

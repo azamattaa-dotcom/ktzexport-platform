@@ -1,7 +1,10 @@
+import { BRAND_NAME } from './brand';
+
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const NOTIFICATION_EMAIL = process.env.NOTIFICATION_EMAIL ?? process.env.ADMIN_EMAIL ?? 'azamattaa@gmail.com';
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://ktzexport.com';
-const FROM_EMAIL = process.env.FROM_EMAIL ?? 'KTZ Export <onboarding@resend.dev>';
+const SITE_DOMAIN = SITE_URL.replace(/^https?:\/\//, '');
+const FROM_EMAIL = process.env.FROM_EMAIL ?? `${BRAND_NAME} <onboarding@resend.dev>`;
 
 async function send(to: string, subject: string, text: string, replyTo?: string) {
   if (!RESEND_API_KEY) {
@@ -36,7 +39,7 @@ export async function notifyAdminNewSupplier(supplier: {
   email: string; phone: string; products: string[]; elevatorName: string;
   loadingStation?: string;
 }) {
-  const body = `Новая заявка поставщика на KTZ Export:
+  const body = `Новая заявка поставщика на ${BRAND_NAME}:
 
 Компания: ${supplier.companyName}
 Страна: ${supplier.country}
@@ -77,7 +80,7 @@ export async function sendLogisticsRequest(params: {
   contactEmail: string;
   contactPhone?: string;
 }) {
-  const body = `Новый запрос на расчёт логистики — KTZ Export
+  const body = `Новый запрос на расчёт логистики — ${BRAND_NAME}
 
 ТИП ТРАНСПОРТА: ${params.transportType}
 
@@ -116,7 +119,7 @@ export async function sendBuyerRequest(params: {
   message?: string;
 }) {
   const product = PRODUCT_LABELS_RU[params.productId] ?? params.productId;
-  const body = `Новый запрос покупателя на KTZ Export
+  const body = `Новый запрос покупателя на ${BRAND_NAME}
 
 Поставщик: ${params.supplierCompany}
 Товар: ${product}
@@ -141,7 +144,7 @@ export async function notifyChatMessage(params: {
   productLabel: string;
   content: string;
 }) {
-  const body = `Новое сообщение от покупателя — KTZ Export
+  const body = `Новое сообщение от покупателя — ${BRAND_NAME}
 
 Покупатель: ${params.buyerName} (${params.buyerEmail})
 Товар: ${params.productLabel}
@@ -161,7 +164,7 @@ export async function notifyChatReply(params: {
   productLabel: string;
   content: string;
 }) {
-  const body = `${params.supplierCompany} ответил на ваш запрос — KTZ Export
+  const body = `${params.supplierCompany} ответил на ваш запрос — ${BRAND_NAME}
 
 Товар: ${params.productLabel}
 
@@ -180,7 +183,7 @@ export async function sendSupplierInvite(supplier: {
   const setupUrl = `${SITE_URL}/ru/supplier/setup/${supplier.inviteToken}`;
   const body = `Уважаемый партнёр, ${supplier.companyName}!
 
-Ваша заявка на платформе KTZ Export одобрена.
+Ваша заявка на платформе ${BRAND_NAME} одобрена.
 
 Для создания личного кабинета перейдите по ссылке и установите пароль:
 ${setupUrl}
@@ -188,10 +191,10 @@ ${setupUrl}
 Ссылка действительна 7 дней.
 
 С уважением,
-Команда KTZ Export
-info@ktzexport.com`;
+Команда ${BRAND_NAME}
+info@${SITE_DOMAIN}`;
 
-  await send(supplier.email, 'Заявка одобрена — KTZ Export', body);
+  await send(supplier.email, `Заявка одобрена — ${BRAND_NAME}`, body);
 }
 
 // ── Buyer emails ─────────────────────────────────────────────────────────────
@@ -207,7 +210,7 @@ export async function notifyAdminNewBuyer(buyer: {
     ? buyer.signatoryCustomType
     : { director: 'Директор', ceo: 'Ген. директор', legal_rep: 'Законный представитель' }[buyer.signatoryType] ?? buyer.signatoryType;
 
-  const body = `Новая заявка покупателя на KTZ Export:
+  const body = `Новая заявка покупателя на ${BRAND_NAME}:
 
 Компания: ${buyer.companyName}
 Страна: ${buyer.country}
@@ -231,7 +234,7 @@ export async function sendBuyerInvite(buyer: {
   const setupUrl = `${SITE_URL}/ru/buyer/setup/${buyer.inviteToken}`;
   const body = `Уважаемый партнёр, ${buyer.companyName}!
 
-Ваша заявка покупателя на платформе KTZ Export одобрена. Верификация документов пройдена.
+Ваша заявка покупателя на платформе ${BRAND_NAME} одобрена. Верификация документов пройдена.
 
 Для доступа к платформе установите пароль по ссылке:
 ${setupUrl}
@@ -239,10 +242,10 @@ ${setupUrl}
 Ссылка действительна 7 дней.
 
 С уважением,
-Команда KTZ Export
-info@ktzexport.com`;
+Команда ${BRAND_NAME}
+info@${SITE_DOMAIN}`;
 
-  await send(buyer.email, 'Заявка покупателя одобрена — KTZ Export', body);
+  await send(buyer.email, `Заявка покупателя одобрена — ${BRAND_NAME}`, body);
 }
 
 export async function notifyBuyerRejected(buyer: {
@@ -250,15 +253,15 @@ export async function notifyBuyerRejected(buyer: {
 }) {
   const body = `Уважаемый партнёр, ${buyer.companyName}!
 
-К сожалению, ваша заявка покупателя на платформе KTZ Export не прошла верификацию.
+К сожалению, ваша заявка покупателя на платформе ${BRAND_NAME} не прошла верификацию.
 
 ${buyer.rejectionReason ? `Причина: ${buyer.rejectionReason}\n` : ''}
-Если вы считаете, что это ошибка, свяжитесь с нами: info@ktzexport.com
+Если вы считаете, что это ошибка, свяжитесь с нами: info@${SITE_DOMAIN}
 
 С уважением,
-Команда KTZ Export`;
+Команда ${BRAND_NAME}`;
 
-  await send(buyer.email, 'Заявка покупателя отклонена — KTZ Export', body);
+  await send(buyer.email, `Заявка покупателя отклонена — ${BRAND_NAME}`, body);
 }
 
 // ── Chat lead emails ──────────────────────────────────────────────────────────
@@ -270,7 +273,7 @@ export async function notifyAdminNewChatLead(lead: {
   volume?: string;
 }) {
   const intentLabel = lead.intent === 'buyer' ? 'Покупатель' : lead.intent === 'supplier' ? 'Поставщик' : 'Не определено';
-  const body = `Новый лид из чата на KTZ Export:
+  const body = `Новый лид из чата на ${BRAND_NAME}:
 
 Контакт: ${lead.contact}
 Интерес: ${intentLabel}

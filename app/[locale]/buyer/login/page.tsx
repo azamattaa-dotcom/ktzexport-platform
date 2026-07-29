@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
+import { BRAND_NAME, BRAND_MARK } from '@/lib/brand';
 
 export default function BuyerLoginPage() {
   const t = useTranslations('buyerLoginPage');
@@ -35,9 +36,9 @@ export default function BuyerLoginPage() {
       <header className="bg-white border-b border-gray-100 px-6 py-4">
         <Link href={`/${locale}`} className="flex items-center gap-2 w-fit">
           <div className="w-8 h-8 bg-primary-700 rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-sm">KTZ</span>
+            <span className="text-white font-bold text-sm">{BRAND_MARK}</span>
           </div>
-          <span className="font-bold text-gray-900 text-lg">KTZ Export</span>
+          <span className="font-bold text-gray-900 text-lg">{BRAND_NAME}</span>
         </Link>
       </header>
 

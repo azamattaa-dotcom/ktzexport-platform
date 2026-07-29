@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
+import { BRAND_NAME } from '@/lib/brand';
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
-const SYSTEM_PROMPT = `Ты — Алия, торговый ассистент компании KTZ Export.
+const SYSTEM_PROMPT = `Ты — Алия, торговый ассистент компании ${BRAND_NAME}.
 
-KTZ Export — это B2B платформа, которая соединяет казахстанских поставщиков агропродукции с покупателями из Китая, Центральной Азии, Ближнего Востока и Европы.
+${BRAND_NAME} — это B2B платформа, которая соединяет казахстанских поставщиков агропродукции с покупателями из Китая, Центральной Азии, Ближнего Востока и Европы.
 
 Доступная продукция: пшеничная мука, кормовая мука, пшеница, ячмень, пшеничные отруби, семена льна, семена подсолнечника, кукуруза.
 

@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
+import { BRAND_NAME, BRAND_MARK } from '@/lib/brand';
 
 interface BuyerProfile {
   id: string;
@@ -86,9 +87,9 @@ export default function BuyerDashboardPage() {
       <header className="bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between">
         <Link href={`/${locale}`} className="flex items-center gap-2">
           <div className="w-8 h-8 bg-primary-700 rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-sm">KTZ</span>
+            <span className="text-white font-bold text-sm">{BRAND_MARK}</span>
           </div>
-          <span className="font-bold text-gray-900">KTZ Export</span>
+          <span className="font-bold text-gray-900">{BRAND_NAME}</span>
         </Link>
         <button onClick={handleLogout} className="text-sm text-gray-500 hover:text-red-600 transition-colors">
           {t('logout')}

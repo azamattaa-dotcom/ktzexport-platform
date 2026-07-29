@@ -3,6 +3,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import Link from 'next/link';
 import { useState, useEffect, useRef } from 'react';
 import LanguageSwitcher from './LanguageSwitcher';
+import { BRAND_NAME, BRAND_MARK } from '@/lib/brand';
 
 export default function Header() {
   const t = useTranslations('nav');
@@ -29,9 +30,9 @@ export default function Header() {
           {/* Logo */}
           <Link href={`/${locale}`} className="flex items-center gap-2 shrink-0">
             <div className="w-8 h-8 bg-primary-700 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">KTZ</span>
+              <span className="text-white font-bold text-sm">{BRAND_MARK}</span>
             </div>
-            <span className="font-bold text-gray-900 text-lg">KTZ Export</span>
+            <span className="font-bold text-gray-900 text-lg">{BRAND_NAME}</span>
           </Link>
 
           {/* Desktop nav */}

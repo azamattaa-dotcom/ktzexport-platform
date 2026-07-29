@@ -6,6 +6,7 @@ import SupplierProductManager from '@/components/SupplierProductManager';
 import SupplierMessagesPanel from '@/components/SupplierMessagesPanel';
 import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
+import { BRAND_NAME, BRAND_MARK } from '@/lib/brand';
 
 const secret = new TextEncoder().encode(process.env.JWT_SECRET ?? 'fallback-secret');
 
@@ -40,9 +41,9 @@ export default async function SupplierDashboard({ params }: { params: { locale: 
         <div className="flex items-center gap-3">
           <Link href={`/${params.locale}`} className="flex items-center gap-2">
             <div className="w-8 h-8 bg-primary-700 rounded-lg flex items-center justify-center">
-              <span className="text-white text-xs font-bold">KTZ</span>
+              <span className="text-white text-xs font-bold">{BRAND_MARK}</span>
             </div>
-            <span className="font-semibold text-gray-900 hidden sm:block">KTZ Export</span>
+            <span className="font-semibold text-gray-900 hidden sm:block">{BRAND_NAME}</span>
           </Link>
           <span className="text-gray-300">/</span>
           <span className="text-sm text-gray-500">{t('cabinet')}</span>

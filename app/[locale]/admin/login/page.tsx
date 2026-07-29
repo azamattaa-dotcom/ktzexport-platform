@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { useRouter } from 'next/navigation';
+import { BRAND_MARK } from '@/lib/brand';
 
 export default function AdminLoginPage() {
   const t = useTranslations('admin');
@@ -37,7 +38,7 @@ export default function AdminLoginPage() {
         {/* Logo */}
         <div className="text-center mb-8">
           <div className="w-12 h-12 bg-primary-700 rounded-xl flex items-center justify-center mx-auto mb-3">
-            <span className="text-white font-bold">KTZ</span>
+            <span className="text-white font-bold">{BRAND_MARK}</span>
           </div>
           <h1 className="text-xl font-bold text-gray-900">{t('loginTitle')}</h1>
         </div>

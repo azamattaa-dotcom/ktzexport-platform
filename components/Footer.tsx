@@ -1,6 +1,7 @@
 import { useTranslations, useLocale } from 'next-intl';
 import Link from 'next/link';
 import { PRODUCT_LIST } from '@/lib/products';
+import { BRAND_NAME, BRAND_MARK } from '@/lib/brand';
 
 export default function Footer() {
   const t = useTranslations('footer');
@@ -16,9 +17,9 @@ export default function Footer() {
           <div className="md:col-span-1">
             <div className="flex items-center gap-2 mb-4">
               <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
-                <span className="text-primary-700 font-bold text-sm">KTZ</span>
+                <span className="text-primary-700 font-bold text-sm">{BRAND_MARK}</span>
               </div>
-              <span className="font-bold text-lg">KTZ Export</span>
+              <span className="font-bold text-lg">{BRAND_NAME}</span>
             </div>
             <p className="text-primary-200 text-sm leading-relaxed">{t('description')}</p>
             <div className="mt-4 space-y-1 text-sm text-primary-300">
@@ -76,7 +77,7 @@ export default function Footer() {
         </div>
 
         <div className="mt-10 pt-6 border-t border-primary-800 flex flex-col sm:flex-row justify-between items-center gap-2 text-xs text-primary-400">
-          <p>© {new Date().getFullYear()} KTZ Export. {t('rights')}.</p>
+          <p>© {new Date().getFullYear()} {BRAND_NAME}. {t('rights')}.</p>
           <p>ТОО «KTZ Export» · БИН 260240023256 · г. Астана</p>
         </div>
       </div>

@@ -4,6 +4,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import type { Supplier } from '@/lib/db';
 import { PRODUCT_LIST } from '@/lib/products';
+import { BRAND_NAME, BRAND_MARK } from '@/lib/brand';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -546,9 +547,9 @@ export default function AdminDashboard() {
       <header className="bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 bg-primary-700 rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-sm">KTZ</span>
+            <span className="text-white font-bold text-sm">{BRAND_MARK}</span>
           </div>
-          <span className="font-bold text-gray-900">KTZ Export</span>
+          <span className="font-bold text-gray-900">{BRAND_NAME}</span>
           <span className="text-gray-400 text-sm ml-2">/ {t('dashboardTitle')}</span>
         </div>
         <button onClick={handleLogout} className="text-sm text-gray-500 hover:text-red-600 transition-colors">

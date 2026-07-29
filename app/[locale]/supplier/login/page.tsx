@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
+import { BRAND_MARK } from '@/lib/brand';
 
 export default function SupplierLoginPage() {
   const t = useTranslations('supplierLogin');
@@ -40,7 +41,7 @@ export default function SupplierLoginPage() {
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <div className="w-12 h-12 bg-primary-700 rounded-xl flex items-center justify-center mx-auto mb-3">
-            <span className="text-white font-bold">KTZ</span>
+            <span className="text-white font-bold">{BRAND_MARK}</span>
           </div>
           <h1 className="text-xl font-bold text-gray-900">{t('title')}</h1>
           {setupSuccess && (
