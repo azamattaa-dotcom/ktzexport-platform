@@ -53,6 +53,12 @@ export default function HeroSection() {
             >
               {t('ctaSupplier')} →
             </Link>
+            <Link
+              href={`/${locale}/logistics`}
+              className="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 border border-white/30 font-semibold px-8 py-3.5 rounded-xl transition-all backdrop-blur-sm"
+            >
+              {t('ctaLogistics')} →
+            </Link>
           </div>
 
           {/* Stats — Kazakhstan market data (context, not platform metrics) */}
