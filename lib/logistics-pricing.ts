@@ -60,25 +60,28 @@ export function isCombinableWithTonPrice(currency: string, unit: string): boolea
   return currency === 'USD' && /тонн|ton/i.test(unit);
 }
 
-export interface CombinedEstimate {
-  productPerContainer: number;
-  logisticsPerContainer: number;
-  totalPerContainer: number;
-  containers: number;
-  grandTotal: number;
+export interface PerTonBreakdown {
+  /** (a) Product price, as quoted by the supplier. */
+  productPerTon: number;
+  /** (b) Fixed logistics overhead per ton — always FLAT_RATE_USD_PER_40FT / REFERENCE_TONS_PER_40FT,
+   *  regardless of the actual tonnage a given container ends up carrying. */
+  logisticsPerTon: number;
+  /** (c) Sum of the two. Actual container/order totals depend on real tonnage,
+   *  which this platform does not assume — multiply by real weight separately. */
+  totalPerTon: number;
 }
 
-export function combineWithProductPrice(
-  productPricePerTon: number,
-  containers: number
-): CombinedEstimate {
-  const productPerContainer = productPricePerTon * REFERENCE_TONS_PER_40FT;
-  const totalPerContainer = productPerContainer + FLAT_RATE_USD_PER_40FT;
+/**
+ * Per-ton breakdown only. Deliberately does NOT multiply by any assumed
+ * tonnage — actual container weight varies (26-28t+) and the seller is paid
+ * on real weight, so a "per container" total here would misstate their
+ * revenue. Logistics is a flat $800/container either way; expressing it per
+ * ton is just a fixed reference number for combining with product price.
+ */
+export function getPerTonBreakdown(productPricePerTon: number): PerTonBreakdown {
   return {
-    productPerContainer,
-    logisticsPerContainer: FLAT_RATE_USD_PER_40FT,
-    totalPerContainer,
-    containers,
-    grandTotal: totalPerContainer * containers,
+    productPerTon: productPricePerTon,
+    logisticsPerTon: RATE_USD_PER_TON,
+    totalPerTon: productPricePerTon + RATE_USD_PER_TON,
   };
 }
