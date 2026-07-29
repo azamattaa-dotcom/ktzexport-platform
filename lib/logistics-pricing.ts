@@ -5,18 +5,15 @@
 export const FLAT_RATE_BORDER_KEYS = ['altynkol', 'dostyk'] as const;
 export type FlatRateBorderKey = (typeof FLAT_RATE_BORDER_KEYS)[number];
 
-// Quoted to the buyer as a per-ton rate (800 / 26 ≈ 30.77, rounded up to 31)
-// so it lines up cleanly with product pricing, which is also per ton.
-export const RATE_USD_PER_TON = 31;
+// The headline price: $800 for one 40ft container on an eligible route.
+export const FLAT_RATE_USD_PER_40FT = 800;
 
-// The actual floor: whatever the per-ton math works out to, KTZ Export must
-// receive at least $800 for a 40ft container. A lighter-than-usual load
-// (below ~26t) would otherwise undercut this, so every container is billed
-// at max(tonsInContainer * RATE_USD_PER_TON, MIN_CHARGE_PER_40FT).
-export const MIN_CHARGE_PER_40FT = 800;
+// Reference load used only to express the $800 as a per-ton rate, so it can
+// be added to product prices (which are quoted per ton). Not a real-world
+// measurement of any specific shipment — just FLAT_RATE_USD_PER_40FT / 26.
+export const REFERENCE_TONS_PER_40FT = 26;
 
-// Reference load range used for buyer-facing explanations only.
-export const TYPICAL_TONS_PER_40FT = { min: 26, max: 28 };
+export const RATE_USD_PER_TON = FLAT_RATE_USD_PER_40FT / REFERENCE_TONS_PER_40FT;
 
 export interface ReturnStation {
   id: string;
@@ -44,33 +41,14 @@ export function isFlatRateReturnStation(stationId: string): boolean {
   return FLAT_RATE_RETURN_STATIONS.some((s) => s.id === stationId);
 }
 
-export function isFlatRateRoute(border: string, returnStationId: string): boolean {
-  return isFlatRateBorder(border) && isFlatRateReturnStation(returnStationId);
-}
-
-export interface ContainerCharge {
-  /** What the per-ton math alone would give. */
-  computed: number;
-  /** What is actually billed — computed, or the $800 floor, whichever is higher. */
-  billed: number;
-  /** True when the $800 floor kicked in (light load). */
-  floorApplied: boolean;
-}
-
 /**
- * Per-container logistics charge for a given load, on an eligible route.
- * Returns null if the route isn't covered by the fixed rate (needs a manual quote).
+ * Returns the flat USD price for one 40ft container, or null if this
+ * route falls outside the fixed-rate rule (needs a manual quote).
  */
-export function getContainerCharge(params: {
-  border: string;
-  returnStationId: string;
-  tonsInContainer: number;
-}): ContainerCharge | null {
-  const { border, returnStationId, tonsInContainer } = params;
-  if (!isFlatRateRoute(border, returnStationId)) return null;
-  const computed = tonsInContainer * RATE_USD_PER_TON;
-  const billed = Math.max(computed, MIN_CHARGE_PER_40FT);
-  return { computed, billed, floorApplied: billed > computed };
+export function getContainerFlatQuote(border: string, returnStationId: string): number | null {
+  if (!isFlatRateBorder(border)) return null;
+  if (!isFlatRateReturnStation(returnStationId)) return null;
+  return FLAT_RATE_USD_PER_40FT;
 }
 
 /**
@@ -85,7 +63,6 @@ export function isCombinableWithTonPrice(currency: string, unit: string): boolea
 export interface CombinedEstimate {
   productPerContainer: number;
   logisticsPerContainer: number;
-  logisticsFloorApplied: boolean;
   totalPerContainer: number;
   containers: number;
   grandTotal: number;
@@ -93,16 +70,13 @@ export interface CombinedEstimate {
 
 export function combineWithProductPrice(
   productPricePerTon: number,
-  containerCharge: ContainerCharge,
-  tonsInContainer: number,
   containers: number
 ): CombinedEstimate {
-  const productPerContainer = productPricePerTon * tonsInContainer;
-  const totalPerContainer = productPerContainer + containerCharge.billed;
+  const productPerContainer = productPricePerTon * REFERENCE_TONS_PER_40FT;
+  const totalPerContainer = productPerContainer + FLAT_RATE_USD_PER_40FT;
   return {
     productPerContainer,
-    logisticsPerContainer: containerCharge.billed,
-    logisticsFloorApplied: containerCharge.floorApplied,
+    logisticsPerContainer: FLAT_RATE_USD_PER_40FT,
     totalPerContainer,
     containers,
     grandTotal: totalPerContainer * containers,
