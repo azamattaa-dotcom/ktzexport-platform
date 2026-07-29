@@ -26,7 +26,8 @@
     "ctaBuyer": "Ürün Bul",
     "ctaSupplier": "Tedarikçi Ol",
     "ctaLogistics": "Lojistik",
-    "stat1": "KZ Tahıl İhracatı / Yıl",
+    "statsContext": "Pazar bağlamı: Kazakistan'ın tarım ihracatı",
+    "stat1": "Kazakistan Tahıl İhracatı / Yıl",
     "stat2": "İthalatçı Ülke",
     "stat3": "Tarım İhracat Hacmi"
   },

@@ -9,9 +9,10 @@ import Link from 'next/link';
 
 function SupplierCTA() {
   const t = useTranslations('supplier');
+  const tn = useTranslations('nav');
   const locale = useLocale();
   return (
-    <section className="py-20 bg-primary-700 text-white text-center">
+    <section className="py-20 bg-primary-700 text-white text-center border-b border-primary-600">
       <div className="max-w-2xl mx-auto px-4">
         <div className="text-4xl mb-4">🌾</div>
         <h2 className="text-3xl font-bold mb-4">{t('ctaTitle')}</h2>
@@ -27,7 +28,7 @@ function SupplierCTA() {
             href={`/${locale}/supplier/login`}
             className="inline-block bg-white/10 hover:bg-white/20 border border-white/30 text-white font-semibold px-8 py-3.5 rounded-xl transition-colors"
           >
-            {t('ctaLoginHint')} {t('ctaLogin')} →
+            {tn('login')} →
           </Link>
         </div>
       </div>

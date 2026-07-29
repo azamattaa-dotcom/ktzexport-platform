@@ -53,16 +53,13 @@ export default function HeroSection() {
             >
               {t('ctaSupplier')} →
             </Link>
-            <Link
-              href={`/${locale}/logistics`}
-              className="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 border border-white/30 font-semibold px-8 py-3.5 rounded-xl transition-all backdrop-blur-sm"
-            >
-              {t('ctaLogistics')} →
-            </Link>
           </div>
 
-          {/* Stats — Kazakhstan market data */}
-          <div className="mt-14 grid grid-cols-3 gap-6 max-w-lg">
+          {/* Stats — Kazakhstan market data (context, not platform metrics) */}
+          <p className="mt-14 text-xs uppercase tracking-wide text-primary-300 mb-3">
+            {t('statsContext')}
+          </p>
+          <div className="grid grid-cols-3 gap-6 max-w-lg">
             {[
               { value: '8 млн т',  label: t('stat1') },
               { value: '80+',      label: t('stat2') },

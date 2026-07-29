@@ -1,4 +1,5 @@
 import { useTranslations } from 'next-intl';
+import { ShieldCheck, FileText, Globe2 } from 'lucide-react';
 
 function KTZContainerSVG() {
   return (
@@ -25,10 +26,10 @@ function KTZContainerSVG() {
 }
 
 const REASONS = [
-  { key: 'reason1', bg: 'bg-blue-50',     border: 'border-blue-100',    useIcon: 'ktz' },
-  { key: 'reason2', icon: '✅',            bg: 'bg-green-50',            border: 'border-green-100' },
-  { key: 'reason3', icon: '📜',            bg: 'bg-primary-50',          border: 'border-primary-100' },
-  { key: 'reason4', icon: '🌍',            bg: 'bg-wheat-50',            border: 'border-wheat-100' },
+  { key: 'reason1', bg: 'bg-blue-50',    border: 'border-blue-100',    useIcon: 'ktz' as const },
+  { key: 'reason2', Icon: ShieldCheck,   bg: 'bg-green-50',            border: 'border-green-100',  iconColor: 'text-green-700' },
+  { key: 'reason3', Icon: FileText,      bg: 'bg-primary-50',          border: 'border-primary-100', iconColor: 'text-primary-700' },
+  { key: 'reason4', Icon: Globe2,        bg: 'bg-wheat-50',            border: 'border-wheat-100',  iconColor: 'text-wheat-600' },
 ];
 
 export default function WhyUs() {
@@ -45,7 +46,9 @@ export default function WhyUs() {
           {REASONS.map((r) => (
             <div key={r.key} className={`${r.bg} border ${r.border} rounded-2xl p-6`}>
               <div className="mb-4">
-                {r.useIcon === 'ktz' ? <KTZContainerSVG /> : <span className="text-3xl">{r.icon}</span>}
+                {r.useIcon === 'ktz'
+                  ? <KTZContainerSVG />
+                  : <r.Icon className={`w-8 h-8 ${r.iconColor}`} strokeWidth={1.75} />}
               </div>
               <h3 className="font-bold text-gray-900 mb-2 text-sm">{t(`${r.key}Title`)}</h3>
               <p className="text-gray-600 text-xs leading-relaxed">{t(`${r.key}Desc`)}</p>
