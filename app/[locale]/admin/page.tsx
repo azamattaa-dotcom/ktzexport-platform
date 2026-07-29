@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import type { Supplier } from '@/lib/db';
 import type { ChatLead } from '@/lib/chat-leads';
 import { PRODUCT_LIST } from '@/lib/products';
+import AnalyticsPanel from '@/components/admin/AnalyticsPanel';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -383,7 +384,7 @@ export default function AdminDashboard() {
   const router = useRouter();
 
   // Tabs
-  const [tab, setTab] = useState<'suppliers' | 'buyers' | 'chats'>('suppliers');
+  const [tab, setTab] = useState<'suppliers' | 'buyers' | 'chats' | 'analytics'>('suppliers');
 
   // Suppliers state
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
@@ -439,6 +440,19 @@ export default function AdminDashboard() {
       });
     }, 4000);
     return () => clearInterval(interval);
+  }, [tab]);
+
+  // Analytics tab needs all three data sources loaded at once
+  useEffect(() => {
+    if (tab !== 'analytics') return;
+    if (buyers.length === 0) {
+      setLoadingBuyers(true);
+      fetch('/api/admin/buyers').then((r) => r.ok ? r.json() : []).then(setBuyers).finally(() => setLoadingBuyers(false));
+    }
+    if (leads.length === 0) {
+      setLoadingLeads(true);
+      fetch('/api/admin/chat').then((r) => r.ok ? r.json() : []).then(setLeads).finally(() => setLoadingLeads(false));
+    }
   }, [tab]);
 
   // Suppliers actions
@@ -570,6 +584,10 @@ export default function AdminDashboard() {
                 {leads.filter((l) => l.status === 'new').length}
               </span>
             )}
+          </button>
+          <button onClick={() => setTab('analytics')}
+            className={`px-5 py-2 rounded-lg text-sm font-medium transition-colors ${tab === 'analytics' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-700'}`}>
+            Аналитика
           </button>
         </div>
 
@@ -960,6 +978,11 @@ export default function AdminDashboard() {
               )}
             </div>
           </div>
+        )}
+
+        {/* ── ANALYTICS TAB ── */}
+        {tab === 'analytics' && (
+          <AnalyticsPanel suppliers={suppliers} buyers={buyers} leads={leads} />
         )}
       </main>
 
