@@ -4,6 +4,9 @@ import {
   FLAT_RATE_BORDER_KEYS,
   FLAT_RATE_RETURN_STATIONS,
   getContainerFlatQuote,
+  isCombinableWithTonPrice,
+  combineWithProductPrice,
+  MIN_TONS_PER_40FT,
   type FlatRateBorderKey,
 } from '@/lib/logistics-pricing';
 
@@ -12,12 +15,20 @@ const BORDER_LABELS: Record<FlatRateBorderKey, string> = {
   dostyk: 'Достык (эксп.) — Алашанькоу',
 };
 
+interface ProductPriceInfo {
+  pricePerTon: number;
+  currency: string;
+  unit: string;
+}
+
 interface Props {
   onNeedsQuote?: () => void;
   compact?: boolean;
+  /** Pass the supplier's per-ton price to unlock a combined product+logistics total. */
+  product?: ProductPriceInfo;
 }
 
-export default function LogisticsEstimator({ onNeedsQuote, compact }: Props) {
+export default function LogisticsEstimator({ onNeedsQuote, compact, product }: Props) {
   const [border, setBorder] = useState<FlatRateBorderKey | ''>('');
   const [returnStation, setReturnStation] = useState('');
   const [containers, setContainers] = useState(1);
@@ -28,6 +39,11 @@ export default function LogisticsEstimator({ onNeedsQuote, compact }: Props) {
 
   const showResult = border !== '' && returnStation !== '';
   const logisticsTotal = perContainer !== null ? perContainer * containers : null;
+
+  const canCombine = !!product && isCombinableWithTonPrice(product.currency, product.unit);
+  const combined = perContainer !== null && canCombine
+    ? combineWithProductPrice(product!.pricePerTon, perContainer, containers)
+    : null;
 
   return (
     <div className={compact ? 'space-y-3' : 'space-y-4'}>
@@ -75,13 +91,32 @@ export default function LogisticsEstimator({ onNeedsQuote, compact }: Props) {
 
       {showResult && (
         logisticsTotal !== null ? (
-          <div className="bg-green-50 border border-green-200 rounded-xl p-4 space-y-1">
+          <div className="bg-green-50 border border-green-200 rounded-xl p-4 space-y-2">
             <p className="text-sm text-gray-700">
               Логистика (доставка контейнера): <span className="font-semibold">${perContainer} × {containers} = ${logisticsTotal.toLocaleString()}</span>
             </p>
             <p className="text-xs text-gray-500">
-              Фиксированная ставка $800 / 40-фут. контейнер по этому маршруту. Складывается с ценой товара отдельно — тоннаж в контейнере отличается по видам продукции.
+              Фиксированная ставка $800 / 40-фут. контейнер по этому маршруту.
             </p>
+
+            {combined ? (
+              <div className="pt-2 mt-2 border-t border-green-200 space-y-1">
+                <p className="text-sm text-gray-700">
+                  Товар: <span className="font-semibold">${combined.productPerContainer.toLocaleString()}</span> / контейнер
+                  <span className="text-xs text-gray-500"> (по {MIN_TONS_PER_40FT} т, минимальная загрузка)</span>
+                </p>
+                <p className="text-base font-bold text-green-800">
+                  Итого за {containers} {containers === 1 ? 'контейнер' : 'контейнера(ов)'}: ${combined.grandTotal.toLocaleString()}
+                </p>
+                <p className="text-xs text-gray-500">
+                  Оценка по минимальной загрузке {MIN_TONS_PER_40FT} т/контейнер (реальная загрузка может быть выше, до ~28 т — тогда итоговая сумма товара будет больше).
+                </p>
+              </div>
+            ) : product ? (
+              <p className="text-xs text-gray-500 pt-2 mt-2 border-t border-green-200">
+                Цену товара в {product.currency === 'KZT' ? 'тенге' : product.unit} к этой логистике автоматически не складываем — избегаем угадывания курса/единиц. Итоговую сумму лучше уточнить у поставщика.
+              </p>
+            ) : null}
           </div>
         ) : (
           <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 space-y-2">

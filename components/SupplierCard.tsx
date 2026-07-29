@@ -148,7 +148,14 @@ export default function SupplierCard({ supplier, productId, locale }: Props) {
             </button>
             {showLogistics && (
               <div className="mt-3">
-                <LogisticsEstimator compact />
+                <LogisticsEstimator
+                  compact
+                  product={
+                    price?.type === 'fixed' && typeof price.fixed === 'number'
+                      ? { pricePerTon: price.fixed, currency: price.currency, unit: price.unit }
+                      : undefined
+                  }
+                />
               </div>
             )}
           </div>
