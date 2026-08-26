@@ -55,7 +55,7 @@ Email: ${supplier.email}
 const PRODUCT_LABELS_RU: Record<string, string> = {
   flour_feed: 'Кормовая мука', flour_wheat: 'Пшеничная мука', wheat: 'Пшеница',
   barley: 'Ячмень', bran: 'Пшеничные отруби', flaxseed: 'Семена льна',
-  sunflower: 'Семена подсолнечника', corn: 'Кукуруза',
+  sunflower: 'Семена подсолнечника', corn: 'Кукуруза', groats: 'Крупы',
 };
 
 export async function sendLogisticsRequest(params: {
