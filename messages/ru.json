@@ -156,7 +156,8 @@
     "annual": "Годовой",
     "characteristics": "Характеристики",
     "contactSupplier": "Написать поставщику",
-    "letterhead": "Фирменный бланк"
+    "letterhead": "Фирменный бланк",
+    "aboutCompany": "О компании"
   },
   "admin": {
     "loginTitle": "Вход в панель администратора",

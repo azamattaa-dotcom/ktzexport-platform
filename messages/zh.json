@@ -156,7 +156,8 @@
     "annual": "年度",
     "characteristics": "产品特性",
     "contactSupplier": "联系供应商",
-    "letterhead": "公司信头"
+    "letterhead": "公司信头",
+    "aboutCompany": "公司介绍"
   },
   "admin": {
     "loginTitle": "管理员登录",

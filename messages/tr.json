@@ -156,7 +156,8 @@
     "annual": "Yıllık",
     "characteristics": "Özellikler",
     "contactSupplier": "Tedarikçiye Yaz",
-    "letterhead": "Şirket Antetli Kağıdı"
+    "letterhead": "Şirket Antetli Kağıdı",
+    "aboutCompany": "Şirket hakkında"
   },
   "admin": {
     "loginTitle": "Yönetici Paneli Girişi",

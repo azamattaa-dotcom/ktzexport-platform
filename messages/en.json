@@ -156,7 +156,8 @@
     "annual": "Annual",
     "characteristics": "Characteristics",
     "contactSupplier": "Message Supplier",
-    "letterhead": "Company Letterhead"
+    "letterhead": "Company Letterhead",
+    "aboutCompany": "About the company"
   },
   "admin": {
     "loginTitle": "Admin Panel Login",

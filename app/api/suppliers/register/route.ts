@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import { db } from '@/lib/db';
 import { notifyAdminNewSupplier, sendSupplierCredentials } from '@/lib/email';
 import { generatePassword } from '@/lib/auth';
+import { containsContactInfo, CONTACT_BLOCK_MESSAGE } from '@/lib/contactValidator';
 
 export async function POST(req: NextRequest) {
   try {
@@ -19,6 +20,10 @@ export async function POST(req: NextRequest) {
 
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return NextResponse.json({ error: 'Invalid email format' }, { status: 400 });
+    }
+
+    if (description && containsContactInfo(description)) {
+      return NextResponse.json({ error: CONTACT_BLOCK_MESSAGE }, { status: 422 });
     }
 
     const existing = await db.suppliers.findByEmail(email);

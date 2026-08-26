@@ -74,6 +74,9 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   if ('products' in patch && (!Array.isArray(patch.products) || patch.products.length === 0)) {
     return NextResponse.json({ error: 'Выберите хотя бы один продукт' }, { status: 400 });
   }
+  if (typeof patch.description === 'string' && containsContactInfo(patch.description)) {
+    return NextResponse.json({ error: CONTACT_BLOCK_MESSAGE }, { status: 422 });
+  }
   if (patch.productDetails) {
     for (const detail of Object.values(patch.productDetails as Record<string, ProductDetail>)) {
       if (detail.characteristics && containsContactInfo(detail.characteristics)) {
