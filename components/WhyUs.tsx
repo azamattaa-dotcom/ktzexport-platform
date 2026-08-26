@@ -19,8 +19,6 @@ function KTZContainerSVG() {
       <circle cx="80" cy="54" r="5" fill="#374151" />
       <circle cx="20" cy="54" r="2" fill="#6b7280" />
       <circle cx="80" cy="54" r="2" fill="#6b7280" />
-      {/* KTZ text */}
-      <text x="50" y="32" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold" fontFamily="Arial, sans-serif" letterSpacing="1">KTZ</text>
     </svg>
   );
 }
