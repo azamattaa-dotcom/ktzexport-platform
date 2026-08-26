@@ -4,6 +4,7 @@ import { db } from '@/lib/db';
 import { redirect } from 'next/navigation';
 import SupplierProductManager from '@/components/SupplierProductManager';
 import SupplierMessagesPanel from '@/components/SupplierMessagesPanel';
+import SupplierPasswordForm from '@/components/SupplierPasswordForm';
 import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 
@@ -121,6 +122,12 @@ export default async function SupplierDashboard({ params }: { params: { locale: 
         <div>
           <h2 className="text-base font-semibold text-gray-900 mb-3">{t('productsTitle')}</h2>
           <SupplierProductManager supplier={supplier as any} />
+        </div>
+
+        {/* Password */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+          <h2 className="text-base font-semibold text-gray-900 mb-4">{t('passwordTitle')}</h2>
+          <SupplierPasswordForm />
         </div>
 
       </main>

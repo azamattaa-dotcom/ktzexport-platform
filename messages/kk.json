@@ -141,7 +141,8 @@
     "letterheadTitle": "Фирмалық бланк",
     "downloadDocument": "Құжатты жүктеп алу",
     "messagesTitle": "💬 Сатып алушылардан хабарлар",
-    "productsTitle": "Өнімдер мен бағалар"
+    "productsTitle": "Өнімдер мен бағалар",
+    "passwordTitle": "Құпия сөзді өзгерту"
   },
   "catalog": {
     "backToProducts": "Өнімдерге қайту",
@@ -607,5 +608,17 @@
     "saved": "✓ Сақталды",
     "saveChanges": "Өзгерістерді сақтау",
     "defaultUnit": "тонна"
+  },
+  "supplierPasswordForm": {
+    "currentPasswordLabel": "Ағымдағы құпия сөз",
+    "newPasswordLabel": "Жаңа құпия сөз",
+    "confirmPasswordLabel": "Жаңа құпия сөзді қайталаңыз",
+    "submit": "Құпия сөзді сақтау",
+    "saving": "Сақталуда...",
+    "saved": "✓ Құпия сөз өзгертілді",
+    "errorTooShort": "Құпия сөз кемінде 8 таңбадан тұруы керек",
+    "errorMismatch": "Құпия сөздер сәйкес келмейді",
+    "errorWrong": "Ағымдағы құпия сөз қате",
+    "errorGeneric": "Сақтау мүмкін болмады. Қайталап көріңіз"
   }
 }

@@ -141,7 +141,8 @@
     "letterheadTitle": "Şirket Antetli Kağıdı",
     "downloadDocument": "Belgeyi İndir",
     "messagesTitle": "💬 Alıcılardan Mesajlar",
-    "productsTitle": "Ürünler ve Fiyatlar"
+    "productsTitle": "Ürünler ve Fiyatlar",
+    "passwordTitle": "Şifre değiştir"
   },
   "catalog": {
     "backToProducts": "Ürünlere Dön",
@@ -607,5 +608,17 @@
     "saved": "✓ Kaydedildi",
     "saveChanges": "Değişiklikleri Kaydet",
     "defaultUnit": "ton"
+  },
+  "supplierPasswordForm": {
+    "currentPasswordLabel": "Mevcut şifre",
+    "newPasswordLabel": "Yeni şifre",
+    "confirmPasswordLabel": "Yeni şifreyi onaylayın",
+    "submit": "Şifreyi kaydet",
+    "saving": "Kaydediliyor...",
+    "saved": "✓ Şifre değiştirildi",
+    "errorTooShort": "Şifre en az 8 karakter olmalı",
+    "errorMismatch": "Şifreler eşleşmiyor",
+    "errorWrong": "Mevcut şifre yanlış",
+    "errorGeneric": "Kaydedilemedi. Lütfen tekrar deneyin"
   }
 }
