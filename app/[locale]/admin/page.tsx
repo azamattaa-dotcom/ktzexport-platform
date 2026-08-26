@@ -4,7 +4,9 @@ import { useTranslations, useLocale } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import type { Supplier } from '@/lib/db';
 import { PRODUCT_LIST } from '@/lib/products';
+import { STATIONS } from '@/lib/stations';
 import SupplierProductManager from '@/components/SupplierProductManager';
+import StationAutocomplete from '@/components/StationAutocomplete';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -88,7 +90,7 @@ const PRODUCT_LABELS: Record<string, string> = {
   sunflower: 'Семена подсолнечника', corn: 'Кукуруза', groats: 'Крупы',
 };
 
-const LOADING_STATIONS = ['Костанай', 'Кокшетау', 'Петропавловск', 'Алматы', 'Павлодар', 'Астана', 'Актобе', 'Шымкент', 'Другая'];
+const LOADING_STATIONS = [...STATIONS, 'Другая'];
 
 const emptyForm = {
   companyName: '', country: 'Казахстан', contactName: '', email: '', phone: '',
@@ -706,12 +708,12 @@ export default function AdminDashboard() {
                   ))}
                   <div>
                     <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Станция погрузки</label>
-                    <select value={createForm.loadingStation}
-                      onChange={(e) => setCreateForm((p) => ({ ...p, loadingStation: e.target.value }))}
-                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm">
-                      <option value="">— Выберите —</option>
-                      {LOADING_STATIONS.map((s) => <option key={s} value={s}>{s}</option>)}
-                    </select>
+                    <StationAutocomplete
+                      options={LOADING_STATIONS}
+                      value={createForm.loadingStation}
+                      onChange={(s) => setCreateForm((p) => ({ ...p, loadingStation: s }))}
+                      placeholder="— Выберите —"
+                    />
                   </div>
                   <div>
                     <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Пароль * (мин. 8 символов)</label>
@@ -853,12 +855,12 @@ export default function AdminDashboard() {
                       ))}
                       <div>
                         <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Станция погрузки</label>
-                        <select value={editForm.loadingStation}
-                          onChange={(e) => setEditForm((p) => ({ ...p, loadingStation: e.target.value }))}
-                          className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm">
-                          <option value="">— Выберите —</option>
-                          {LOADING_STATIONS.map((s) => <option key={s} value={s}>{s}</option>)}
-                        </select>
+                        <StationAutocomplete
+                          options={LOADING_STATIONS}
+                          value={editForm.loadingStation}
+                          onChange={(s) => setEditForm((p) => ({ ...p, loadingStation: s }))}
+                          placeholder="— Выберите —"
+                        />
                       </div>
                     </div>
                     <div>
