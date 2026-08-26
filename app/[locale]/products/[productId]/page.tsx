@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import { db } from '@/lib/db';
 import { PRODUCT_LIST } from '@/lib/products';
@@ -7,6 +8,25 @@ import Footer from '@/components/Footer';
 import Link from 'next/link';
 import Image from 'next/image';
 import SupplierCard from '@/components/SupplierCard';
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string; productId: string }>;
+}): Promise<Metadata> {
+  const { locale, productId } = await params;
+  const product = PRODUCT_LIST.find((p) => p.id === productId);
+  if (!product) return {};
+
+  const t = await getTranslations({ locale, namespace: 'products' });
+  const name = t(`items.${productId}`);
+
+  return {
+    title: name,
+    description: `${name} оптом из Казахстана — экспорт, поставщики и цены на B2B платформе KTZ Export.`,
+    alternates: { canonical: `/${locale}/products/${productId}` },
+  };
+}
 
 export default async function ProductPage({
   params,
@@ -24,7 +44,7 @@ export default async function ProductPage({
     db.suppliers.findAll(),
   ]);
   const suppliers = allSuppliers.filter(
-    (s) => s.status === 'approved' && s.products.includes(productId)
+    (s) => s.status === 'approved' && s.published && s.products.includes(productId)
   );
 
   return (

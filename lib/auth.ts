@@ -1,5 +1,6 @@
 import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
+import { randomInt } from 'crypto';
 
 const JWT_SECRET = new TextEncoder().encode(
   process.env.JWT_SECRET || 'ktzexport-fallback-secret'
@@ -34,6 +35,17 @@ export async function isAdminAuthenticated(): Promise<boolean> {
   const token = await getAdminToken();
   if (!token) return false;
   return verifyAdminToken(token);
+}
+
+// Excludes visually ambiguous characters (0/O, 1/l/I) so generated passwords are easy to retype.
+const PASSWORD_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+
+export function generatePassword(length = 10): string {
+  let out = '';
+  for (let i = 0; i < length; i++) {
+    out += PASSWORD_ALPHABET[randomInt(PASSWORD_ALPHABET.length)];
+  }
+  return out;
 }
 
 export function validateAdminCredentials(email: string, password: string): boolean {

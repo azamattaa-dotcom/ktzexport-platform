@@ -11,13 +11,17 @@ const PRODUCT_EMOJI: Record<string, string> = {
 
 interface Props {
   supplier: Omit<Supplier, 'passwordHash' | 'inviteToken'>;
+  // Lets the admin edit screen reuse this same widget against the admin API
+  // instead of the supplier's own session-authenticated endpoint.
+  apiUrl?: string;
+  method?: 'PATCH' | 'PUT';
 }
 
 function emptyDetail(): ProductDetail {
   return { price: undefined, availableVolume: '', minOrder: '', characteristics: '', certificateBase64: undefined, certificateFileName: undefined };
 }
 
-export default function SupplierProductManager({ supplier }: Props) {
+export default function SupplierProductManager({ supplier, apiUrl = '/api/supplier/me', method = 'PATCH' }: Props) {
   const t = useTranslations('supplierProductManager');
   const tp = useTranslations('products');
   const [details, setDetails] = useState<Record<string, ProductDetail>>(() => {
@@ -60,8 +64,8 @@ export default function SupplierProductManager({ supplier }: Props) {
 
   async function handleSave() {
     setSaving(true);
-    const res = await fetch('/api/supplier/me', {
-      method: 'PATCH',
+    const res = await fetch(apiUrl, {
+      method,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ productDetails: details }),
     });

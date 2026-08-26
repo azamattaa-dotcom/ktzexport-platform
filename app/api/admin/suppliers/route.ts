@@ -8,7 +8,8 @@ export async function GET() {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
   const suppliers = await db.suppliers.findAll();
-  return NextResponse.json(suppliers);
+  const safe = suppliers.map(({ passwordHash, inviteToken, ...s }) => s);
+  return NextResponse.json(safe);
 }
 
 export async function POST(req: NextRequest) {
@@ -45,8 +46,9 @@ export async function POST(req: NextRequest) {
       elevatorName: elevatorName || '',
       loadingStation: loadingStation || '',
     },
-    { status: 'approved', passwordHash }
+    { status: 'approved', published: true, passwordHash }
   );
 
-  return NextResponse.json(supplier, { status: 201 });
+  const { passwordHash: _ph, inviteToken: _it, ...safe } = supplier;
+  return NextResponse.json(safe, { status: 201 });
 }
