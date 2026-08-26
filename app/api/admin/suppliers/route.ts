@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { isAdminAuthenticated } from '@/lib/auth';
 import bcrypt from 'bcryptjs';
+import { containsContactInfo, CONTACT_BLOCK_MESSAGE } from '@/lib/contactValidator';
 
 export async function GET() {
   if (!(await isAdminAuthenticated())) {
@@ -25,6 +26,9 @@ export async function POST(req: NextRequest) {
   }
   if (!Array.isArray(products) || products.length === 0) {
     return NextResponse.json({ error: 'Выберите хотя бы один продукт.' }, { status: 400 });
+  }
+  if (description && containsContactInfo(description)) {
+    return NextResponse.json({ error: CONTACT_BLOCK_MESSAGE }, { status: 422 });
   }
 
   const existing = await db.suppliers.findByEmail(email);

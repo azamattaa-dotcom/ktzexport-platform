@@ -156,7 +156,8 @@
     "annual": "Жылдық",
     "characteristics": "Сипаттамалар",
     "contactSupplier": "Жеткізушіге жазу",
-    "letterhead": "Фирмалық бланк"
+    "letterhead": "Фирмалық бланк",
+    "aboutCompany": "Компания туралы"
   },
   "admin": {
     "loginTitle": "Әкімші панеліне кіру",

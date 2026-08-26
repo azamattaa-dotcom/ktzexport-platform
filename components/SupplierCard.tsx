@@ -50,8 +50,12 @@ export default function SupplierCard({ supplier, productId, locale }: Props) {
       >
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-4 min-w-0">
-            <div className="w-12 h-12 rounded-xl bg-primary-100 flex items-center justify-center text-primary-700 font-bold text-lg shrink-0">
-              {supplier.companyName.charAt(0).toUpperCase()}
+            <div className="w-12 h-12 rounded-xl bg-primary-100 flex items-center justify-center text-primary-700 font-bold text-lg shrink-0 overflow-hidden">
+              {isImage ? (
+                <img src={supplier.letterheadBase64} alt={supplier.companyName} className="w-full h-full object-cover" />
+              ) : (
+                supplier.companyName.charAt(0).toUpperCase()
+              )}
             </div>
             <div className="min-w-0">
               <h2 className="font-bold text-gray-900 truncate">{supplier.companyName}</h2>
@@ -106,6 +110,14 @@ export default function SupplierCard({ supplier, productId, locale }: Props) {
             <div>
               <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">{tc('characteristics')}</h3>
               <p className="text-sm text-gray-700 whitespace-pre-line bg-gray-50 rounded-xl p-4">{detail.characteristics}</p>
+            </div>
+          )}
+
+          {/* Company description */}
+          {supplier.description && (
+            <div>
+              <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">{tc('aboutCompany')}</h3>
+              <p className="text-sm text-gray-700 whitespace-pre-line bg-gray-50 rounded-xl p-4">{supplier.description}</p>
             </div>
           )}
 
