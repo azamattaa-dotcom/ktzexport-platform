@@ -43,7 +43,8 @@
       "bran": "Wheat Bran",
       "flaxseed": "Flaxseed",
       "sunflower": "Sunflower Seeds",
-      "corn": "Corn"
+      "corn": "Corn",
+      "groats": "Groats"
     },
     "viewAll": "View All"
   },

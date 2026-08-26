@@ -6,7 +6,7 @@ import { containsContactInfo, CONTACT_BLOCK_MESSAGE } from '@/lib/contactValidat
 
 const PRODUCT_EMOJI: Record<string, string> = {
   flour_feed: '🏭', flour_wheat: '🌾', wheat: '🌾', barley: '🌿',
-  bran: '🟤', flaxseed: '🫐', sunflower: '🌻', corn: '🌽',
+  bran: '🟤', flaxseed: '🫐', sunflower: '🌻', corn: '🌽', groats: '🥣',
 };
 
 interface Props {

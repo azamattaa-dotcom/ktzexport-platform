@@ -8,7 +8,7 @@ import { db } from '@/lib/db';
 const PRODUCT_LABELS: Record<string, string> = {
   flour_feed: 'Кормовая мука', flour_wheat: 'Пшеничная мука', wheat: 'Пшеница',
   barley: 'Ячмень', bran: 'Пшеничные отруби', flaxseed: 'Семена льна',
-  sunflower: 'Семена подсолнечника', corn: 'Кукуруза',
+  sunflower: 'Семена подсолнечника', corn: 'Кукуруза', groats: 'Крупы',
 };
 
 const secret = new TextEncoder().encode(process.env.JWT_SECRET ?? 'fallback-secret');
