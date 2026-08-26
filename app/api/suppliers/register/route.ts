@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
+import bcrypt from 'bcryptjs';
 import { db } from '@/lib/db';
-import { notifyAdminNewSupplier } from '@/lib/email';
+import { notifyAdminNewSupplier, sendSupplierCredentials } from '@/lib/email';
+import { generatePassword } from '@/lib/auth';
 
 export async function POST(req: NextRequest) {
   try {
@@ -24,19 +26,32 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'A supplier with this email already exists' }, { status: 409 });
     }
 
-    const supplier = await db.suppliers.create({
-      companyName: companyName.trim(),
-      country: country.trim(),
-      contactName: contactName.trim(),
-      email: email.trim().toLowerCase(),
-      phone: phone.trim(),
-      products,
-      annualVolume,
-      elevatorName: elevatorName?.trim() ?? '',
-      loadingStation: loadingStation?.trim() ?? '',
-      description: description?.trim() ?? '',
-      letterheadBase64: letterheadBase64 ?? undefined,
-      letterheadFileName: letterheadFileName ?? undefined,
+    const generatedPassword = generatePassword();
+    const passwordHash = await bcrypt.hash(generatedPassword, 10);
+
+    const supplier = await db.suppliers.create(
+      {
+        companyName: companyName.trim(),
+        country: country.trim(),
+        contactName: contactName.trim(),
+        email: email.trim().toLowerCase(),
+        phone: phone.trim(),
+        products,
+        annualVolume,
+        elevatorName: elevatorName?.trim() ?? '',
+        loadingStation: loadingStation?.trim() ?? '',
+        description: description?.trim() ?? '',
+        letterheadBase64: letterheadBase64 ?? undefined,
+        letterheadFileName: letterheadFileName ?? undefined,
+      },
+      { status: 'approved', published: false, passwordHash }
+    );
+
+    // Cabinet access is instant; showing up publicly to buyers still needs admin sign-off (see `published`).
+    await sendSupplierCredentials({
+      companyName: supplier.companyName,
+      email: supplier.email,
+      password: generatedPassword,
     });
 
     await notifyAdminNewSupplier({

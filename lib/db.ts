@@ -82,6 +82,7 @@ export interface Supplier {
   productPrices?: Record<string, ProductPrice>;
   productDetails?: Record<string, ProductDetail>;
   status: 'pending' | 'approved' | 'rejected';
+  published: boolean;
   inviteToken?: string;
   passwordHash?: string;
   createdAt: string;
@@ -118,8 +119,8 @@ export const db = {
     },
 
     async create(
-      data: Omit<Supplier, 'id' | 'status' | 'createdAt' | 'updatedAt' | 'inviteToken' | 'passwordHash'>,
-      opts?: { status?: Supplier['status']; passwordHash?: string }
+      data: Omit<Supplier, 'id' | 'status' | 'published' | 'createdAt' | 'updatedAt' | 'inviteToken' | 'passwordHash'>,
+      opts?: { status?: Supplier['status']; published?: boolean; passwordHash?: string }
     ): Promise<Supplier> {
       const suppliers = await readSuppliers();
       const now = new Date().toISOString();
@@ -127,6 +128,7 @@ export const db = {
         id: uuidv4(),
         ...data,
         status: opts?.status ?? 'pending',
+        published: opts?.published ?? false,
         createdAt: now,
         updatedAt: now,
       };
@@ -153,6 +155,15 @@ export const db = {
       if (idx === -1) return null;
       suppliers[idx].productDetails = productDetails;
       suppliers[idx].updatedAt = new Date().toISOString();
+      await writeSuppliers(suppliers);
+      return suppliers[idx];
+    },
+
+    async update(id: string, patch: Partial<Omit<Supplier, 'id' | 'createdAt'>>): Promise<Supplier | null> {
+      const suppliers = await readSuppliers();
+      const idx = suppliers.findIndex((s) => s.id === id);
+      if (idx === -1) return null;
+      suppliers[idx] = { ...suppliers[idx], ...patch, updatedAt: new Date().toISOString() };
       await writeSuppliers(suppliers);
       return suppliers[idx];
     },

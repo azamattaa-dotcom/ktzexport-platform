@@ -174,6 +174,31 @@ ${params.content}
   await send(params.buyerEmail, `Ответ от ${params.supplierCompany}`, body);
 }
 
+export async function sendSupplierCredentials(supplier: {
+  companyName: string; email: string; password: string;
+}) {
+  const loginUrl = `${SITE_URL}/ru/supplier/login`;
+  const body = `Уважаемый партнёр, ${supplier.companyName}!
+
+Спасибо за регистрацию на платформе KTZ Export. Ваш личный кабинет уже готов.
+
+Данные для входа:
+Логин (email): ${supplier.email}
+Пароль: ${supplier.password}
+
+Войти в кабинет: ${loginUrl}
+
+Рекомендуем сменить пароль после первого входа.
+
+Обращаем внимание: доступ в кабинет открыт сразу, а показ ваших товаров покупателям на сайте появится после проверки нашей командой — мы уведомим вас дополнительно.
+
+С уважением,
+Команда KTZ Export
+info@ktzexport.com`;
+
+  await send(supplier.email, 'Ваш личный кабинет на KTZ Export готов', body);
+}
+
 export async function sendSupplierInvite(supplier: {
   companyName: string; email: string; inviteToken: string;
 }) {
