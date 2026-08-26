@@ -2,16 +2,15 @@
 import { useTranslations } from 'next-intl';
 import { useState, useRef } from 'react';
 import { PRODUCT_LIST } from '@/lib/products';
+import { STATIONS } from '@/lib/stations';
+import StationAutocomplete from './StationAutocomplete';
 
 const COUNTRIES = [
   'Казахстан', 'Россия', 'Узбекистан', 'Кыргызстан', 'Таджикистан',
   'Туркменистан', 'Афганистан', 'Китай', 'Турция', 'Другое',
 ];
 
-const LOADING_STATIONS = [
-  'Костанай', 'Кокшетау', 'Петропавловск', 'Алматы', 'Павлодар',
-  'Астана', 'Актобе', 'Шымкент', 'Другая',
-];
+const LOADING_STATIONS = [...STATIONS, 'Другая'];
 
 const MAX_FILE_BYTES = 2 * 1024 * 1024;
 
@@ -141,11 +140,13 @@ export default function SupplierRegistrationForm() {
       {/* Loading Station */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">{t('loadingStationLabel')} *</label>
-        <select className={inputClass('loadingStation')} value={form.loadingStation}
-          onChange={(e) => setForm({ ...form, loadingStation: e.target.value, loadingStationCustom: '' })}>
-          <option value="">— {t('selectStation')} —</option>
-          {LOADING_STATIONS.map((s) => <option key={s} value={s}>{t(`loadingStations.${s}`)}</option>)}
-        </select>
+        <StationAutocomplete
+          options={LOADING_STATIONS}
+          value={form.loadingStation}
+          onChange={(s) => setForm({ ...form, loadingStation: s, loadingStationCustom: '' })}
+          placeholder={`— ${t('selectStation')} —`}
+          inputClassName={inputClass('loadingStation')}
+        />
         {form.loadingStation === 'Другая' && (
           <input className={`${inputClass('loadingStation')} mt-2`}
             placeholder={t('specifyStation')}
