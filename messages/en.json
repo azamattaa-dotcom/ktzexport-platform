@@ -141,7 +141,8 @@
     "letterheadTitle": "Company Letterhead",
     "downloadDocument": "Download Document",
     "messagesTitle": "💬 Messages from Buyers",
-    "productsTitle": "Products & Pricing"
+    "productsTitle": "Products & Pricing",
+    "passwordTitle": "Change password"
   },
   "catalog": {
     "backToProducts": "Back to Products",
@@ -607,5 +608,17 @@
     "saved": "✓ Saved",
     "saveChanges": "Save Changes",
     "defaultUnit": "tonne"
+  },
+  "supplierPasswordForm": {
+    "currentPasswordLabel": "Current password",
+    "newPasswordLabel": "New password",
+    "confirmPasswordLabel": "Confirm new password",
+    "submit": "Save password",
+    "saving": "Saving...",
+    "saved": "✓ Password changed",
+    "errorTooShort": "Password must be at least 8 characters",
+    "errorMismatch": "Passwords do not match",
+    "errorWrong": "Current password is incorrect",
+    "errorGeneric": "Could not save. Please try again"
   }
 }

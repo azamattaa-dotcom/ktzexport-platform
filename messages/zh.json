@@ -141,7 +141,8 @@
     "letterheadTitle": "公司信头",
     "downloadDocument": "下载文件",
     "messagesTitle": "💬 买家消息",
-    "productsTitle": "产品与价格"
+    "productsTitle": "产品与价格",
+    "passwordTitle": "修改密码"
   },
   "catalog": {
     "backToProducts": "返回产品列表",
@@ -607,5 +608,17 @@
     "saved": "✓ 已保存",
     "saveChanges": "保存更改",
     "defaultUnit": "吨"
+  },
+  "supplierPasswordForm": {
+    "currentPasswordLabel": "当前密码",
+    "newPasswordLabel": "新密码",
+    "confirmPasswordLabel": "确认新密码",
+    "submit": "保存密码",
+    "saving": "保存中...",
+    "saved": "✓ 密码已修改",
+    "errorTooShort": "密码至少需要8个字符",
+    "errorMismatch": "两次输入的密码不一致",
+    "errorWrong": "当前密码不正确",
+    "errorGeneric": "保存失败，请重试"
   }
 }

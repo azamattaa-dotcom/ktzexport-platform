@@ -141,7 +141,8 @@
     "letterheadTitle": "Фирменный бланк",
     "downloadDocument": "Скачать документ",
     "messagesTitle": "💬 Сообщения от покупателей",
-    "productsTitle": "Продукция и цены"
+    "productsTitle": "Продукция и цены",
+    "passwordTitle": "Смена пароля"
   },
   "catalog": {
     "backToProducts": "Назад к продукции",
@@ -607,5 +608,17 @@
     "saved": "✓ Сохранено",
     "saveChanges": "Сохранить изменения",
     "defaultUnit": "тонна"
+  },
+  "supplierPasswordForm": {
+    "currentPasswordLabel": "Текущий пароль",
+    "newPasswordLabel": "Новый пароль",
+    "confirmPasswordLabel": "Повторите новый пароль",
+    "submit": "Сохранить пароль",
+    "saving": "Сохраняем...",
+    "saved": "✓ Пароль изменён",
+    "errorTooShort": "Пароль должен быть не менее 8 символов",
+    "errorMismatch": "Пароли не совпадают",
+    "errorWrong": "Текущий пароль неверен",
+    "errorGeneric": "Не удалось сохранить. Попробуйте ещё раз"
   }
 }
