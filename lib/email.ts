@@ -177,7 +177,7 @@ ${params.content}
 export async function sendSupplierCredentials(supplier: {
   companyName: string; email: string; password: string;
 }) {
-  const loginUrl = `${SITE_URL}/ru/supplier/login`;
+  const loginUrl = `${SITE_URL}/ru/login`;
   const body = `Уважаемый партнёр, ${supplier.companyName}!
 
 Спасибо за регистрацию на платформе KTZ Export. Ваш личный кабинет уже готов.
@@ -305,4 +305,70 @@ ${lead.volume ? `Объём / сроки: ${lead.volume}` : ''}
 Ответить в чате: ${SITE_URL}/ru/admin?tab=chats`;
 
   await send(NOTIFICATION_EMAIL, `Новый лид из чата: ${lead.contact}`, body);
+}
+
+// ── Moderated buyer↔supplier chat ────────────────────────────────────────────
+
+export async function notifyAdminPendingChatMessage(params: {
+  fromType: 'buyer' | 'supplier';
+  buyerName: string;
+  buyerEmail: string;
+  supplierCompany: string;
+  productLabel: string;
+  content: string;
+}) {
+  const fromLabel = params.fromType === 'buyer' ? 'Покупатель' : 'Поставщик';
+  const body = `Новое сообщение ожидает проверки — KTZ Export
+
+От кого: ${fromLabel}
+Покупатель: ${params.buyerName} (${params.buyerEmail})
+Поставщик: ${params.supplierCompany}
+Товар: ${params.productLabel}
+
+Сообщение:
+${params.content}
+
+---
+Проверить и одобрить: ${SITE_URL}/ru/admin?tab=messages`;
+
+  await send(
+    NOTIFICATION_EMAIL,
+    `На проверке: сообщение от ${fromLabel === 'Покупатель' ? params.buyerName : params.supplierCompany}`,
+    body
+  );
+}
+
+// ── Logistics requests ───────────────────────────────────────────────────────
+
+export async function notifyAdminPendingLogisticsRequest(params: {
+  contactName: string;
+  contactCompany?: string;
+  contactEmail: string;
+  supplierCompany: string;
+}) {
+  const body = `Новая адресная заявка на логистику ожидает проверки — KTZ Export
+
+От: ${params.contactName}${params.contactCompany ? ` (${params.contactCompany})` : ''}
+Email: ${params.contactEmail}
+Кому адресована: ${params.supplierCompany}
+
+---
+Проверить и одобрить: ${SITE_URL}/ru/admin?tab=logistics`;
+
+  await send(NOTIFICATION_EMAIL, `На проверке: заявка на логистику для ${params.supplierCompany}`, body);
+}
+
+export async function notifySupplierLogisticsRequestApproved(params: {
+  supplierEmail: string;
+  supplierCompany: string;
+  contactName: string;
+}) {
+  const body = `У вас новая заявка на логистику — KTZ Export
+
+От: ${params.contactName}
+
+---
+Посмотреть в личном кабинете: ${SITE_URL}/ru/supplier/dashboard`;
+
+  await send(params.supplierEmail, `Новая заявка на логистику от ${params.contactName}`, body);
 }

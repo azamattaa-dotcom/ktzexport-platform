@@ -40,12 +40,18 @@ export default function HeroSection() {
           </p>
 
           {/* CTAs */}
-          <div className="flex flex-col sm:flex-row gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Link
               href={`/${locale}#products`}
               className="inline-flex items-center justify-center gap-2 bg-wheat-500 hover:bg-wheat-600 text-white font-semibold px-8 py-3.5 rounded-xl transition-all shadow-lg hover:shadow-xl"
             >
               {t('ctaBuyer')} →
+            </Link>
+            <Link
+              href={`/${locale}/logistics`}
+              className="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 border border-white/30 font-semibold px-8 py-3.5 rounded-xl transition-all backdrop-blur-sm"
+            >
+              {t('ctaLogistics')} →
             </Link>
             <Link
               href={`/${locale}/suppliers/register`}
@@ -54,10 +60,10 @@ export default function HeroSection() {
               {t('ctaSupplier')} →
             </Link>
             <Link
-              href={`/${locale}/logistics`}
+              href={`/${locale}/buyer/register`}
               className="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 border border-white/30 font-semibold px-8 py-3.5 rounded-xl transition-all backdrop-blur-sm"
             >
-              {t('ctaLogistics')} →
+              {t('ctaBuyerRegister')} →
             </Link>
           </div>
 

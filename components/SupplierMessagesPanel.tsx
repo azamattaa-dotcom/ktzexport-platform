@@ -2,7 +2,13 @@
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 
-interface Msg { id: string; fromType: 'buyer' | 'supplier'; content: string; timestamp: number; }
+interface Msg {
+  id: string;
+  fromType: 'buyer' | 'supplier' | 'admin';
+  content: string;
+  timestamp: number;
+  status: 'pending' | 'approved' | 'rejected';
+}
 interface Thread {
   id: string; supplierId: string; productId: string;
   buyerEmail: string; buyerName: string; messages: Msg[]; lastAt: number;
@@ -119,12 +125,17 @@ export default function SupplierMessagesPanel() {
                     <div key={msg.id} className={`flex ${msg.fromType === 'supplier' ? 'justify-end' : 'justify-start'}`}>
                       <div className={`max-w-[80%] flex flex-col gap-0.5 ${msg.fromType === 'supplier' ? 'items-end' : 'items-start'}`}>
                         <span className="text-xs text-gray-400 px-1">
-                          {msg.fromType === 'buyer' ? thread.buyerName : t('you')} · {formatTime(msg.timestamp)}
+                          {msg.fromType === 'buyer' ? thread.buyerName : msg.fromType === 'admin' ? t('ktzExportLabel') : t('you')} · {formatTime(msg.timestamp)}
+                          {msg.fromType === 'supplier' && msg.status === 'pending' && (
+                            <span className="text-amber-600"> · {t('pendingReview')}</span>
+                          )}
                         </span>
                         <div className={`px-3 py-2 rounded-xl text-sm ${
                           msg.fromType === 'supplier'
                             ? 'bg-primary-700 text-white rounded-br-sm'
-                            : 'bg-gray-100 text-gray-800 rounded-bl-sm'
+                            : msg.fromType === 'admin'
+                              ? 'bg-amber-50 border border-amber-200 text-amber-900 rounded-bl-sm'
+                              : 'bg-gray-100 text-gray-800 rounded-bl-sm'
                         }`}>
                           {msg.content}
                         </div>

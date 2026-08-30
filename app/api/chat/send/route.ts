@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { chatDb } from '@/lib/chat';
 import { db } from '@/lib/db';
-import { notifyChatMessage } from '@/lib/email';
+import { notifyAdminPendingChatMessage } from '@/lib/email';
 
 const PRODUCT_LABELS: Record<string, string> = {
   flour_feed: 'Кормовая мука', flour_wheat: 'Пшеничная мука', wheat: 'Пшеница',
@@ -24,11 +24,11 @@ export async function POST(req: NextRequest) {
   const supplier = await db.suppliers.findById(supplierId);
   if (supplier) {
     const productLabel = PRODUCT_LABELS[productId] ?? productId;
-    await notifyChatMessage({
-      supplierEmail: supplier.email,
-      supplierCompany: supplier.companyName,
+    await notifyAdminPendingChatMessage({
+      fromType: 'buyer',
       buyerName,
       buyerEmail,
+      supplierCompany: supplier.companyName,
       productLabel,
       content,
     }).catch(() => {});

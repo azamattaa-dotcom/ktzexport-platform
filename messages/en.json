@@ -11,6 +11,7 @@
     "logistics": "Logistics",
     "contact": "Contact",
     "registerSupplier": "Become a Supplier",
+    "registerBuyer": "Become a Buyer",
     "adminPanel": "Admin Panel",
     "cabinet": "My Account",
     "login": "Log In",
@@ -25,6 +26,7 @@
     "subtitle": "Direct supply of grain, flour and oilseeds to China, Central Asia and Europe. Logistics cost calculated on request.",
     "ctaBuyer": "Find Products",
     "ctaSupplier": "Become a Supplier",
+    "ctaBuyerRegister": "Become a Buyer",
     "ctaLogistics": "Logistics",
     "statsContext": "Kazakhstan's agricultural exports",
     "stat1": "Kazakhstan Grain Export / Year",
@@ -142,7 +144,15 @@
     "downloadDocument": "Download Document",
     "messagesTitle": "💬 Messages from Buyers",
     "productsTitle": "Products & Pricing",
-    "passwordTitle": "Change password"
+    "passwordTitle": "Change password",
+    "tabProfile": "Profile",
+    "tabMessages": "Messages",
+    "tabProducts": "Products & Pricing",
+    "tabLogistics": "Logistics",
+    "quoteRequestTitle": "Quote Request",
+    "wagonDislocationTitle": "Wagon Tracking",
+    "wagonDislocationPlaceholder": "Coming soon",
+    "logisticsRequestsTitle": "Logistics Request"
   },
   "catalog": {
     "backToProducts": "Back to Products",
@@ -199,6 +209,8 @@
   "logistics": {
     "pageTitle": "Logistics",
     "pageSubtitle": "Request a freight cost calculation from Kazakhstan to China and other destinations. We will contact you within 24 hours.",
+    "targetSupplier": "Supplier",
+    "selectSupplier": "Select supplier",
     "transportType": "Transport Type",
     "transport": {
       "container": "Container Train",
@@ -295,7 +307,9 @@
     "noMessages": "No incoming messages yet",
     "replyPlaceholder": "Reply...",
     "reply": "Reply",
-    "you": "You"
+    "you": "You",
+    "ktzExportLabel": "KTZ Export",
+    "pendingReview": "pending review"
   },
   "buyerLogin": {
     "title": "Buyer Account",
@@ -335,6 +349,22 @@
     "register": "Sign up →",
     "isSupplier": "Are you a supplier?",
     "supplierLogin": "Sign in as supplier"
+  },
+  "login": {
+    "title": "My Account",
+    "subtitle": "Sign in to your supplier or buyer account",
+    "email": "Email",
+    "password": "Password",
+    "submit": "Sign In",
+    "submitting": "Signing in...",
+    "errorDefault": "Invalid email or password",
+    "setupSuccess": "Password set. Please sign in.",
+    "chooseRoleDesc": "This email is registered as both a supplier and a buyer. Choose which account to sign in to:",
+    "continueAsSupplier": "Sign in as supplier",
+    "continueAsBuyer": "Sign in as buyer",
+    "noAccount": "Don't have an account?",
+    "registerAsSupplier": "Become a Supplier",
+    "registerAsBuyer": "Become a Buyer"
   },
   "buyerRegister": {
     "pageTitle": "Buyer Registration",
@@ -504,13 +534,20 @@
     "swift": "BIC / SWIFT",
     "bankAccount": "Account Number",
     "bankCurrency": "Account Currency",
-    "sectionLogistics": "Logistics",
+    "sectionLogistics": "Logistics Details",
     "unloadingRegion": "Unloading Region",
     "sectionDocuments": "Uploaded Documents",
     "doc1": "Document 1 (Charter / Business License)",
     "doc2": "Document 2 (Registration Certificate)",
     "doc3": "Document 3 (Passport / Signatory ID)",
-    "goToCatalog": "Browse Supplier Catalog →"
+    "goToCatalog": "Browse Supplier Catalog →",
+    "tabProfile": "Profile",
+    "tabLogistics": "Logistics",
+    "quoteRequestTitle": "Quote Request",
+    "wagonDislocationTitle": "Wagon Tracking",
+    "wagonDislocationPlaceholder": "Coming soon",
+    "logisticsRequestsTitle": "Logistics Request",
+    "myRequestsLabel": "My Requests"
   },
   "buyerSetup": {
     "passwordTooShort": "Password must be at least 8 characters",
@@ -557,6 +594,7 @@
     "closeAria": "Close",
     "welcomeMessage": "{greeting}! My name is Aliya — your assistant on the KTZ Export platform.\n\nWe connect agricultural suppliers from Kazakhstan with buyers worldwide. Where would you like to start?",
     "qrBuyer": "🛒 Looking for products to buy",
+    "qrBecomeBuyer": "📋 I want to become a buyer",
     "qrSupplier": "🚜 I want to become a supplier",
     "buyerIntro": "Great! What exactly are you interested in?",
     "supplierIntro": "Glad to hear it! KTZ Export helps Kazakhstani suppliers reach markets in China, Central Asia and Europe. Registration is free and takes about 5 minutes.",
@@ -566,6 +604,8 @@
     "volumeQuestionLater": "Alright, we'll figure it out. What approximate volume do you need and what is your target timeline?\n\nFor example: \"500 tonnes, August–September\"",
     "registerSupplierMsg": "Follow the link — the form takes 5 minutes. After verification we'll give you access to the platform.",
     "registerSupplierLinkLabel": "Register as a supplier",
+    "becomeBuyerMsg": "Great! To get access to the supplier catalog and complete deals on the platform, please complete buyer registration — it takes a bit of time but gives you full access to verified suppliers.",
+    "registerBuyerLinkLabel": "Register as a buyer",
     "supplierBenefitsMsg": "Sure! On the KTZ Export platform you get:\n\n• Access to verified buyers from China and other countries\n• Help arranging logistics and paperwork\n• Support in 5 languages\n\nLeave your email or WhatsApp — a manager will reach out with more details.",
     "contactBuyerQuestion": "Got it! How can we reach you? Please share your email or WhatsApp number — a manager will respond within one business day.",
     "buyerThanks": "Thank you! Your request has been received. A KTZ Export manager will contact you at \"{contact}\" shortly. 🙏\n\nIf you have any other questions, feel free to write here.",
@@ -609,6 +649,15 @@
     "saved": "✓ Saved",
     "saveChanges": "Save Changes",
     "defaultUnit": "tonne"
+  },
+  "logisticsRequests": {
+    "loading": "Loading...",
+    "emptySupplier": "No requests from buyers yet",
+    "emptyBuyer": "You don't have any logistics requests yet",
+    "statusPending": "Pending review",
+    "statusApproved": "Approved",
+    "statusRejected": "Rejected",
+    "supplierLabel": "Supplier"
   },
   "supplierPasswordForm": {
     "currentPasswordLabel": "Current password",

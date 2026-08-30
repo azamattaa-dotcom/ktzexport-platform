@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { chatDb } from '@/lib/chat';
-import { notifyChatReply } from '@/lib/email';
+import { notifyAdminPendingChatMessage } from '@/lib/email';
 import { cookies } from 'next/headers';
 import { jwtVerify } from 'jose';
 import { db } from '@/lib/db';
@@ -39,7 +39,9 @@ export async function POST(req: NextRequest) {
   const thread = await chatDb.addMessage(supplierId, productId, buyerEmail, buyerName ?? '', 'supplier', content);
 
   const productLabel = PRODUCT_LABELS[productId] ?? productId;
-  await notifyChatReply({
+  await notifyAdminPendingChatMessage({
+    fromType: 'supplier',
+    buyerName: buyerName ?? thread.buyerName,
     buyerEmail,
     supplierCompany: supplier.companyName,
     productLabel,

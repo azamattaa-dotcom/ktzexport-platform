@@ -2,9 +2,11 @@ import { kv } from '@vercel/kv';
 
 export interface ChatMessage {
   id: string;
-  fromType: 'buyer' | 'supplier';
+  fromType: 'buyer' | 'supplier' | 'admin';
   content: string;
+  originalContent?: string;
   timestamp: number;
+  status: 'pending' | 'approved' | 'rejected';
 }
 
 export interface ChatThread {
@@ -45,6 +47,11 @@ export const chatDb = {
       .sort((a, b) => b.lastAt - a.lastAt);
   },
 
+  async getAllThreads(): Promise<ChatThread[]> {
+    const threads = await read();
+    return threads.sort((a, b) => b.lastAt - a.lastAt);
+  },
+
   async addMessage(
     supplierId: string,
     productId: string,
@@ -62,6 +69,7 @@ export const chatDb = {
       fromType,
       content: content.trim(),
       timestamp: Date.now(),
+      status: 'pending',
     };
 
     if (!thread) {
@@ -81,6 +89,48 @@ export const chatDb = {
 
     thread.messages.push(msg);
     thread.lastAt = Date.now();
+    await write(threads);
+    return thread;
+  },
+
+  async addAdminMessage(threadId: string, content: string): Promise<ChatThread | null> {
+    const threads = await read();
+    const thread = threads.find((t) => t.id === threadId);
+    if (!thread) return null;
+
+    const msg: ChatMessage = {
+      id: Date.now().toString(36) + Math.random().toString(36).slice(2),
+      fromType: 'admin',
+      content: content.trim(),
+      timestamp: Date.now(),
+      status: 'approved',
+    };
+
+    thread.messages.push(msg);
+    thread.lastAt = Date.now();
+    await write(threads);
+    return thread;
+  },
+
+  async reviewMessage(
+    threadId: string,
+    messageId: string,
+    action: 'approve' | 'reject',
+    editedContent?: string
+  ): Promise<ChatThread | null> {
+    const threads = await read();
+    const thread = threads.find((t) => t.id === threadId);
+    if (!thread) return null;
+
+    const msg = thread.messages.find((m) => m.id === messageId);
+    if (!msg) return null;
+
+    if (editedContent && editedContent.trim() !== msg.content) {
+      msg.originalContent = msg.content;
+      msg.content = editedContent.trim();
+    }
+    msg.status = action === 'approve' ? 'approved' : 'rejected';
+
     await write(threads);
     return thread;
   },

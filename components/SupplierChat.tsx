@@ -4,9 +4,10 @@ import { useTranslations } from 'next-intl';
 
 interface Msg {
   id: string;
-  fromType: 'buyer' | 'supplier';
+  fromType: 'buyer' | 'supplier' | 'admin';
   content: string;
   timestamp: number;
+  status: 'pending' | 'approved' | 'rejected';
 }
 
 interface Props {
@@ -130,14 +131,24 @@ export default function SupplierChat({ supplierId, productId, supplierName }: Pr
                 {msg.fromType === 'supplier' && (
                   <span className="text-xs font-semibold text-primary-700 px-1">{supplierName}</span>
                 )}
+                {msg.fromType === 'admin' && (
+                  <span className="text-xs font-semibold text-amber-700 px-1">{t('ktzExportLabel')}</span>
+                )}
                 <div className={`px-3 py-2 rounded-xl text-sm leading-snug ${
                   msg.fromType === 'buyer'
                     ? 'bg-primary-700 text-white rounded-br-sm'
-                    : 'bg-white border border-gray-200 text-gray-800 rounded-bl-sm'
+                    : msg.fromType === 'admin'
+                      ? 'bg-amber-50 border border-amber-200 text-amber-900 rounded-bl-sm'
+                      : 'bg-white border border-gray-200 text-gray-800 rounded-bl-sm'
                 }`}>
                   {msg.content}
                 </div>
-                <span className="text-xs text-gray-400 px-1">{formatTime(msg.timestamp)}</span>
+                <span className="text-xs text-gray-400 px-1">
+                  {formatTime(msg.timestamp)}
+                  {msg.fromType === 'buyer' && msg.status === 'pending' && (
+                    <span className="text-amber-600"> · {t('pendingReview')}</span>
+                  )}
+                </span>
               </div>
             </div>
           ))

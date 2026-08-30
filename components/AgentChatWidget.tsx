@@ -196,7 +196,7 @@ export default function AgentChatWidget() {
         id: uid(),
         from: 'bot',
         content: t('welcomeMessage', { greeting }),
-        quickReplies: [t('qrBuyer'), t('qrSupplier')],
+        quickReplies: [t('qrBuyer'), t('qrBecomeBuyer'), t('qrSupplier')],
       }]);
     }, 400);
   }
@@ -254,6 +254,14 @@ export default function AgentChatWidget() {
         setCtx((c) => ({ ...c, intent: 'buyer' }));
         setStep('product');
         botSay(t('buyerIntro'), { quickReplies: PRODUCTS });
+      } else if (text === t('qrBecomeBuyer')) {
+        setCtx((c) => ({ ...c, intent: 'buyer' }));
+        botSay(
+          t('becomeBuyerMsg'),
+          { link: { label: t('registerBuyerLinkLabel'), href: `/${locale}/buyer/register` } }
+        );
+        setStep('submitted');
+        setSubmitted(true);
       } else {
         setCtx((c) => ({ ...c, intent: 'supplier' }));
         setStep('supplier_options');
@@ -267,7 +275,7 @@ export default function AgentChatWidget() {
       if (text === t('qrRegister')) {
         botSay(
           t('registerSupplierMsg'),
-          { link: { label: t('registerSupplierLinkLabel'), href: `/${locale}/supplier/register` } }
+          { link: { label: t('registerSupplierLinkLabel'), href: `/${locale}/suppliers/register` } }
         );
         setStep('submitted');
         setSubmitted(true);
@@ -308,7 +316,7 @@ export default function AgentChatWidget() {
       await saveLead(text, finalCtx);
       botSay(
         t('supplierThanks', { contact: text }),
-        { link: { label: t('registerSupplierLinkLabel'), href: `/${locale}/supplier/register` } }
+        { link: { label: t('registerSupplierLinkLabel'), href: `/${locale}/suppliers/register` } }
       );
     }
   }

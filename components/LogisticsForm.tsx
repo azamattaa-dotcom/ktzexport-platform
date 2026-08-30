@@ -40,11 +40,29 @@ const emptyForm = {
   contactPhone: '',
 };
 
-export default function LogisticsForm() {
+interface LogisticsFormProps {
+  mode?: 'general' | 'targeted';
+  prefill?: Partial<typeof emptyForm>;
+  origin?: 'public' | 'buyer_dashboard' | 'supplier_dashboard';
+  buyerId?: string;
+  supplierOptions?: { id: string; companyName: string }[];
+  onSuccess?: () => void;
+}
+
+export default function LogisticsForm({
+  mode = 'general',
+  prefill,
+  origin = 'public',
+  buyerId,
+  supplierOptions,
+  onSuccess,
+}: LogisticsFormProps = {}) {
   const t = useTranslations('logistics');
-  const [form, setForm] = useState(emptyForm);
+  const [form, setForm] = useState({ ...emptyForm, ...prefill });
+  const [supplierId, setSupplierId] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
+  const targeted = mode === 'targeted';
 
   const isContainer = form.transportType === 'container';
   const borderCustom = form.stationBorder === 'other';
@@ -95,6 +113,7 @@ export default function LogisticsForm() {
     if (!form.contactName) e.contactName = t('errRequired');
     if (!form.contactEmail) e.contactEmail = t('errRequired');
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.contactEmail)) e.contactEmail = t('errInvalidEmail');
+    if (targeted && !supplierId) e.supplierId = t('errRequired');
     return e;
   }
 
@@ -109,13 +128,17 @@ export default function LogisticsForm() {
       transportType: selectedTransport?.label ?? form.transportType,
       stationBorder: borderCustom ? form.stationBorderCustom : (STATION_RU[form.stationBorder] ?? form.stationBorder),
       containerSize: isContainer ? (form.containerSize === '40ft' ? '40-футовый' : '20-футовый') : undefined,
+      origin,
+      buyerId,
+      ...(targeted ? { supplierId } : {}),
     };
-    const res = await fetch('/api/logistics/quote', {
+    const res = await fetch(targeted ? '/api/logistics/request' : '/api/logistics/quote', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     });
     setStatus(res.ok ? 'sent' : 'error');
+    if (res.ok) onSuccess?.();
   }
 
   const inp = (field: string) =>
@@ -129,7 +152,7 @@ export default function LogisticsForm() {
         <div className="text-5xl mb-4">✅</div>
         <h2 className="text-2xl font-bold text-gray-900 mb-3">{t('successTitle')}</h2>
         <p className="text-gray-500 max-w-sm mx-auto">{t('successDesc')}</p>
-        <button onClick={() => { setForm(emptyForm); setStatus('idle'); }}
+        <button onClick={() => { setForm({ ...emptyForm, ...prefill }); setSupplierId(''); setStatus('idle'); }}
           className="mt-8 text-primary-700 hover:text-primary-900 text-sm font-medium underline">
           {t('sendAnother')}
         </button>
@@ -139,6 +162,22 @@ export default function LogisticsForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
+
+      {/* Target supplier (targeted mode only) */}
+      {targeted && (
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">{t('targetSupplier')} *</label>
+          <select value={supplierId}
+            onChange={(e) => { setSupplierId(e.target.value); setErrors((p) => { const n = { ...p }; delete n.supplierId; return n; }); }}
+            className={inp('supplierId')}>
+            <option value="">{t('selectSupplier')}</option>
+            {(supplierOptions ?? []).map((s) => (
+              <option key={s.id} value={s.id}>{s.companyName}</option>
+            ))}
+          </select>
+          {errors.supplierId && <p className="text-red-500 text-xs mt-1">{errors.supplierId}</p>}
+        </div>
+      )}
 
       {/* Transport type */}
       <div>
