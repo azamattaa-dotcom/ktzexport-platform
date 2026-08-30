@@ -1,8 +1,23 @@
+import type { Metadata } from 'next';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import PrintButton from './PrintButton';
 import Link from 'next/link';
 import { contractData } from './contractData';
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const lang = locale === 'en' ? 'en' : 'ru';
+  return {
+    title: LABELS[lang].bannerTitle,
+    description: LABELS[lang].bannerSubtitle,
+    alternates: { canonical: `/${locale}/contract` },
+  };
+}
 
 const LABELS = {
   ru: {

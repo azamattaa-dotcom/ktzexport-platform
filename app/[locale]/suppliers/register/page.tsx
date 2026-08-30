@@ -1,7 +1,23 @@
+import type { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import SupplierRegistrationForm from '@/components/SupplierRegistrationForm';
 import { useTranslations } from 'next-intl';
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'supplier' });
+  return {
+    title: t('registerTitle'),
+    description: t('registerSubtitle'),
+    alternates: { canonical: `/${locale}/suppliers/register` },
+  };
+}
 
 function PageHeader() {
   const t = useTranslations('supplier');
