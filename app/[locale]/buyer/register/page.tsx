@@ -1,9 +1,24 @@
+import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
 import { getLocale } from 'next-intl/server';
 import BuyerRegistrationForm from '@/components/BuyerRegistrationForm';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'buyerRegister' });
+  return {
+    title: t('pageTitle'),
+    description: t('pageSubtitle'),
+    alternates: { canonical: `/${locale}/buyer/register` },
+  };
+}
 
 export default async function BuyerRegisterPage() {
   const t = await getTranslations('buyerRegister');
@@ -21,7 +36,7 @@ export default async function BuyerRegisterPage() {
           <BuyerRegistrationForm />
           <div className="border-t border-gray-100 mt-6 pt-5 text-center text-sm text-gray-500">
             {t('alreadyRegistered')}{' '}
-            <Link href={`/${locale}/buyer/login`} className="text-primary-700 font-medium hover:underline">
+            <Link href={`/${locale}/login`} className="text-primary-700 font-medium hover:underline">
               {t('loginLink')}
             </Link>
           </div>

@@ -3,6 +3,9 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
+import DashboardTabs from '@/components/DashboardTabs';
+import LogisticsForm from '@/components/LogisticsForm';
+import BuyerLogisticsRequestsPanel from '@/components/BuyerLogisticsRequestsPanel';
 
 interface BuyerProfile {
   id: string;
@@ -48,17 +51,24 @@ export default function BuyerDashboardPage() {
   const router = useRouter();
   const [buyer, setBuyer] = useState<BuyerProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [tab, setTab] = useState('profile');
+  const [suppliers, setSuppliers] = useState<{ id: string; companyName: string }[]>([]);
+  const [requestsRefreshKey, setRequestsRefreshKey] = useState(0);
 
   useEffect(() => {
     fetch('/api/buyer/me')
-      .then((r) => { if (r.status === 401) router.push(`/${locale}/buyer/login`); return r.ok ? r.json() : null; })
+      .then((r) => { if (r.status === 401) router.push(`/${locale}/login`); return r.ok ? r.json() : null; })
       .then((d) => { if (d) setBuyer(d); })
       .finally(() => setLoading(false));
+    fetch('/api/suppliers')
+      .then((r) => (r.ok ? r.json() : { suppliers: [] }))
+      .then((d) => setSuppliers(d.suppliers ?? []))
+      .catch(() => {});
   }, [locale, router]);
 
   async function handleLogout() {
     await fetch('/api/buyer/logout', { method: 'POST' });
-    router.push(`/${locale}/buyer/login`);
+    router.push(`/${locale}/login`);
   }
 
   if (loading) return (
@@ -95,7 +105,18 @@ export default function BuyerDashboardPage() {
         </button>
       </header>
 
-      <main className="max-w-3xl mx-auto px-4 sm:px-6 py-10 space-y-6">
+      <main className="max-w-3xl mx-auto px-4 sm:px-6 py-10">
+        <DashboardTabs
+          tabs={[
+            { id: 'profile', label: t('tabProfile') },
+            { id: 'logistics', label: t('tabLogistics') },
+          ]}
+          active={tab}
+          onChange={setTab}
+        />
+
+        {tab === 'profile' && (
+        <div className="space-y-6">
         {/* Status */}
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
           <div className="flex items-start justify-between">
@@ -187,6 +208,53 @@ export default function BuyerDashboardPage() {
             className="block w-full bg-primary-700 hover:bg-primary-800 text-white font-medium py-3 rounded-xl text-sm text-center transition-colors">
             {t('goToCatalog')}
           </Link>
+        )}
+        </div>
+        )}
+
+        {tab === 'logistics' && (
+        <div className="space-y-6">
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+            <h2 className="text-base font-semibold text-gray-900 mb-4">{t('quoteRequestTitle')}</h2>
+            <LogisticsForm
+              origin="buyer_dashboard"
+              buyerId={buyer.id}
+              prefill={{
+                contactName: buyer.contactName,
+                contactCompany: buyer.companyName,
+                contactEmail: buyer.email,
+                contactPhone: buyer.phone,
+              }}
+            />
+          </div>
+
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+            <h2 className="text-base font-semibold text-gray-900 mb-2">{t('wagonDislocationTitle')}</h2>
+            <p className="text-sm text-gray-400">{t('wagonDislocationPlaceholder')}</p>
+          </div>
+
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+            <h2 className="text-base font-semibold text-gray-900 mb-4">{t('logisticsRequestsTitle')}</h2>
+            <LogisticsForm
+              mode="targeted"
+              origin="buyer_dashboard"
+              buyerId={buyer.id}
+              supplierOptions={suppliers}
+              prefill={{
+                contactName: buyer.contactName,
+                contactCompany: buyer.companyName,
+                contactEmail: buyer.email,
+                contactPhone: buyer.phone,
+              }}
+              onSuccess={() => setRequestsRefreshKey((k) => k + 1)}
+            />
+          </div>
+
+          <div>
+            <h2 className="text-base font-semibold text-gray-900 mb-3">{t('myRequestsLabel')}</h2>
+            <BuyerLogisticsRequestsPanel refreshKey={requestsRefreshKey} />
+          </div>
+        </div>
         )}
       </main>
     </div>

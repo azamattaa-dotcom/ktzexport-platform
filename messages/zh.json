@@ -11,6 +11,7 @@
     "logistics": "物流",
     "contact": "联系我们",
     "registerSupplier": "成为供应商",
+    "registerBuyer": "成为买家",
     "adminPanel": "管理面板",
     "cabinet": "个人账户",
     "login": "登录",
@@ -25,6 +26,7 @@
     "subtitle": "直接供应粮食、面粉和油籽到中国、中亚和欧洲。物流费用按需核算。",
     "ctaBuyer": "查找产品",
     "ctaSupplier": "成为供应商",
+    "ctaBuyerRegister": "成为买家",
     "ctaLogistics": "物流",
     "statsContext": "哈萨克斯坦农产品出口",
     "stat1": "哈萨克斯坦谷物出口/年",
@@ -142,7 +144,15 @@
     "downloadDocument": "下载文件",
     "messagesTitle": "💬 买家消息",
     "productsTitle": "产品与价格",
-    "passwordTitle": "修改密码"
+    "passwordTitle": "修改密码",
+    "tabProfile": "档案",
+    "tabMessages": "消息",
+    "tabProducts": "产品与价格",
+    "tabLogistics": "物流",
+    "quoteRequestTitle": "费用咨询",
+    "wagonDislocationTitle": "车辆调度",
+    "wagonDislocationPlaceholder": "功能即将上线",
+    "logisticsRequestsTitle": "物流申请"
   },
   "catalog": {
     "backToProducts": "返回产品列表",
@@ -199,6 +209,8 @@
   "logistics": {
     "pageTitle": "物流",
     "pageSubtitle": "申请从哈萨克斯坦到中国及其他目的地的运费报价。我们将在24小时内与您联系。",
+    "targetSupplier": "供应商",
+    "selectSupplier": "请选择供应商",
     "transportType": "运输方式",
     "transport": {
       "container": "集装箱列车",
@@ -295,7 +307,9 @@
     "noMessages": "暂无收到的消息",
     "replyPlaceholder": "回复...",
     "reply": "回复",
-    "you": "您"
+    "you": "您",
+    "ktzExportLabel": "KTZ Export",
+    "pendingReview": "审核中"
   },
   "buyerLogin": {
     "title": "买家账户",
@@ -335,6 +349,22 @@
     "register": "注册 →",
     "isSupplier": "您是供应商吗？",
     "supplierLogin": "以供应商身份登录"
+  },
+  "login": {
+    "title": "个人账户",
+    "subtitle": "登录您的供应商或买家账户",
+    "email": "电子邮件",
+    "password": "密码",
+    "submit": "登录",
+    "submitting": "登录中...",
+    "errorDefault": "邮箱或密码错误",
+    "setupSuccess": "密码已设置，请登录。",
+    "chooseRoleDesc": "该邮箱同时注册了供应商和买家账户，请选择要登录的账户：",
+    "continueAsSupplier": "以供应商身份登录",
+    "continueAsBuyer": "以买家身份登录",
+    "noAccount": "还没有账户？",
+    "registerAsSupplier": "成为供应商",
+    "registerAsBuyer": "成为买家"
   },
   "buyerRegister": {
     "pageTitle": "买家注册",
@@ -504,13 +534,20 @@
     "swift": "SWIFT / 银行代码",
     "bankAccount": "账号",
     "bankCurrency": "账户币种",
-    "sectionLogistics": "物流信息",
+    "sectionLogistics": "物流详情",
     "unloadingRegion": "卸货地区",
     "sectionDocuments": "已上传文件",
     "doc1": "文件1（营业执照/公司章程）",
     "doc2": "文件2（注册证明）",
     "doc3": "文件3（护照/签署人身份证明）",
-    "goToCatalog": "浏览供应商目录 →"
+    "goToCatalog": "浏览供应商目录 →",
+    "tabProfile": "档案",
+    "tabLogistics": "物流",
+    "quoteRequestTitle": "费用咨询",
+    "wagonDislocationTitle": "车辆调度",
+    "wagonDislocationPlaceholder": "功能即将上线",
+    "logisticsRequestsTitle": "物流申请",
+    "myRequestsLabel": "我的申请"
   },
   "buyerSetup": {
     "passwordTooShort": "密码至少需要8个字符",
@@ -557,6 +594,7 @@
     "closeAria": "关闭",
     "welcomeMessage": "{greeting}！我叫阿丽娅——KTZ Export平台的助手。\n\n我们将哈萨克斯坦的农产品供应商与全球买家连接起来。您想从哪里开始？",
     "qrBuyer": "🛒 我想采购产品",
+    "qrBecomeBuyer": "📋 我想成为买家",
     "qrSupplier": "🚜 我想成为供应商",
     "buyerIntro": "太好了！您具体对什么感兴趣？",
     "supplierIntro": "很高兴听到这个消息！KTZ Export帮助哈萨克斯坦供应商进入中国、中亚和欧洲市场。注册免费，大约需要5分钟。",
@@ -566,6 +604,8 @@
     "volumeQuestionLater": "好的，我们再商量。您大概需要多少数量，计划什么时候采购？\n\n例如：「500吨，8月–9月」",
     "registerSupplierMsg": "请点击链接——填写表格大约需要5分钟。审核通过后我们将为您开通平台权限。",
     "registerSupplierLinkLabel": "注册成为供应商",
+    "becomeBuyerMsg": "太好了！要访问供应商目录并在平台上完成交易，请完成买家注册——需要一点时间，但可以让您完全访问经过验证的供应商。",
+    "registerBuyerLinkLabel": "注册成为买家",
     "supplierBenefitsMsg": "当然！在KTZ Export平台上，您将获得：\n\n• 接触来自中国及其他国家的已验证买家\n• 物流和文件方面的协助\n• 5种语言支持\n\n请留下您的邮箱或WhatsApp——经理会联系您并详细介绍。",
     "contactBuyerQuestion": "明白了！请问如何联系您？请留下邮箱或WhatsApp号码——经理将在一个工作日内回复。",
     "buyerThanks": "谢谢！您的请求已收到。KTZ Export经理将很快通过「{contact}」与您联系。🙏\n\n如有其他问题，欢迎在此留言。",
@@ -609,6 +649,15 @@
     "saved": "✓ 已保存",
     "saveChanges": "保存更改",
     "defaultUnit": "吨"
+  },
+  "logisticsRequests": {
+    "loading": "加载中...",
+    "emptySupplier": "暂无买家的申请",
+    "emptyBuyer": "您还没有物流申请",
+    "statusPending": "审核中",
+    "statusApproved": "已批准",
+    "statusRejected": "已拒绝",
+    "supplierLabel": "供应商"
   },
   "supplierPasswordForm": {
     "currentPasswordLabel": "当前密码",

@@ -67,7 +67,7 @@ export default function Footer() {
                 </a>
               </li>
               <li>
-                <Link href={`/${locale}/supplier/login`} className="hover:text-white transition-colors">
+                <Link href={`/${locale}/login`} className="hover:text-white transition-colors">
                   {tn('login')}
                 </Link>
               </li>

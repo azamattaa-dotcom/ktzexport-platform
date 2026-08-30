@@ -45,7 +45,7 @@ export default function SupplierSetupPage() {
     });
 
     if (res.ok) {
-      router.push(`/${locale}/supplier/login?setup=success`);
+      router.push(`/${locale}/login?setup=success`);
     } else {
       const d = await res.json();
       setError(d.error ?? t('errorDefault'));

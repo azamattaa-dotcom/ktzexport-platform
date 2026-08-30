@@ -25,7 +25,7 @@ function SupplierCTA() {
             {t('ctaRegister')} →
           </Link>
           <Link
-            href={`/${locale}/supplier/login`}
+            href={`/${locale}/login`}
             className="inline-block bg-white/10 hover:bg-white/20 border border-white/30 text-white font-semibold px-8 py-3.5 rounded-xl transition-colors"
           >
             {tn('login')} →

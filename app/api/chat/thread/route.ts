@@ -12,5 +12,8 @@ export async function GET(req: NextRequest) {
   }
 
   const thread = await chatDb.getThread(supplierId, productId, email);
-  return NextResponse.json({ messages: thread?.messages ?? [] });
+  const messages = (thread?.messages ?? []).filter(
+    (m) => m.fromType === 'buyer' || m.status === 'approved'
+  );
+  return NextResponse.json({ messages });
 }

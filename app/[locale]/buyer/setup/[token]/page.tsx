@@ -36,7 +36,7 @@ export default function BuyerSetupPage() {
     setLoading(false);
     if (res.ok) {
       setDone(true);
-      setTimeout(() => router.push(`/${locale}/buyer/login`), 2000);
+      setTimeout(() => router.push(`/${locale}/login`), 2000);
     } else {
       const d = await res.json();
       setError(d.error || t('errorDefault'));
@@ -49,7 +49,7 @@ export default function BuyerSetupPage() {
         <div className="text-4xl mb-4">⚠️</div>
         <h1 className="text-xl font-bold text-gray-900 mb-2">{t('invalidLinkTitle')}</h1>
         <p className="text-gray-500 text-sm">{t('invalidLinkDesc')}</p>
-        <Link href={`/${locale}/buyer/login`} className="mt-6 inline-block text-primary-700 font-medium hover:underline text-sm">
+        <Link href={`/${locale}/login`} className="mt-6 inline-block text-primary-700 font-medium hover:underline text-sm">
           {t('loginLink')}
         </Link>
       </div>

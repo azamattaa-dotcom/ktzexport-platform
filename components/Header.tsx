@@ -9,7 +9,6 @@ export default function Header() {
   const locale = useLocale();
   const [menuOpen, setMenuOpen] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
-  const [authRole, setAuthRole] = useState<'supplier' | 'buyer'>('supplier');
   const authRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -70,60 +69,28 @@ export default function Header() {
               </button>
 
               {authOpen && (
-                <div className="absolute right-0 top-full mt-2 w-72 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-50">
-                  {/* Role tabs */}
-                  <div className="flex border-b border-gray-100">
-                    <button
-                      onClick={() => setAuthRole('supplier')}
-                      className={`flex-1 py-3 text-sm font-medium transition-colors border-b-2 ${
-                        authRole === 'supplier'
-                          ? 'text-primary-700 border-primary-600'
-                          : 'text-gray-500 hover:text-gray-700 border-transparent'
-                      }`}
-                    >
-                      {t('roleSupplier')}
-                    </button>
-                    <button
-                      onClick={() => setAuthRole('buyer')}
-                      className={`flex-1 py-3 text-sm font-medium transition-colors border-b-2 ${
-                        authRole === 'buyer'
-                          ? 'text-primary-700 border-primary-600'
-                          : 'text-gray-500 hover:text-gray-700 border-transparent'
-                      }`}
-                    >
-                      {t('roleBuyer')}
-                    </button>
-                  </div>
-
-                  {/* Tab content */}
-                  <div className="p-4 space-y-2">
-                    {authRole === 'supplier' ? (
-                      <>
-                        <Link
-                          href={`/${locale}/supplier/login`}
-                          onClick={() => setAuthOpen(false)}
-                          className="flex items-center gap-2 w-full border border-gray-200 text-gray-700 hover:border-primary-300 hover:text-primary-700 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors"
-                        >
-                          → {t('login')}
-                        </Link>
-                        <Link
-                          href={`/${locale}/suppliers/register`}
-                          onClick={() => setAuthOpen(false)}
-                          className="flex items-center gap-2 w-full bg-primary-700 hover:bg-primary-800 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition-colors"
-                        >
-                          + {t('registerSupplier')}
-                        </Link>
-                      </>
-                    ) : (
-                      <Link
-                        href={`/${locale}/buyer/login`}
-                        onClick={() => setAuthOpen(false)}
-                        className="flex items-center gap-2 w-full bg-primary-700 hover:bg-primary-800 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition-colors"
-                      >
-                        → {t('login')} / {t('register')}
-                      </Link>
-                    )}
-                  </div>
+                <div className="absolute right-0 top-full mt-2 w-64 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-50 p-4 space-y-2">
+                  <Link
+                    href={`/${locale}/login`}
+                    onClick={() => setAuthOpen(false)}
+                    className="flex items-center gap-2 w-full bg-primary-700 hover:bg-primary-800 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition-colors"
+                  >
+                    → {t('login')}
+                  </Link>
+                  <Link
+                    href={`/${locale}/suppliers/register`}
+                    onClick={() => setAuthOpen(false)}
+                    className="flex items-center gap-2 w-full border border-gray-200 text-gray-700 hover:border-primary-300 hover:text-primary-700 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors"
+                  >
+                    + {t('registerSupplier')}
+                  </Link>
+                  <Link
+                    href={`/${locale}/buyer/register`}
+                    onClick={() => setAuthOpen(false)}
+                    className="flex items-center gap-2 w-full border border-gray-200 text-gray-700 hover:border-primary-300 hover:text-primary-700 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors"
+                  >
+                    + {t('registerBuyer')}
+                  </Link>
                 </div>
               )}
             </div>
@@ -152,23 +119,19 @@ export default function Header() {
             <div className="pt-2">
               <LanguageSwitcher />
             </div>
-            {/* Mobile role sections */}
+            {/* Mobile auth section */}
             <div className="border-t border-gray-100 pt-3 space-y-2">
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">{t('roleSupplier')}</p>
-              <Link href={`/${locale}/supplier/login`} onClick={() => setMenuOpen(false)}
-                className="block border border-gray-200 text-gray-700 text-center px-4 py-2 rounded-lg text-sm font-medium">
+              <Link href={`/${locale}/login`} onClick={() => setMenuOpen(false)}
+                className="block bg-primary-700 text-white text-center px-4 py-2 rounded-lg text-sm font-medium">
                 {t('login')}
               </Link>
               <Link href={`/${locale}/suppliers/register`} onClick={() => setMenuOpen(false)}
-                className="block bg-primary-700 text-white text-center px-4 py-2 rounded-lg text-sm font-medium">
+                className="block border border-gray-200 text-gray-700 text-center px-4 py-2 rounded-lg text-sm font-medium">
                 {t('registerSupplier')}
               </Link>
-            </div>
-            <div className="border-t border-gray-100 pt-3 space-y-2">
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">{t('roleBuyer')}</p>
-              <Link href={`/${locale}/buyer/login`} onClick={() => setMenuOpen(false)}
+              <Link href={`/${locale}/buyer/register`} onClick={() => setMenuOpen(false)}
                 className="block border border-gray-200 text-gray-700 text-center px-4 py-2 rounded-lg text-sm font-medium">
-                {t('login')} / {t('register')}
+                {t('registerBuyer')}
               </Link>
             </div>
           </div>

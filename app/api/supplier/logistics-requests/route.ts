@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { chatDb } from '@/lib/chat';
-import { isAdminAuthenticated } from '@/lib/auth';
+import { logisticsDb } from '@/lib/logistics';
 import { cookies } from 'next/headers';
 import { jwtVerify } from 'jose';
 import { db } from '@/lib/db';
@@ -22,10 +21,6 @@ export async function GET(_req: NextRequest) {
   const supplier = await getSupplierFromToken();
   if (!supplier) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const threads = await chatDb.getThreadsForSupplier(supplier.id);
-  const filtered = threads.map((t) => ({
-    ...t,
-    messages: t.messages.filter((m) => m.fromType === 'supplier' || m.status === 'approved'),
-  }));
-  return NextResponse.json({ threads: filtered });
+  const requests = await logisticsDb.findApprovedForSupplier(supplier.id);
+  return NextResponse.json({ requests });
 }

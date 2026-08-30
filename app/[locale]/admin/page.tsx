@@ -7,6 +7,8 @@ import { PRODUCT_LIST } from '@/lib/products';
 import { STATIONS } from '@/lib/stations';
 import SupplierProductManager from '@/components/SupplierProductManager';
 import StationAutocomplete from '@/components/StationAutocomplete';
+import ChatModerationTab from '@/components/admin/ChatModerationTab';
+import LogisticsRequestsTab from '@/components/admin/LogisticsRequestsTab';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -407,7 +409,7 @@ export default function AdminDashboard() {
   const router = useRouter();
 
   // Tabs
-  const [tab, setTab] = useState<'suppliers' | 'buyers' | 'chats'>('suppliers');
+  const [tab, setTab] = useState<'suppliers' | 'buyers' | 'chats' | 'messages' | 'logistics'>('suppliers');
 
   // Suppliers state
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
@@ -671,6 +673,14 @@ export default function AdminDashboard() {
                 {leads.filter((l) => l.status === 'new').length}
               </span>
             )}
+          </button>
+          <button onClick={() => setTab('messages')}
+            className={`px-5 py-2 rounded-lg text-sm font-medium transition-colors ${tab === 'messages' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-700'}`}>
+            Сообщения
+          </button>
+          <button onClick={() => setTab('logistics')}
+            className={`px-5 py-2 rounded-lg text-sm font-medium transition-colors ${tab === 'logistics' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-700'}`}>
+            Логистика
           </button>
         </div>
 
@@ -1123,6 +1133,22 @@ export default function AdminDashboard() {
               )}
             </div>
           </div>
+        )}
+
+        {/* ── MESSAGES TAB (chat moderation) ── */}
+        {tab === 'messages' && (
+          <>
+            <h1 className="text-2xl font-bold text-gray-900 mb-6">Сообщения на проверке</h1>
+            <ChatModerationTab />
+          </>
+        )}
+
+        {/* ── LOGISTICS TAB ── */}
+        {tab === 'logistics' && (
+          <>
+            <h1 className="text-2xl font-bold text-gray-900 mb-6">Заявки на логистику</h1>
+            <LogisticsRequestsTab />
+          </>
         )}
       </main>
 
