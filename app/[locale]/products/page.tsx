@@ -1,9 +1,24 @@
+import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import { PRODUCT_LIST } from '@/lib/products';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
 import Image from 'next/image';
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'products' });
+  return {
+    title: t('title'),
+    description: t('subtitle'),
+    alternates: { canonical: `/${locale}/products` },
+  };
+}
 
 export default async function ProductsPage({
   params,
