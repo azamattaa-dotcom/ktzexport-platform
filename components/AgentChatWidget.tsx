@@ -196,7 +196,7 @@ export default function AgentChatWidget() {
         id: uid(),
         from: 'bot',
         content: t('welcomeMessage', { greeting }),
-        quickReplies: [t('qrBuyer'), t('qrBecomeBuyer'), t('qrSupplier')],
+        quickReplies: [t('qrBuyer'), t('qrLogistics'), t('qrSupplier')],
       }]);
     }, 400);
   }
@@ -254,11 +254,10 @@ export default function AgentChatWidget() {
         setCtx((c) => ({ ...c, intent: 'buyer' }));
         setStep('product');
         botSay(t('buyerIntro'), { quickReplies: PRODUCTS });
-      } else if (text === t('qrBecomeBuyer')) {
-        setCtx((c) => ({ ...c, intent: 'buyer' }));
+      } else if (text === t('qrLogistics')) {
         botSay(
-          t('becomeBuyerMsg'),
-          { link: { label: t('registerBuyerLinkLabel'), href: `/${locale}/buyer/register` } }
+          t('logisticsMsg'),
+          { link: { label: t('logisticsLinkLabel'), href: `/${locale}/logistics` } }
         );
         setStep('submitted');
         setSubmitted(true);
