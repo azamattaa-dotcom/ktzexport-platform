@@ -9,6 +9,11 @@ import Link from 'next/link';
 import Image from 'next/image';
 import SupplierCard from '@/components/SupplierCard';
 
+// The public page most likely to get real traffic, and the only one reading
+// suppliers straight from KV on every request — cache it and regenerate in
+// the background instead of hitting the DB on every visit.
+export const revalidate = 60;
+
 export async function generateMetadata({
   params,
 }: {
