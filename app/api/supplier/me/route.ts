@@ -1,20 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { jwtVerify } from 'jose';
 import { db, ProductDetail } from '@/lib/db';
-import { cookies } from 'next/headers';
+import { getAuthenticatedSupplierId } from '@/lib/auth';
 import { containsContactInfo, CONTACT_BLOCK_MESSAGE } from '@/lib/contactValidator';
-
-const secret = new TextEncoder().encode(process.env.JWT_SECRET ?? 'fallback-secret');
+import { validateCertificateDataUri } from '@/lib/validation';
+import { uploadDataUri, deleteBlobUrl } from '@/lib/storage';
 
 async function getSupplierFromCookie() {
-  const token = cookies().get('ktz_supplier_token')?.value;
-  if (!token) return null;
-  try {
-    const { payload } = await jwtVerify(token, secret);
-    return db.suppliers.findById(payload.supplierId as string);
-  } catch {
-    return null;
-  }
+  const id = await getAuthenticatedSupplierId();
+  return id ? db.suppliers.findById(id) : null;
 }
 
 export async function GET() {
@@ -29,11 +22,19 @@ export async function PATCH(req: NextRequest) {
   if (!supplier) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   try {
-    const { productDetails } = await req.json() as { productDetails: Record<string, ProductDetail> };
+    const { productDetails } = await req.json() as { productDetails: Record<string, ProductDetail & { certificateBase64?: string }> };
 
-    for (const detail of Object.values(productDetails)) {
+    for (const [productId, detail] of Object.entries(productDetails)) {
       if (detail.characteristics && containsContactInfo(detail.characteristics)) {
         return NextResponse.json({ error: CONTACT_BLOCK_MESSAGE }, { status: 422 });
+      }
+      if (detail.certificateBase64) {
+        const certError = validateCertificateDataUri(detail.certificateBase64);
+        if (certError) return NextResponse.json({ error: certError }, { status: 400 });
+        const oldUrl = supplier.productDetails?.[productId]?.certificateUrl;
+        detail.certificateUrl = await uploadDataUri(detail.certificateBase64, `suppliers/${supplier.email}/certificates/${productId}`);
+        delete detail.certificateBase64;
+        if (oldUrl) await deleteBlobUrl(oldUrl);
       }
     }
 

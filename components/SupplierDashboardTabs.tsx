@@ -17,7 +17,7 @@ export default function SupplierDashboardTabs({ supplier }: { supplier: Supplier
   const ts = useTranslations('supplier');
   const [tab, setTab] = useState('profile');
 
-  const isImage = supplier.letterheadBase64?.startsWith('data:image');
+  const letterhead = supplier.letterheadUrl ?? supplier.letterheadBase64;
   const countryLabel = KNOWN_COUNTRIES.includes(supplier.country) ? ts(`countries.${supplier.country}` as any) : supplier.country;
   const volumeLabel = KNOWN_VOLUMES.includes(supplier.annualVolume) ? ts(`volumes.${supplier.annualVolume}` as any) : supplier.annualVolume;
 
@@ -65,25 +65,14 @@ export default function SupplierDashboardTabs({ supplier }: { supplier: Supplier
             </div>
           </div>
 
-          {supplier.letterheadBase64 && (
+          {letterhead && (
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
               <h2 className="text-base font-semibold text-gray-900 mb-4">{t('letterheadTitle')}</h2>
-              {isImage ? (
-                <img
-                  src={supplier.letterheadBase64}
-                  alt={t('letterheadTitle')}
-                  className="w-full max-h-64 object-contain rounded-xl border border-gray-100"
-                />
-              ) : (
-                <a
-                  href={supplier.letterheadBase64}
-                  download={supplier.letterheadFileName ?? 'letterhead.pdf'}
-                  className="flex items-center gap-3 text-sm text-primary-700 border border-primary-200 rounded-xl px-4 py-3 hover:bg-primary-50 transition-colors"
-                >
-                  <span className="text-2xl">📄</span>
-                  <span>{supplier.letterheadFileName ?? t('downloadDocument')}</span>
-                </a>
-              )}
+              <img
+                src={letterhead}
+                alt={t('letterheadTitle')}
+                className="w-full max-h-64 object-contain rounded-xl border border-gray-100"
+              />
             </div>
           )}
 

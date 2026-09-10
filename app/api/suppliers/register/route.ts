@@ -4,9 +4,17 @@ import { db } from '@/lib/db';
 import { notifyAdminNewSupplier, sendSupplierCredentials } from '@/lib/email';
 import { generatePassword } from '@/lib/auth';
 import { containsContactInfo, CONTACT_BLOCK_MESSAGE } from '@/lib/contactValidator';
+import { validateImageDataUri } from '@/lib/validation';
+import { checkRateLimit, clientIp } from '@/lib/rateLimit';
+import { uploadDataUri } from '@/lib/storage';
 
 export async function POST(req: NextRequest) {
   try {
+    const underLimit = await checkRateLimit(`rl:supplier-register:${clientIp(req)}`, 5, 60 * 60);
+    if (!underLimit) {
+      return NextResponse.json({ error: 'Слишком много заявок с этого адреса. Попробуйте позже.' }, { status: 429 });
+    }
+
     const body = await req.json();
     const {
       companyName, country, contactName, email, phone,
@@ -26,6 +34,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: CONTACT_BLOCK_MESSAGE }, { status: 422 });
     }
 
+    if (letterheadBase64) {
+      const logoError = validateImageDataUri(letterheadBase64);
+      if (logoError) return NextResponse.json({ error: logoError }, { status: 400 });
+    }
+
     const existing = await db.suppliers.findByEmail(email);
     if (existing) {
       return NextResponse.json({ error: 'A supplier with this email already exists' }, { status: 409 });
@@ -33,6 +46,10 @@ export async function POST(req: NextRequest) {
 
     const generatedPassword = generatePassword();
     const passwordHash = await bcrypt.hash(generatedPassword, 10);
+
+    const letterheadUrl = letterheadBase64
+      ? await uploadDataUri(letterheadBase64, `suppliers/${email.trim().toLowerCase()}/letterhead`)
+      : undefined;
 
     const supplier = await db.suppliers.create(
       {
@@ -46,7 +63,7 @@ export async function POST(req: NextRequest) {
         elevatorName: elevatorName?.trim() ?? '',
         loadingStation: loadingStation?.trim() ?? '',
         description: description?.trim() ?? '',
-        letterheadBase64: letterheadBase64 ?? undefined,
+        letterheadUrl,
         letterheadFileName: letterheadFileName ?? undefined,
       },
       { status: 'approved', published: false, passwordHash }

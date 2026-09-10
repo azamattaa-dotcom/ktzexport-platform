@@ -3,6 +3,8 @@ import { db } from '@/lib/db';
 import { isAdminAuthenticated } from '@/lib/auth';
 import bcrypt from 'bcryptjs';
 import { containsContactInfo, CONTACT_BLOCK_MESSAGE } from '@/lib/contactValidator';
+import { validateImageDataUri } from '@/lib/validation';
+import { uploadDataUri } from '@/lib/storage';
 
 export async function GET() {
   if (!(await isAdminAuthenticated())) {
@@ -19,7 +21,7 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json();
-  const { companyName, country, contactName, email, phone, products, annualVolume, description, elevatorName, loadingStation, password } = body;
+  const { companyName, country, contactName, email, phone, products, annualVolume, description, elevatorName, loadingStation, password, letterheadBase64, letterheadFileName } = body;
 
   if (!companyName || !contactName || !email || !phone || !password || password.length < 8) {
     return NextResponse.json({ error: 'Заполните все обязательные поля. Пароль — не менее 8 символов.' }, { status: 400 });
@@ -30,6 +32,10 @@ export async function POST(req: NextRequest) {
   if (description && containsContactInfo(description)) {
     return NextResponse.json({ error: CONTACT_BLOCK_MESSAGE }, { status: 422 });
   }
+  if (letterheadBase64) {
+    const logoError = validateImageDataUri(letterheadBase64);
+    if (logoError) return NextResponse.json({ error: logoError }, { status: 400 });
+  }
 
   const existing = await db.suppliers.findByEmail(email);
   if (existing) {
@@ -37,6 +43,10 @@ export async function POST(req: NextRequest) {
   }
 
   const passwordHash = await bcrypt.hash(password, 10);
+  const letterheadUrl = letterheadBase64
+    ? await uploadDataUri(letterheadBase64, `suppliers/${email.trim().toLowerCase()}/letterhead`)
+    : undefined;
+
   const supplier = await db.suppliers.create(
     {
       companyName,
@@ -49,6 +59,8 @@ export async function POST(req: NextRequest) {
       description: description || '',
       elevatorName: elevatorName || '',
       loadingStation: loadingStation || '',
+      letterheadUrl,
+      letterheadFileName: letterheadFileName || undefined,
     },
     { status: 'approved', published: true, passwordHash }
   );

@@ -9,11 +9,10 @@ out/
 .env.local
 .env.*.local
 
-# Data (local only)
-data/suppliers.json
-
 # OS
 .DS_Store
 
 # Vercel
 .vercel
+.env*
+!.env.local.example

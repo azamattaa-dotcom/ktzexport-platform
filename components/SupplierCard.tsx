@@ -21,7 +21,7 @@ export default function SupplierCard({ supplier, productId, locale }: Props) {
 
   const detail = supplier.productDetails?.[productId];
   const price = detail?.price ?? supplier.productPrices?.[productId];
-  const isImage = supplier.letterheadBase64?.startsWith('data:image');
+  const letterhead = supplier.letterheadUrl ?? supplier.letterheadBase64;
 
   function getVolumeLabel(key: string): string {
     try { return tv(key as any); } catch { return key; }
@@ -51,8 +51,8 @@ export default function SupplierCard({ supplier, productId, locale }: Props) {
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-4 min-w-0">
             <div className="w-12 h-12 rounded-xl bg-primary-100 flex items-center justify-center text-primary-700 font-bold text-lg shrink-0 overflow-hidden">
-              {isImage ? (
-                <img src={supplier.letterheadBase64} alt={supplier.companyName} className="w-full h-full object-cover" />
+              {letterhead ? (
+                <img src={letterhead} alt={supplier.companyName} className="w-full h-full object-cover" />
               ) : (
                 supplier.companyName.charAt(0).toUpperCase()
               )}
@@ -123,24 +123,17 @@ export default function SupplierCard({ supplier, productId, locale }: Props) {
 
           {/* Documents */}
           <div className="flex flex-wrap gap-3">
-            {detail?.certificateBase64 && (
-              <a href={detail.certificateBase64} download={detail.certificateFileName ?? 'certificate'}
+            {(detail?.certificateUrl ?? detail?.certificateBase64) && (
+              <a href={detail?.certificateUrl ?? detail?.certificateBase64} download={detail?.certificateFileName ?? 'certificate'}
                 className="flex items-center gap-2 text-sm text-primary-600 border border-primary-200 hover:bg-primary-50 px-3 py-2 rounded-lg transition-colors">
-                📄 {detail.certificateFileName ?? tc('downloadLetterhead')}
+                📄 {detail?.certificateFileName ?? tc('downloadLetterhead')}
               </a>
             )}
-            {supplier.letterheadBase64 && (
-              isImage ? (
-                <div className="w-full">
-                  <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">{tc('letterhead')}</h3>
-                  <img src={supplier.letterheadBase64} alt={tc('letterhead')} className="max-h-48 rounded-xl border border-gray-100 object-contain" />
-                </div>
-              ) : (
-                <a href={supplier.letterheadBase64} download={supplier.letterheadFileName ?? 'letterhead'}
-                  className="flex items-center gap-2 text-sm text-gray-600 border border-gray-200 hover:bg-gray-50 px-3 py-2 rounded-lg transition-colors">
-                  📎 {supplier.letterheadFileName ?? tc('letterhead')}
-                </a>
-              )
+            {letterhead && (
+              <div className="w-full">
+                <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">{tc('letterhead')}</h3>
+                <img src={letterhead} alt={tc('letterhead')} className="max-h-48 rounded-xl border border-gray-100 object-contain" />
+              </div>
             )}
           </div>
 

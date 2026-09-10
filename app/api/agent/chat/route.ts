@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
+import { checkRateLimit, clientIp } from '@/lib/rateLimit';
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
@@ -38,6 +39,18 @@ export async function POST(req: NextRequest) {
 
   if (!process.env.ANTHROPIC_API_KEY) {
     return NextResponse.json({ error: 'Agent not configured' }, { status: 503 });
+  }
+
+  const ip = clientIp(req);
+  const [underMinuteLimit, underDayLimit] = await Promise.all([
+    checkRateLimit(`rl:chat:min:${ip}`, 8, 60),
+    checkRateLimit(`rl:chat:day:${ip}`, 40, 60 * 60 * 24),
+  ]);
+  if (!underMinuteLimit || !underDayLimit) {
+    return NextResponse.json(
+      { reply: 'Слишком много сообщений подряд — дайте мне минутку, или напишите менеджеру напрямую.' },
+      { status: 429 }
+    );
   }
 
   try {
