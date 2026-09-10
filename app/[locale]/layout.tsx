@@ -7,7 +7,9 @@ import { BRAND_NAME } from '@/lib/brand';
 import AgentChatWidget from '@/components/AgentChatWidget';
 import '../globals.css';
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://ktzexport.com';
+// `||` (not `??`) on purpose: an empty string must also fall back — e.g. Vercel
+// returns "" for this var when it's marked Sensitive and pulled via `env pull`.
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://ktzexport.com';
 
 const OG_LOCALE: Record<string, string> = {
   ru: 'ru_RU', kk: 'kk_KZ', en: 'en_US', zh: 'zh_CN', tr: 'tr_TR',

@@ -1,10 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import bcrypt from 'bcryptjs';
-import { SignJWT } from 'jose';
-
-const COOKIE_NAME = 'ktz_supplier_token';
-const secret = new TextEncoder().encode(process.env.JWT_SECRET ?? 'fallback-secret');
+import { signSupplierToken, SUPPLIER_COOKIE } from '@/lib/auth';
 
 export async function POST(req: NextRequest) {
   try {
@@ -25,13 +22,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
     }
 
-    const token = await new SignJWT({ supplierId: supplier.id })
-      .setProtectedHeader({ alg: 'HS256' })
-      .setExpirationTime('8h')
-      .sign(secret);
+    const token = await signSupplierToken(supplier.id);
 
     const response = NextResponse.json({ success: true });
-    response.cookies.set(COOKIE_NAME, token, {
+    response.cookies.set(SUPPLIER_COOKIE, token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',

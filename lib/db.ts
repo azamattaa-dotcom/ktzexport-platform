@@ -2,9 +2,11 @@ import { kv } from '@vercel/kv';
 import { v4 as uuidv4 } from 'uuid';
 
 export interface BuyerDocument {
-  base64: string;
+  url?: string;
   fileName: string;
   fileType: string;
+  /** @deprecated pre-Blob-migration shape — data URI. Read as a fallback only; new writes never set this. */
+  base64?: string;
 }
 
 export interface Buyer {
@@ -61,8 +63,10 @@ export interface ProductDetail {
   availableVolume?: string;
   minOrder?: string;
   characteristics?: string;
-  certificateBase64?: string;
+  certificateUrl?: string;
   certificateFileName?: string;
+  /** @deprecated pre-Blob-migration shape — data URI. Read as a fallback only; new writes never set this. */
+  certificateBase64?: string;
 }
 
 export interface Supplier {
@@ -77,8 +81,10 @@ export interface Supplier {
   description: string;
   elevatorName: string;
   loadingStation?: string;
-  letterheadBase64?: string;
+  letterheadUrl?: string;
   letterheadFileName?: string;
+  /** @deprecated pre-Blob-migration shape — data URI. Read as a fallback only; new writes never set this. */
+  letterheadBase64?: string;
   productPrices?: Record<string, ProductPrice>;
   productDetails?: Record<string, ProductDetail>;
   status: 'pending' | 'approved' | 'rejected';

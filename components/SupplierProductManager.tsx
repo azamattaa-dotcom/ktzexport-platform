@@ -18,7 +18,7 @@ interface Props {
 }
 
 function emptyDetail(): ProductDetail {
-  return { price: undefined, availableVolume: '', minOrder: '', characteristics: '', certificateBase64: undefined, certificateFileName: undefined };
+  return { price: undefined, availableVolume: '', minOrder: '', characteristics: '', certificateUrl: undefined, certificateFileName: undefined };
 }
 
 export default function SupplierProductManager({ supplier, apiUrl = '/api/supplier/me', method = 'PATCH' }: Props) {
@@ -192,11 +192,11 @@ export default function SupplierProductManager({ supplier, apiUrl = '/api/suppli
                   <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">{t('certificateLabel')}</label>
                   {d.certificateFileName ? (
                     <div className="flex items-center gap-3">
-                      <a href={d.certificateBase64} download={d.certificateFileName}
+                      <a href={d.certificateUrl ?? d.certificateBase64} download={d.certificateFileName}
                         className="text-sm text-primary-600 hover:text-primary-800 border border-primary-200 px-3 py-1.5 rounded-lg">
                         📄 {d.certificateFileName}
                       </a>
-                      <button onClick={() => updateDetail(pid, { certificateBase64: undefined, certificateFileName: undefined })}
+                      <button onClick={() => updateDetail(pid, { certificateUrl: undefined, certificateBase64: undefined, certificateFileName: undefined })}
                         className="text-xs text-red-400 hover:text-red-600">{t('deleteLabel')}</button>
                     </div>
                   ) : (

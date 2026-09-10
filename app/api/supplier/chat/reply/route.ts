@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { chatDb } from '@/lib/chat';
 import { notifyAdminPendingChatMessage } from '@/lib/email';
-import { cookies } from 'next/headers';
-import { jwtVerify } from 'jose';
+import { getAuthenticatedSupplierId } from '@/lib/auth';
 import { db } from '@/lib/db';
 
 const PRODUCT_LABELS: Record<string, string> = {
@@ -11,17 +10,9 @@ const PRODUCT_LABELS: Record<string, string> = {
   sunflower: 'Семена подсолнечника', corn: 'Кукуруза', groats: 'Крупы',
 };
 
-const secret = new TextEncoder().encode(process.env.JWT_SECRET ?? 'fallback-secret');
-
 async function getSupplierFromToken() {
-  const token = cookies().get('ktz_supplier_token')?.value;
-  if (!token) return null;
-  try {
-    const { payload } = await jwtVerify(token, secret);
-    return db.suppliers.findById(payload.supplierId as string);
-  } catch {
-    return null;
-  }
+  const id = await getAuthenticatedSupplierId();
+  return id ? db.suppliers.findById(id) : null;
 }
 
 export async function POST(req: NextRequest) {

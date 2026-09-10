@@ -13,6 +13,7 @@ const COUNTRIES = [
 const LOADING_STATIONS = [...STATIONS, 'Другая'];
 
 const MAX_FILE_BYTES = 2 * 1024 * 1024;
+const ALLOWED_LOGO_TYPES = ['image/jpeg', 'image/png'];
 
 export default function SupplierRegistrationForm() {
   const t = useTranslations('supplier');
@@ -34,6 +35,12 @@ export default function SupplierRegistrationForm() {
   function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (!ALLOWED_LOGO_TYPES.includes(file.type)) {
+      setFileError(t('letterheadFormatError'));
+      setLetterheadBase64('');
+      setLetterheadFileName('');
+      return;
+    }
     if (file.size > MAX_FILE_BYTES) {
       setFileError(t('letterheadError'));
       setLetterheadBase64('');
@@ -229,12 +236,12 @@ export default function SupplierRegistrationForm() {
             </div>
           ) : (
             <div className="text-gray-400 text-sm">
-              <div className="text-2xl mb-1">📄</div>
+              <div className="text-2xl mb-1">🖼️</div>
               <div>{t('letterheadHint')}</div>
             </div>
           )}
         </div>
-        <input ref={fileRef} type="file" accept=".pdf,.jpg,.jpeg,.png" className="hidden" onChange={handleFile} />
+        <input ref={fileRef} type="file" accept="image/jpeg,image/png,.jpg,.jpeg,.png" className="hidden" onChange={handleFile} />
         {fileError && <p className="text-red-500 text-xs mt-1">{fileError}</p>}
       </div>
 

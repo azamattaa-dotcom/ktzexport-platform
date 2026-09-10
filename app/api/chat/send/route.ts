@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { chatDb } from '@/lib/chat';
 import { db } from '@/lib/db';
 import { notifyAdminPendingChatMessage } from '@/lib/email';
+import { checkRateLimit, clientIp } from '@/lib/rateLimit';
 
 const PRODUCT_LABELS: Record<string, string> = {
   flour_feed: 'Кормовая мука', flour_wheat: 'Пшеничная мука', wheat: 'Пшеница',
@@ -10,6 +11,11 @@ const PRODUCT_LABELS: Record<string, string> = {
 };
 
 export async function POST(req: NextRequest) {
+  const underLimit = await checkRateLimit(`rl:chat-send:${clientIp(req)}`, 20, 60);
+  if (!underLimit) {
+    return NextResponse.json({ error: 'Слишком много сообщений подряд. Подождите немного.' }, { status: 429 });
+  }
+
   const { supplierId, productId, buyerEmail, buyerName, content } = await req.json();
 
   if (!supplierId || !productId || !buyerEmail || !buyerName || !content?.trim()) {

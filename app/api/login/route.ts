@@ -1,18 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { signBuyerToken, BUYER_COOKIE } from '@/lib/auth';
+import { signBuyerToken, BUYER_COOKIE, signSupplierToken, SUPPLIER_COOKIE } from '@/lib/auth';
 import bcrypt from 'bcryptjs';
-import { SignJWT } from 'jose';
-
-const SUPPLIER_COOKIE = 'ktz_supplier_token';
-const secret = new TextEncoder().encode(process.env.JWT_SECRET ?? 'fallback-secret');
-
-async function signSupplierToken(supplierId: string): Promise<string> {
-  return new SignJWT({ supplierId })
-    .setProtectedHeader({ alg: 'HS256' })
-    .setExpirationTime('8h')
-    .sign(secret);
-}
 
 export async function POST(req: NextRequest) {
   const { email, password } = await req.json();
