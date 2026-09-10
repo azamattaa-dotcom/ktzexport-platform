@@ -2,10 +2,17 @@ import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
 import { randomInt } from 'crypto';
 
-if (!process.env.JWT_SECRET) {
-  throw new Error('JWT_SECRET is not set — see .env.local.example');
+// Lazy on purpose: `next build` imports every route module to collect page
+// data, which would otherwise crash the whole build if this secret happens
+// to be unavailable at build time. Failing loudly still happens — just on
+// the first real sign/verify call, not at import time.
+function getJwtSecret(): Uint8Array {
+  if (!process.env.JWT_SECRET) {
+    throw new Error('JWT_SECRET is not set — see .env.local.example');
+  }
+  return new TextEncoder().encode(process.env.JWT_SECRET);
 }
-const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET);
+
 const COOKIE_NAME = 'ktz_admin_token';
 const BUYER_COOKIE = 'ktz_buyer_token';
 const TOKEN_EXPIRY = '8h';
@@ -15,12 +22,12 @@ export async function signAdminToken(): Promise<string> {
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
     .setExpirationTime(TOKEN_EXPIRY)
-    .sign(JWT_SECRET);
+    .sign(getJwtSecret());
 }
 
 export async function verifyAdminToken(token: string): Promise<boolean> {
   try {
-    await jwtVerify(token, JWT_SECRET);
+    await jwtVerify(token, getJwtSecret());
     return true;
   } catch {
     return false;
@@ -63,12 +70,12 @@ export async function signBuyerToken(buyerId: string): Promise<string> {
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
     .setExpirationTime(TOKEN_EXPIRY)
-    .sign(JWT_SECRET);
+    .sign(getJwtSecret());
 }
 
 export async function verifyBuyerToken(token: string): Promise<{ sub: string } | null> {
   try {
-    const { payload } = await jwtVerify(token, JWT_SECRET);
+    const { payload } = await jwtVerify(token, getJwtSecret());
     if (payload.role !== 'buyer' || !payload.sub) return null;
     return { sub: payload.sub as string };
   } catch {
@@ -97,7 +104,7 @@ export async function signSupplierToken(supplierId: string): Promise<string> {
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
     .setExpirationTime(TOKEN_EXPIRY)
-    .sign(JWT_SECRET);
+    .sign(getJwtSecret());
 }
 
 export async function getSupplierToken(): Promise<string | undefined> {
@@ -109,7 +116,7 @@ export async function getAuthenticatedSupplierId(): Promise<string | null> {
   const token = await getSupplierToken();
   if (!token) return null;
   try {
-    const { payload } = await jwtVerify(token, JWT_SECRET);
+    const { payload } = await jwtVerify(token, getJwtSecret());
     return (payload.supplierId as string) ?? null;
   } catch {
     return null;
