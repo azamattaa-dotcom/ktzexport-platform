@@ -1,5 +1,7 @@
-import { kv } from '@vercel/kv';
+import { eq } from 'drizzle-orm';
 import { v4 as uuidv4 } from 'uuid';
+import { drizzleDb } from './drizzle';
+import * as schema from './schema';
 
 export interface BuyerDocument {
   url?: string;
@@ -95,142 +97,199 @@ export interface Supplier {
   updatedAt: string;
 }
 
-const KV_KEY = 'suppliers';
-const BUYERS_KEY = 'buyers';
+type SupplierRow = typeof schema.suppliers.$inferSelect;
+type BuyerRow = typeof schema.buyers.$inferSelect;
 
-async function readSuppliers(): Promise<Supplier[]> {
-  return (await kv.get<Supplier[]>(KV_KEY)) ?? [];
+// Callers clear a field by setting it to `undefined` (matches the old KV/JSON
+// behavior, where an explicit `undefined` drops the key on serialize). Drizzle's
+// `.set()` treats `undefined` as "leave this column alone", so a key that's
+// explicitly present with value `undefined` must become `null` to actually clear
+// the column — keys that are simply absent from `patch` stay untouched either way.
+function patchToSetValues<T extends Record<string, unknown>>(patch: Partial<T>): Record<string, unknown> {
+  const setValues: Record<string, unknown> = {};
+  for (const key of Object.keys(patch)) {
+    const value = patch[key];
+    setValues[key] = value === undefined ? null : value;
+  }
+  return setValues;
 }
 
-async function writeSuppliers(suppliers: Supplier[]): Promise<void> {
-  await kv.set(KV_KEY, suppliers);
+function toSupplier(row: SupplierRow): Supplier {
+  return {
+    id: row.id,
+    companyName: row.companyName,
+    country: row.country,
+    contactName: row.contactName,
+    email: row.email,
+    phone: row.phone,
+    products: row.products,
+    annualVolume: row.annualVolume,
+    description: row.description,
+    elevatorName: row.elevatorName,
+    loadingStation: row.loadingStation ?? undefined,
+    letterheadUrl: row.letterheadUrl ?? undefined,
+    letterheadFileName: row.letterheadFileName ?? undefined,
+    letterheadBase64: row.letterheadBase64 ?? undefined,
+    productPrices: row.productPrices ?? undefined,
+    productDetails: row.productDetails ?? undefined,
+    status: row.status as Supplier['status'],
+    published: row.published,
+    inviteToken: row.inviteToken ?? undefined,
+    passwordHash: row.passwordHash ?? undefined,
+    createdAt: row.createdAt.toISOString(),
+    updatedAt: row.updatedAt.toISOString(),
+  };
+}
+
+function toBuyer(row: BuyerRow): Buyer {
+  return {
+    id: row.id,
+    companyName: row.companyName,
+    country: row.country,
+    registrationNumber: row.registrationNumber,
+    legalAddress: row.legalAddress,
+    postalAddress: row.postalAddress,
+    signatoryName: row.signatoryName,
+    signatoryType: row.signatoryType,
+    signatoryCustomType: row.signatoryCustomType ?? undefined,
+    contactName: row.contactName,
+    email: row.email,
+    phone: row.phone,
+    website: row.website ?? undefined,
+    description: row.description ?? undefined,
+    bankName: row.bankName,
+    swift: row.swift,
+    bankAccount: row.bankAccount,
+    bankCurrency: row.bankCurrency,
+    unloadingRegion: row.unloadingRegion,
+    charterDoc: row.charterDoc ?? undefined,
+    registrationDoc: row.registrationDoc ?? undefined,
+    passportDoc: row.passportDoc ?? undefined,
+    passwordHash: row.passwordHash ?? undefined,
+    inviteToken: row.inviteToken ?? undefined,
+    status: row.status as Buyer['status'],
+    rejectionReason: row.rejectionReason ?? undefined,
+    adminNotes: row.adminNotes ?? undefined,
+    createdAt: row.createdAt.toISOString(),
+    updatedAt: row.updatedAt.toISOString(),
+  };
 }
 
 export const db = {
   suppliers: {
     async findAll(): Promise<Supplier[]> {
-      return readSuppliers();
+      const rows = await drizzleDb.select().from(schema.suppliers);
+      return rows.map(toSupplier);
     },
 
     async findByStatus(status: Supplier['status']): Promise<Supplier[]> {
-      return (await readSuppliers()).filter((s) => s.status === status);
+      const rows = await drizzleDb.select().from(schema.suppliers).where(eq(schema.suppliers.status, status));
+      return rows.map(toSupplier);
     },
 
     async findById(id: string): Promise<Supplier | undefined> {
-      return (await readSuppliers()).find((s) => s.id === id);
+      const rows = await drizzleDb.select().from(schema.suppliers).where(eq(schema.suppliers.id, id)).limit(1);
+      return rows[0] ? toSupplier(rows[0]) : undefined;
     },
 
     async findByEmail(email: string): Promise<Supplier | undefined> {
-      return (await readSuppliers()).find((s) => s.email === email);
+      const rows = await drizzleDb.select().from(schema.suppliers).where(eq(schema.suppliers.email, email)).limit(1);
+      return rows[0] ? toSupplier(rows[0]) : undefined;
     },
 
     async create(
       data: Omit<Supplier, 'id' | 'status' | 'published' | 'createdAt' | 'updatedAt' | 'inviteToken' | 'passwordHash'>,
       opts?: { status?: Supplier['status']; published?: boolean; passwordHash?: string }
     ): Promise<Supplier> {
-      const suppliers = await readSuppliers();
-      const now = new Date().toISOString();
-      const supplier: Supplier = {
+      const now = new Date();
+      const rows = await drizzleDb.insert(schema.suppliers).values({
         id: uuidv4(),
         ...data,
         status: opts?.status ?? 'pending',
         published: opts?.published ?? false,
+        passwordHash: opts?.passwordHash,
         createdAt: now,
         updatedAt: now,
-      };
-      if (opts?.passwordHash) supplier.passwordHash = opts.passwordHash;
-      suppliers.push(supplier);
-      await writeSuppliers(suppliers);
-      return supplier;
+      }).returning();
+      return toSupplier(rows[0]);
     },
 
     async updateStatus(id: string, status: Supplier['status'], inviteToken?: string): Promise<Supplier | null> {
-      const suppliers = await readSuppliers();
-      const idx = suppliers.findIndex((s) => s.id === id);
-      if (idx === -1) return null;
-      suppliers[idx].status = status;
-      suppliers[idx].updatedAt = new Date().toISOString();
-      if (inviteToken) suppliers[idx].inviteToken = inviteToken;
-      await writeSuppliers(suppliers);
-      return suppliers[idx];
+      const patch: Partial<SupplierRow> = { status, updatedAt: new Date() };
+      if (inviteToken) patch.inviteToken = inviteToken;
+      const rows = await drizzleDb.update(schema.suppliers).set(patch).where(eq(schema.suppliers.id, id)).returning();
+      return rows[0] ? toSupplier(rows[0]) : null;
     },
 
     async updateProductDetails(id: string, productDetails: Record<string, ProductDetail>): Promise<Supplier | null> {
-      const suppliers = await readSuppliers();
-      const idx = suppliers.findIndex((s) => s.id === id);
-      if (idx === -1) return null;
-      suppliers[idx].productDetails = productDetails;
-      suppliers[idx].updatedAt = new Date().toISOString();
-      await writeSuppliers(suppliers);
-      return suppliers[idx];
+      const rows = await drizzleDb.update(schema.suppliers)
+        .set({ productDetails, updatedAt: new Date() })
+        .where(eq(schema.suppliers.id, id)).returning();
+      return rows[0] ? toSupplier(rows[0]) : null;
     },
 
     async update(id: string, patch: Partial<Omit<Supplier, 'id' | 'createdAt'>>): Promise<Supplier | null> {
-      const suppliers = await readSuppliers();
-      const idx = suppliers.findIndex((s) => s.id === id);
-      if (idx === -1) return null;
-      suppliers[idx] = { ...suppliers[idx], ...patch, updatedAt: new Date().toISOString() };
-      await writeSuppliers(suppliers);
-      return suppliers[idx];
+      const rows = await drizzleDb.update(schema.suppliers)
+        .set({ ...patchToSetValues(patch), updatedAt: new Date() })
+        .where(eq(schema.suppliers.id, id)).returning();
+      return rows[0] ? toSupplier(rows[0]) : null;
     },
 
     async findByInviteToken(token: string): Promise<Supplier | undefined> {
-      return (await readSuppliers()).find((s) => s.inviteToken === token);
+      const rows = await drizzleDb.select().from(schema.suppliers).where(eq(schema.suppliers.inviteToken, token)).limit(1);
+      return rows[0] ? toSupplier(rows[0]) : undefined;
     },
 
     async setPassword(id: string, passwordHash: string): Promise<void> {
-      const suppliers = await readSuppliers();
-      const idx = suppliers.findIndex((s) => s.id === id);
-      if (idx === -1) return;
-      suppliers[idx].passwordHash = passwordHash;
-      suppliers[idx].inviteToken = undefined;
-      suppliers[idx].updatedAt = new Date().toISOString();
-      await writeSuppliers(suppliers);
+      await drizzleDb.update(schema.suppliers)
+        .set({ passwordHash, inviteToken: null, updatedAt: new Date() })
+        .where(eq(schema.suppliers.id, id));
     },
 
     async delete(id: string): Promise<boolean> {
-      const suppliers = await readSuppliers();
-      const idx = suppliers.findIndex((s) => s.id === id);
-      if (idx === -1) return false;
-      suppliers.splice(idx, 1);
-      await writeSuppliers(suppliers);
-      return true;
+      const rows = await drizzleDb.delete(schema.suppliers).where(eq(schema.suppliers.id, id)).returning({ id: schema.suppliers.id });
+      return rows.length > 0;
     },
   },
 
   buyers: {
     async findAll(): Promise<Buyer[]> {
-      return (await kv.get<Buyer[]>(BUYERS_KEY)) ?? [];
+      const rows = await drizzleDb.select().from(schema.buyers);
+      return rows.map(toBuyer);
     },
 
     async findById(id: string): Promise<Buyer | undefined> {
-      return (await db.buyers.findAll()).find((b) => b.id === id);
+      const rows = await drizzleDb.select().from(schema.buyers).where(eq(schema.buyers.id, id)).limit(1);
+      return rows[0] ? toBuyer(rows[0]) : undefined;
     },
 
     async findByEmail(email: string): Promise<Buyer | undefined> {
-      return (await db.buyers.findAll()).find((b) => b.email === email);
+      const rows = await drizzleDb.select().from(schema.buyers).where(eq(schema.buyers.email, email)).limit(1);
+      return rows[0] ? toBuyer(rows[0]) : undefined;
     },
 
     async findByInviteToken(token: string): Promise<Buyer | undefined> {
-      return (await db.buyers.findAll()).find((b) => b.inviteToken === token);
+      const rows = await drizzleDb.select().from(schema.buyers).where(eq(schema.buyers.inviteToken, token)).limit(1);
+      return rows[0] ? toBuyer(rows[0]) : undefined;
     },
 
     async create(data: Omit<Buyer, 'id' | 'status' | 'createdAt' | 'updatedAt' | 'inviteToken' | 'passwordHash'>): Promise<Buyer> {
-      const all = await db.buyers.findAll();
-      const now = new Date().toISOString();
-      const buyer: Buyer = { id: uuidv4(), ...data, status: 'pending', createdAt: now, updatedAt: now };
-      all.push(buyer);
-      await kv.set(BUYERS_KEY, all);
-      return buyer;
+      const now = new Date();
+      const rows = await drizzleDb.insert(schema.buyers).values({
+        id: uuidv4(),
+        ...data,
+        status: 'pending',
+        createdAt: now,
+        updatedAt: now,
+      }).returning();
+      return toBuyer(rows[0]);
     },
 
     async update(id: string, patch: Partial<Buyer>): Promise<Buyer | null> {
-      const all = await db.buyers.findAll();
-      const idx = all.findIndex((b) => b.id === id);
-      if (idx === -1) return null;
-      all[idx] = { ...all[idx], ...patch, updatedAt: new Date().toISOString() };
-      await kv.set(BUYERS_KEY, all);
-      return all[idx];
+      const rows = await drizzleDb.update(schema.buyers)
+        .set({ ...patchToSetValues(patch), updatedAt: new Date() })
+        .where(eq(schema.buyers.id, id)).returning();
+      return rows[0] ? toBuyer(rows[0]) : null;
     },
 
     async setPassword(id: string, passwordHash: string): Promise<void> {
@@ -238,12 +297,8 @@ export const db = {
     },
 
     async delete(id: string): Promise<boolean> {
-      const all = await db.buyers.findAll();
-      const idx = all.findIndex((b) => b.id === id);
-      if (idx === -1) return false;
-      all.splice(idx, 1);
-      await kv.set(BUYERS_KEY, all);
-      return true;
+      const rows = await drizzleDb.delete(schema.buyers).where(eq(schema.buyers.id, id)).returning({ id: schema.buyers.id });
+      return rows.length > 0;
     },
   },
 };

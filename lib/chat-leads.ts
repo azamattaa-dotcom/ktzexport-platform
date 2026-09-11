@@ -1,5 +1,7 @@
-import { kv } from '@vercel/kv';
+import { eq } from 'drizzle-orm';
 import { v4 as uuidv4 } from 'uuid';
+import { drizzleDb } from './drizzle';
+import * as schema from './schema';
 
 export interface LeadMessage {
   id: string;
@@ -20,24 +22,31 @@ export interface ChatLead {
   updatedAt: string;
 }
 
-const KV_KEY = 'chat_leads';
+type ChatLeadRow = typeof schema.chatLeads.$inferSelect;
 
-async function readAll(): Promise<ChatLead[]> {
-  return (await kv.get<ChatLead[]>(KV_KEY)) ?? [];
-}
-
-async function writeAll(leads: ChatLead[]): Promise<void> {
-  await kv.set(KV_KEY, leads);
+function toLead(row: ChatLeadRow): ChatLead {
+  return {
+    id: row.id,
+    status: row.status as ChatLead['status'],
+    intent: row.intent as ChatLead['intent'],
+    product: row.product ?? undefined,
+    volume: row.volume ?? undefined,
+    contact: row.contact,
+    messages: row.messages,
+    createdAt: row.createdAt.toISOString(),
+    updatedAt: row.updatedAt.toISOString(),
+  };
 }
 
 export const chatLeads = {
   async findAll(): Promise<ChatLead[]> {
-    const all = await readAll();
-    return all.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    const rows = await drizzleDb.select().from(schema.chatLeads);
+    return rows.map(toLead).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   },
 
   async findById(id: string): Promise<ChatLead | null> {
-    return (await readAll()).find((l) => l.id === id) ?? null;
+    const rows = await drizzleDb.select().from(schema.chatLeads).where(eq(schema.chatLeads.id, id)).limit(1);
+    return rows[0] ? toLead(rows[0]) : null;
   },
 
   async create(data: {
@@ -47,24 +56,24 @@ export const chatLeads = {
     volume?: string;
     contact: string;
   }): Promise<ChatLead> {
-    const all = await readAll();
-    const now = new Date().toISOString();
-    const lead: ChatLead = {
-      ...data,
+    const now = new Date();
+    const rows = await drizzleDb.insert(schema.chatLeads).values({
+      id: data.id,
+      intent: data.intent,
+      product: data.product,
+      volume: data.volume,
+      contact: data.contact,
       status: 'new',
       messages: [],
       createdAt: now,
       updatedAt: now,
-    };
-    all.push(lead);
-    await writeAll(all);
-    return lead;
+    }).returning();
+    return toLead(rows[0]);
   },
 
   async addMessage(id: string, from: 'visitor' | 'admin', content: string): Promise<ChatLead | null> {
-    const all = await readAll();
-    const idx = all.findIndex((l) => l.id === id);
-    if (idx === -1) return null;
+    const existing = (await drizzleDb.select().from(schema.chatLeads).where(eq(schema.chatLeads.id, id)).limit(1))[0];
+    if (!existing) return null;
 
     const msg: LeadMessage = {
       id: uuidv4(),
@@ -73,27 +82,23 @@ export const chatLeads = {
       timestamp: new Date().toISOString(),
     };
 
-    all[idx].messages.push(msg);
-    all[idx].updatedAt = new Date().toISOString();
-    if (from === 'admin' && all[idx].status === 'new') {
-      all[idx].status = 'active';
-    }
-
-    await writeAll(all);
-    return all[idx];
+    const rows = await drizzleDb.update(schema.chatLeads)
+      .set({
+        messages: [...existing.messages, msg],
+        updatedAt: new Date(),
+        status: from === 'admin' && existing.status === 'new' ? 'active' : existing.status,
+      })
+      .where(eq(schema.chatLeads.id, id)).returning();
+    return toLead(rows[0]);
   },
 
   async updateStatus(id: string, status: ChatLead['status']): Promise<void> {
-    const all = await readAll();
-    const idx = all.findIndex((l) => l.id === id);
-    if (idx === -1) return;
-    all[idx].status = status;
-    all[idx].updatedAt = new Date().toISOString();
-    await writeAll(all);
+    await drizzleDb.update(schema.chatLeads)
+      .set({ status, updatedAt: new Date() })
+      .where(eq(schema.chatLeads.id, id));
   },
 
   async delete(id: string): Promise<void> {
-    const all = await readAll();
-    await writeAll(all.filter((l) => l.id !== id));
+    await drizzleDb.delete(schema.chatLeads).where(eq(schema.chatLeads.id, id));
   },
 };
