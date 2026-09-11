@@ -1,4 +1,6 @@
-import { kv } from '@vercel/kv';
+import { eq } from 'drizzle-orm';
+import { drizzleDb } from './drizzle';
+import * as schema from './schema';
 
 export interface ChatMessage {
   id: string;
@@ -19,14 +21,18 @@ export interface ChatThread {
   lastAt: number;
 }
 
-const KV_KEY = 'chat_threads';
+type ChatThreadRow = typeof schema.chatThreads.$inferSelect;
 
-async function read(): Promise<ChatThread[]> {
-  return (await kv.get<ChatThread[]>(KV_KEY)) ?? [];
-}
-
-async function write(threads: ChatThread[]): Promise<void> {
-  await kv.set(KV_KEY, threads);
+function toThread(row: ChatThreadRow): ChatThread {
+  return {
+    id: row.id,
+    supplierId: row.supplierId,
+    productId: row.productId,
+    buyerEmail: row.buyerEmail,
+    buyerName: row.buyerName,
+    messages: row.messages,
+    lastAt: row.lastAt,
+  };
 }
 
 function threadId(supplierId: string, productId: string, buyerEmail: string): string {
@@ -36,20 +42,18 @@ function threadId(supplierId: string, productId: string, buyerEmail: string): st
 export const chatDb = {
   async getThread(supplierId: string, productId: string, buyerEmail: string): Promise<ChatThread | null> {
     const id = threadId(supplierId, productId, buyerEmail);
-    const threads = await read();
-    return threads.find((t) => t.id === id) ?? null;
+    const rows = await drizzleDb.select().from(schema.chatThreads).where(eq(schema.chatThreads.id, id)).limit(1);
+    return rows[0] ? toThread(rows[0]) : null;
   },
 
   async getThreadsForSupplier(supplierId: string): Promise<ChatThread[]> {
-    const threads = await read();
-    return threads
-      .filter((t) => t.supplierId === supplierId)
-      .sort((a, b) => b.lastAt - a.lastAt);
+    const rows = await drizzleDb.select().from(schema.chatThreads).where(eq(schema.chatThreads.supplierId, supplierId));
+    return rows.map(toThread).sort((a, b) => b.lastAt - a.lastAt);
   },
 
   async getAllThreads(): Promise<ChatThread[]> {
-    const threads = await read();
-    return threads.sort((a, b) => b.lastAt - a.lastAt);
+    const rows = await drizzleDb.select().from(schema.chatThreads);
+    return rows.map(toThread).sort((a, b) => b.lastAt - a.lastAt);
   },
 
   async addMessage(
@@ -60,10 +64,7 @@ export const chatDb = {
     fromType: 'buyer' | 'supplier',
     content: string
   ): Promise<ChatThread> {
-    const threads = await read();
     const id = threadId(supplierId, productId, buyerEmail);
-    let thread = threads.find((t) => t.id === id);
-
     const msg: ChatMessage = {
       id: Date.now().toString(36) + Math.random().toString(36).slice(2),
       fromType,
@@ -71,32 +72,36 @@ export const chatDb = {
       timestamp: Date.now(),
       status: 'pending',
     };
+    const now = Date.now();
 
-    if (!thread) {
-      thread = {
+    const existing = (await drizzleDb.select().from(schema.chatThreads).where(eq(schema.chatThreads.id, id)).limit(1))[0];
+
+    if (!existing) {
+      const rows = await drizzleDb.insert(schema.chatThreads).values({
         id,
         supplierId,
         productId,
         buyerEmail: buyerEmail.toLowerCase().trim(),
         buyerName: buyerName.trim(),
-        messages: [],
-        lastAt: 0,
-      };
-      threads.push(thread);
-    } else if (buyerName && thread.buyerName !== buyerName.trim()) {
-      thread.buyerName = buyerName.trim();
+        messages: [msg],
+        lastAt: now,
+      }).returning();
+      return toThread(rows[0]);
     }
 
-    thread.messages.push(msg);
-    thread.lastAt = Date.now();
-    await write(threads);
-    return thread;
+    const rows = await drizzleDb.update(schema.chatThreads)
+      .set({
+        messages: [...existing.messages, msg],
+        lastAt: now,
+        buyerName: buyerName && existing.buyerName !== buyerName.trim() ? buyerName.trim() : existing.buyerName,
+      })
+      .where(eq(schema.chatThreads.id, id)).returning();
+    return toThread(rows[0]);
   },
 
   async addAdminMessage(threadId: string, content: string): Promise<ChatThread | null> {
-    const threads = await read();
-    const thread = threads.find((t) => t.id === threadId);
-    if (!thread) return null;
+    const existing = (await drizzleDb.select().from(schema.chatThreads).where(eq(schema.chatThreads.id, threadId)).limit(1))[0];
+    if (!existing) return null;
 
     const msg: ChatMessage = {
       id: Date.now().toString(36) + Math.random().toString(36).slice(2),
@@ -106,10 +111,10 @@ export const chatDb = {
       status: 'approved',
     };
 
-    thread.messages.push(msg);
-    thread.lastAt = Date.now();
-    await write(threads);
-    return thread;
+    const rows = await drizzleDb.update(schema.chatThreads)
+      .set({ messages: [...existing.messages, msg], lastAt: Date.now() })
+      .where(eq(schema.chatThreads.id, threadId)).returning();
+    return toThread(rows[0]);
   },
 
   async reviewMessage(
@@ -118,20 +123,24 @@ export const chatDb = {
     action: 'approve' | 'reject',
     editedContent?: string
   ): Promise<ChatThread | null> {
-    const threads = await read();
-    const thread = threads.find((t) => t.id === threadId);
-    if (!thread) return null;
+    const existing = (await drizzleDb.select().from(schema.chatThreads).where(eq(schema.chatThreads.id, threadId)).limit(1))[0];
+    if (!existing) return null;
 
-    const msg = thread.messages.find((m) => m.id === messageId);
-    if (!msg) return null;
+    const messages = existing.messages.map((m) => {
+      if (m.id !== messageId) return m;
+      const updated = { ...m };
+      if (editedContent && editedContent.trim() !== m.content) {
+        updated.originalContent = m.content;
+        updated.content = editedContent.trim();
+      }
+      updated.status = action === 'approve' ? 'approved' : 'rejected';
+      return updated;
+    });
+    if (!messages.some((m) => m.id === messageId)) return null;
 
-    if (editedContent && editedContent.trim() !== msg.content) {
-      msg.originalContent = msg.content;
-      msg.content = editedContent.trim();
-    }
-    msg.status = action === 'approve' ? 'approved' : 'rejected';
-
-    await write(threads);
-    return thread;
+    const rows = await drizzleDb.update(schema.chatThreads)
+      .set({ messages })
+      .where(eq(schema.chatThreads.id, threadId)).returning();
+    return toThread(rows[0]);
   },
 };

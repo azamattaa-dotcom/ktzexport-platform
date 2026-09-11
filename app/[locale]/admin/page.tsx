@@ -81,6 +81,10 @@ export default function AdminDashboard() {
   const [migrating, setMigrating] = useState(false);
   const [migrationResult, setMigrationResult] = useState<{ suppliersMigrated?: number; productCertificatesMigrated?: number; buyersMigrated?: number; errors: string[] } | null>(null);
 
+  // One-off DB migration (see app/api/admin/migrate-db)
+  const [migratingDb, setMigratingDb] = useState(false);
+  const [dbMigrationResult, setDbMigrationResult] = useState<{ suppliers?: number; buyers?: number; chatThreads?: number; chatLeads?: number; logisticsRequests?: number; error?: string } | null>(null);
+
   // Chats state
   const [leads, setLeads] = useState<ChatLead[]>([]);
   const [loadingLeads, setLoadingLeads] = useState(false);
@@ -140,6 +144,19 @@ export default function AdminDashboard() {
     setMigrationResult(res.ok ? data : { errors: [data.error ?? 'Не удалось выполнить перенос'] });
   }
 
+  async function runDbMigration() {
+    if (!confirm(
+      'Перенести поставщиков, покупателей, чаты и заявки на логистику из KV в Postgres?\n\n' +
+      'Перед этим убедитесь, что вы скачали свежую резервную копию. Действие безопасно повторять.'
+    )) return;
+    setMigratingDb(true);
+    setDbMigrationResult(null);
+    const res = await fetch('/api/admin/migrate-db', { method: 'POST' });
+    const data = await res.json();
+    setMigratingDb(false);
+    setDbMigrationResult(res.ok ? data : { error: data.error ?? 'Не удалось выполнить перенос' });
+  }
+
   async function sendAdminReply(e: React.FormEvent) {
     e.preventDefault();
     if (!selectedLead || !adminReply.trim()) return;
@@ -188,6 +205,10 @@ export default function AdminDashboard() {
             className="text-sm text-gray-500 hover:text-primary-700 disabled:opacity-50 transition-colors">
             {migrating ? 'Переносим файлы...' : '📦 Перенести файлы в Blob'}
           </button>
+          <button onClick={runDbMigration} disabled={migratingDb}
+            className="text-sm text-gray-500 hover:text-primary-700 disabled:opacity-50 transition-colors">
+            {migratingDb ? 'Переносим базу...' : '🗄 Перенести базу в Postgres'}
+          </button>
           <button onClick={handleLogout} className="text-sm text-gray-500 hover:text-red-600 transition-colors">
             {t('logout')} →
           </button>
@@ -209,6 +230,21 @@ export default function AdminDashboard() {
                 {migrationResult.errors.map((err, i) => <li key={i}>{err}</li>)}
               </ul>
             )}
+          </div>
+        </div>
+      )}
+
+      {dbMigrationResult && (
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-4">
+          <div className={`rounded-xl border px-4 py-3 text-sm ${dbMigrationResult.error ? 'bg-orange-50 border-orange-200 text-orange-800' : 'bg-green-50 border-green-200 text-green-800'}`}>
+            <div className="flex items-center justify-between gap-3">
+              <p>
+                {dbMigrationResult.error
+                  ? dbMigrationResult.error
+                  : `Готово: поставщиков — ${dbMigrationResult.suppliers ?? 0}, покупателей — ${dbMigrationResult.buyers ?? 0}, чатов — ${dbMigrationResult.chatThreads ?? 0}, лидов — ${dbMigrationResult.chatLeads ?? 0}, заявок на логистику — ${dbMigrationResult.logisticsRequests ?? 0}.`}
+              </p>
+              <button onClick={() => setDbMigrationResult(null)} className="text-xs opacity-60 hover:opacity-100 shrink-0">✕</button>
+            </div>
           </div>
         </div>
       )}
